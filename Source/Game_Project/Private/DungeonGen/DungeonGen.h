@@ -5,6 +5,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "DungeonTheme.h"
+#include "DungeonData.h"
+#include "DungeonRoom.h"
+#include "DungeonBuilder.h"
+#include "DungeonGridUtils.h"
+#include "DungeonGenUtils.h"
 #include "DungeonGen.generated.h"
 
 UCLASS()
@@ -57,5 +62,11 @@ private:
 	bool m_AllowOverlapingRooms = false;
 
 	UPROPERTY(EditAnywhere, Category = "Dungeon Assets", meta = (DisplayName = "Dungeon Assets"))
-	UDungeonTheme* m_DungeonTheme;
+	UDungeonTheme* m_DungeonTheme; 
+	FDungeonData m_Data;
+	UDungeonBuilder* m_Builder;
+
+	void GenerateRooms();
+	void GenerateCorridors();
+	void GenerateDungeon();
 };

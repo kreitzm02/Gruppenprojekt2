@@ -20,4 +20,9 @@ struct FDungeonData
 	TArray<TPair<FInt32Vector2, FInt32Vector2>> m_DungeonMST;
 	TMap<FInt32Vector2, TArray<FInt32Vector2>> m_DungeonAdjacencyList;
 	TArray<TArray<ECellType>> m_DungeonGrid;
+
+	FDungeonData() {}
+	FDungeonData(int a_RoomAmount, int a_GridLength, int a_GridWidth);
+	void GetStartAndEndRoom(const TPair<FInt32Vector2, FInt32Vector2>& a_Positions);
+	void GetDeadEndRooms();
 };

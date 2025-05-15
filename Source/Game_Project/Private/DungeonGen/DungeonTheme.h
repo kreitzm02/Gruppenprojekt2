@@ -17,6 +17,9 @@ public:
 	
 	UPROPERTY(EditAnywhere, Category = "Meshes", meta = (DisplayName = "Wall Meshes"))
 	TArray <FDungeonMeshEntry> m_WallMeshes;
+
+	UPROPERTY(EditAnywhere, Category = "Meshes", meta = (DisplayName = "Void Mesh"))
+	UStaticMesh* m_VoidMesh;
 	
 	UPROPERTY(EditAnywhere, Category = "Meshes", meta= (DisplayName = "Wall Corner Mesh"))
 	UStaticMesh* m_WallCornerMesh;

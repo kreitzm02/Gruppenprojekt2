@@ -82,7 +82,7 @@ FInt32Vector2 UDungeonGenUtils::BFSFindFarthestNode(const FInt32Vector2& a_Start
 
 // This method creates a mst based on kruskal algo.
 // Checks each connection and adds it to the mst if  it connects two different groups, and then will merge them
-TArray<TPair<FInt32Vector2, FInt32Vector2>> UDungeonGenUtils::CreateMST(const TArray<FInt32Vector2>& a_RoomCenters, const TArray<TPair<FInt32Vector2, FInt32Vector2>>& a_Connections)
+TArray<TPair<FInt32Vector2, FInt32Vector2>> UDungeonGenUtils::CreateMST(const TArray<FInt32Vector2>& a_RoomCenters, const TArray<TPair<TPair<FInt32Vector2, FInt32Vector2>, float>>& a_Connections)
 {
 	// Minimum Spanning Tree (MST) --> Kruskal Algorithm
 	TArray<TPair<FInt32Vector2, FInt32Vector2>> mst = {};
@@ -91,7 +91,7 @@ TArray<TPair<FInt32Vector2, FInt32Vector2>> UDungeonGenUtils::CreateMST(const TA
 
 	for (int i = 0; i < a_RoomCenters.Num(); i++)
 	{
-		roomGroups[a_RoomCenters[i]] = groupCounter++;
+		roomGroups.Add(a_RoomCenters[i], groupCounter++);
 	}
 
 	TArray<FInt32Vector2> keys;
@@ -99,8 +99,13 @@ TArray<TPair<FInt32Vector2, FInt32Vector2>> UDungeonGenUtils::CreateMST(const TA
 
 	for (int i = 0; i < a_Connections.Num(); i++)
 	{
-		FInt32Vector2 roomA = a_Connections[i].Key;
-		FInt32Vector2 roomB = a_Connections[i].Value;
+		FInt32Vector2 roomA = a_Connections[i].Key.Key; // todo check if this works!!
+		FInt32Vector2 roomB = a_Connections[i].Key.Value;
+
+		if (!roomGroups.Contains(roomA) || !roomGroups.Contains(roomB))
+		{
+			continue;
+		}
 
 		if (roomGroups[roomA] != roomGroups[roomB])
 		{
