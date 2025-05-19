@@ -38,8 +38,8 @@ void ADungeonGen::GenerateRooms()
 {
 	for (int i = 0; i < m_MaxRoomAmount; i++)
 	{
-		FInt32Vector2 newRoomSize = UDungeonGenUtils::GetRandomRoomSize(m_MinRoomSize, m_MaxRoomSize);
-		FInt32Vector2 newRoomOrigin = UDungeonGenUtils::GetRandomRoomOrigin(newRoomSize.X, newRoomSize.Y, m_GridLength, m_GridWidth);
+		FInt32Vector2 newRoomSize = UDungeonGenUtils::GetRandomRoomSize(m_MinRoomSize, m_MaxRoomSize, m_DungeonRng);
+		FInt32Vector2 newRoomOrigin = UDungeonGenUtils::GetRandomRoomOrigin(newRoomSize.X, newRoomSize.Y, m_GridLength, m_GridWidth, m_DungeonRng);
 		FDungeonRoom newRoom = { newRoomOrigin, newRoomSize.X, newRoomSize.Y };
 		bool overlapsWithRoom = false;
 
@@ -108,14 +108,18 @@ void ADungeonGen::GenerateCorridors()
 
 void ADungeonGen::GenerateDungeon()
 {
+	m_DungeonRng.Initialize(m_Seed);
 	m_Data = { m_MaxRoomAmount, m_GridLength, m_GridWidth };
 	GenerateRooms();
 	GenerateCorridors();
+
+	// todo : makes unreal crash every time
 	// m_Data.m_DungeonAdjacencyList = UDungeonGenUtils::BuildAdjacencyList(m_Data.m_AllRoomCenters, m_Data.m_DungeonMST);
 	// m_Data.GetStartAndEndRoom(UDungeonGenUtils::DetermineDungeonDiameter(m_Data.m_AllRoomCenters, m_Data.m_DungeonAdjacencyList));
 	// m_Data.GetDeadEndRooms();
 	m_Builder = NewObject<UDungeonBuilder>(this);
-	m_Builder->Init(m_UnitSize, m_DungeonTheme, &m_Data, GetWorld());
+	m_Builder->Init(m_UnitSize, m_DungeonTheme, &m_Data, GetWorld(), m_WallOffset);
 	m_Builder->BuildFloor();
+	m_Builder->BuildWall();
 }
 

@@ -20,8 +20,16 @@ class UDungeonBuilder : public UObject
 	UDungeonTheme* m_DungeonTheme;
 	FDungeonData* m_Data;
 	UWorld* m_WorldContext;
+	float m_WallOffset;
 
 public:
-	void Init(float a_UnitSize, UDungeonTheme* a_Theme, FDungeonData* a_Data, UWorld* a_World);
+	void Init(float a_UnitSize, UDungeonTheme* a_Theme, FDungeonData* a_Data, UWorld* a_World, float a_WallOffset);
 	void BuildFloor();
+	void BuildWall();
+
+
+private:
+	void TryPlaceWall(int32 a_GridX, int32 a_GridY, FVector a_Position, FRotator a_Rotation, int32 a_WallIndex);
+	void TryPlaceCornerWall(int32 a_GridX, int32 a_GridY, FVector a_Position, FRotator a_Rotation);
+	bool IsWithinBounds(int32 a_GridX, int32 a_GridY);
 };

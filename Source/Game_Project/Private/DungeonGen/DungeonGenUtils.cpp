@@ -3,14 +3,14 @@
 
 #include "DungeonGen/DungeonGenUtils.h"
 
-FInt32Vector2 UDungeonGenUtils::GetRandomRoomSize(int32 a_Min, int32 a_Max)
+FInt32Vector2 UDungeonGenUtils::GetRandomRoomSize(int32 a_Min, int32 a_Max, FRandomStream& a_Stream)
 {
-	return FInt32Vector2(FMath::RandRange(a_Min, a_Max) ,FMath::RandRange(a_Min, a_Max));
+	return FInt32Vector2(a_Stream.RandRange(a_Min, a_Max) , a_Stream.RandRange(a_Min, a_Max));
 }
 
-FInt32Vector2 UDungeonGenUtils::GetRandomRoomOrigin(int32 a_RoomLengthX, int32 a_RoomWidthY, int32 a_GridLengthX, int32 a_GridWidthY)
+FInt32Vector2 UDungeonGenUtils::GetRandomRoomOrigin(int32 a_RoomLengthX, int32 a_RoomWidthY, int32 a_GridLengthX, int32 a_GridWidthY, FRandomStream& a_Stream)
 {
-	return FInt32Vector2(FMath::RandRange(1, a_GridLengthX - a_RoomLengthX - 1), FMath::RandRange(1, a_GridWidthY - a_RoomWidthY - 1));
+	return FInt32Vector2(a_Stream.RandRange(1, a_GridLengthX - a_RoomLengthX - 1), a_Stream.RandRange(1, a_GridWidthY - a_RoomWidthY - 1));
 }
 
 // this will create a dictionary which will get each room their corresponding neighbour rooms ( room centers are used for this )

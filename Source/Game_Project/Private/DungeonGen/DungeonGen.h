@@ -45,6 +45,9 @@ private:
 		ClampMin = "100.0", ClampMax = "1600.0", UIMin = "100.0", UIMax = "1600.0"))
 	float m_UnitSize = 400.0f;
 
+	UPROPERTY(EditAnywhere, Category = "General Settings", meta = (DisplayName = "Generation Seed"))
+	int m_Seed = -1;
+
 	UPROPERTY(EditAnywhere, Category = "Room Settings", meta = (DisplayName = "Room Size (min)", 
 		ClampMin = "2", ClampMax = "20", UIMin = "2", UIMax = "20"))
 	int m_MinRoomSize = 2;
@@ -63,8 +66,12 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Dungeon Assets", meta = (DisplayName = "Dungeon Assets"))
 	UDungeonTheme* m_DungeonTheme; 
+
+	UPROPERTY(EditAnywhere, Category = "Dungeon Assets", meta = (DisplayName = "Wall Offset"))
+	float m_WallOffset;
 	FDungeonData m_Data;
 	UDungeonBuilder* m_Builder;
+	FRandomStream m_DungeonRng;
 
 	void GenerateRooms();
 	void GenerateCorridors();
