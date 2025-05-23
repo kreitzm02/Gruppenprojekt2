@@ -8,7 +8,7 @@
 UENUM()
 enum class ERoomType : uint8
 {
-	EMPTY, DECORATION, LOOT, START, END, BOSS
+	EMPTY, VARIANT_A, VARIANT_B, VARIANT_C, BOSS, REWARD, ENTRANCE, EXIT,
 };
 
 USTRUCT()
@@ -28,4 +28,5 @@ struct FDungeonRoom
 	FInt32Vector2 GetRoomCenter() const;
 	bool OverlapsWith(const FDungeonRoom& a_Other) const;
 	void SetRoomType(const ERoomType& a_RoomType);
+	void SetRoomType();
 };

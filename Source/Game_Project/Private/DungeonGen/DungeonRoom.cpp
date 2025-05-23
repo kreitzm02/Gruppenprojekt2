@@ -20,3 +20,15 @@ void FDungeonRoom::SetRoomType(const ERoomType& a_RoomType)
 	m_RoomType = a_RoomType;
 }
 
+void FDungeonRoom::SetRoomType()
+{
+	if (m_RoomCellWidth > 6 && m_RoomCellLength > 6)
+	{
+		m_RoomType = (ERoomType)FMath::RandRange(0, 3);
+	}
+	else
+	{
+		m_RoomType = ERoomType::EMPTY;
+	}
+}
+

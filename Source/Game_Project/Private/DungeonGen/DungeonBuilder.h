@@ -29,7 +29,6 @@ public:
 
 
 private:
-	void TryPlaceWall(int32 a_GridX, int32 a_GridY, FVector a_Position, FRotator a_Rotation, int32 a_WallIndex);
-	void TryPlaceCornerWall(int32 a_GridX, int32 a_GridY, FVector a_Position, FRotator a_Rotation);
-	bool IsWithinBounds(int32 a_GridX, int32 a_GridY);
+	void TryPlaceWall(int32 a_GridX, int32 a_GridY, const FVector& a_Position, const FRotator& a_Rotation, int32 a_WallIndex) const;
+	bool IsWithinBounds(int32 a_GridX, int32 a_GridY) const;
 };

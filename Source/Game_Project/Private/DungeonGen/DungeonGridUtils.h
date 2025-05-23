@@ -9,7 +9,7 @@
 UENUM()
 enum class ECellType : uint8
 {
-	EMPTY, FLOOR, WALL, WALLCORNER, WALLDEC, FLOORCORRIDOR, FLOORWITHDOOR
+	EMPTY, FLOOR, WALL, WALLCORNER, WALLDEC, FLOORCORRIDOR, FLOORWITHDOOR, EMPTYFORCED
 };
 
 UCLASS()
@@ -20,4 +20,5 @@ class UDungeonGridUtils : public UObject
 public:
 	static TArray<FInt32Vector2> CollectAffectedCells(const FInt32Vector2& a_Origin, const FInt32Vector2& a_Size);
 	static void ChangeCellsInGrid(const TArray<FInt32Vector2>& a_Cells, const ECellType& a_CellType, TArray<TArray<ECellType>>& a_GridToChange);
+	static void ChangeCellsInGridForced(const TArray<FInt32Vector2>& a_Cells, const ECellType& a_CellType, TArray<TArray<ECellType>>& a_GridToChange);
 };

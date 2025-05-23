@@ -24,3 +24,11 @@ void UDungeonGridUtils::ChangeCellsInGrid(const TArray<FInt32Vector2>& a_Cells, 
 		a_GridToChange[a_Cells[i].X][a_Cells[i].Y] = a_CellType;
 	}
 }
+
+void UDungeonGridUtils::ChangeCellsInGridForced(const TArray<FInt32Vector2>& a_Cells, const ECellType& a_CellType, TArray<TArray<ECellType>>& a_GridToChange)
+{
+	for (int i = 0; i < a_Cells.Num(); i++)
+	{
+		a_GridToChange[a_Cells[i].X][a_Cells[i].Y] = a_CellType;
+	}
+}

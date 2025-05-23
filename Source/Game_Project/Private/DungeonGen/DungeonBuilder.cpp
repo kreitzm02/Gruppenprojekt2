@@ -103,7 +103,7 @@ void UDungeonBuilder::BuildWall()
 	}
 }
 
-void UDungeonBuilder::TryPlaceWall(int32 a_GridX, int32 a_GridY, FVector a_Position, FRotator a_Rotation, int32 a_WallIndex)
+void UDungeonBuilder::TryPlaceWall(int32 a_GridX, int32 a_GridY, const FVector& a_Position, const FRotator& a_Rotation, int32 a_WallIndex) const
 {
 	if (!IsWithinBounds(a_GridX, a_GridY)) return;
 	if (m_Data->m_DungeonGrid[a_GridX][a_GridY] == ECellType::FLOOR) return;
@@ -116,20 +116,7 @@ void UDungeonBuilder::TryPlaceWall(int32 a_GridX, int32 a_GridY, FVector a_Posit
 	}
 }
 
-void UDungeonBuilder::TryPlaceCornerWall(int32 a_GridX, int32 a_GridY, FVector a_Position, FRotator a_Rotation)
-{
-	if (!IsWithinBounds(a_GridX, a_GridY)) return;
-	if (m_Data->m_DungeonGrid[a_GridX][a_GridY] == ECellType::FLOOR) return;
-	m_Data->m_DungeonGrid[a_GridX][a_GridY] = ECellType::WALLCORNER;
-	AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), a_Position, a_Rotation); // testing!
-	if (meshActor)
-	{
-		meshActor->GetStaticMeshComponent()->SetStaticMesh(m_DungeonTheme->m_WallCornerMesh);
-		meshActor->SetMobility(EComponentMobility::Static);
-	}
-}
-
-bool UDungeonBuilder::IsWithinBounds(int32 a_GridX, int32 a_GridY)
+bool UDungeonBuilder::IsWithinBounds(int32 a_GridX, int32 a_GridY) const
 {
 	return a_GridX >= 0 && a_GridY >= 0 && a_GridX < m_Data->m_DungeonGrid.Num() && a_GridY < m_Data->m_DungeonGrid[0].Num();
 }

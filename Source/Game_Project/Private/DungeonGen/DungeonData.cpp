@@ -22,13 +22,17 @@ void FDungeonData::GetStartAndEndRoom(const TPair<FInt32Vector2, FInt32Vector2>&
 	{
 		if (m_AllRooms[i].GetRoomCenter() == a_Positions.Key)
 		{
-			m_AllRooms[i].SetRoomType(ERoomType::START);
+			m_AllRooms[i].SetRoomType(ERoomType::ENTRANCE);
 			m_StartRoom = m_AllRooms[i];
+			UE_LOG(LogTemp, Log, TEXT("Start Room: %d, %d"),
+				m_StartRoom.GetRoomCenter().X, m_StartRoom.GetRoomCenter().Y);
 		}
 		else if (m_AllRooms[i].GetRoomCenter() == a_Positions.Value)
 		{
-			m_AllRooms[i].SetRoomType(ERoomType::END);
+			m_AllRooms[i].SetRoomType(ERoomType::EXIT);
 			m_EndRoom = m_AllRooms[i];
+			UE_LOG(LogTemp, Log, TEXT("End Room: %d, %d"),
+				m_EndRoom.GetRoomCenter().X, m_StartRoom.GetRoomCenter().Y);
 		}
 	}
 }
@@ -39,8 +43,9 @@ void FDungeonData::GetDeadEndRooms()
 	{
 		if (m_DungeonAdjacencyList[m_AllRooms[i].GetRoomCenter()].Num() == 1)
 		{
-			if (m_AllRooms[i].m_RoomType == ERoomType::END || m_AllRooms[i].m_RoomType == ERoomType::START) continue;
+			if (m_AllRooms[i].m_RoomType == ERoomType::EXIT || m_AllRooms[i].m_RoomType == ERoomType::ENTRANCE) continue;
 			m_DeadEndRooms.Add(m_AllRooms[i]);
+			m_AllRooms[i].m_RoomType = ERoomType::REWARD;
 		}
 	}
 }

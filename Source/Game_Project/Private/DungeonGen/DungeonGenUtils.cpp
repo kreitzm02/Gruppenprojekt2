@@ -19,9 +19,10 @@ TMap<FInt32Vector2, TArray<FInt32Vector2>> UDungeonGenUtils::BuildAdjacencyList(
 	TMap<FInt32Vector2, TArray<FInt32Vector2>> adjacencyList = {};
 	for (int i = 0; i < a_RoomCenters.Num(); i++)
 	{
-		adjacencyList[a_RoomCenters[i]] = TArray<FInt32Vector2>();
+		adjacencyList.Add(a_RoomCenters[i], TArray<FInt32Vector2>());
+		//adjacencyList[a_RoomCenters[i]] = TArray<FInt32Vector2>();
 	}
-
+	
 	for (int i = 0; i < a_MST.Num(); i++)
 	{
 		adjacencyList[a_MST[i].Key].Add(a_MST[i].Value);
@@ -47,7 +48,8 @@ FInt32Vector2 UDungeonGenUtils::BFSFindFarthestNode(const FInt32Vector2& a_Start
 
 	for (int i = 0; i < a_RoomCenters.Num(); i++)
 	{
-		distances[a_RoomCenters[i]] = -1;
+		distances.Add(a_RoomCenters[i], -1);
+		//distances[a_RoomCenters[i]] = -1;
 	}
 
 	distances[a_Start] = 0;
@@ -122,4 +124,100 @@ TArray<TPair<FInt32Vector2, FInt32Vector2>> UDungeonGenUtils::CreateMST(const TA
 	}
 
 	return mst;
+}
+
+TArray<FInt32Vector2> UDungeonGenUtils::GetCellsToModifyFromVariant(const FDungeonRoom& a_Room)
+{
+	if (a_Room.m_RoomType == ERoomType::VARIANT_A)
+	{
+		//TArray<FInt32Vector2> cells;
+		//int offsetX = 2, offsetY = 2;
+		//int startX = a_Room.m_RoomOrigin.X, startY = a_Room.m_RoomOrigin.Y;
+		//int endX = startX + a_Room.m_RoomCellLength - 1, endY = startY + a_Room.m_RoomCellWidth - 1;
+		//
+		//cells.Add(FInt32Vector2(startX + offsetX, startY + offsetY));
+		//cells.Add(FInt32Vector2(endX - offsetX, startY + offsetY));
+		//cells.Add(FInt32Vector2(startX + offsetX, endY - offsetY));
+		//cells.Add(FInt32Vector2(endX - offsetX, endY - offsetY));
+
+		TArray<FInt32Vector2> cells;
+		int offset = 2;
+		int startX = a_Room.m_RoomOrigin.X, startY = a_Room.m_RoomOrigin.Y;
+		int length = a_Room.m_RoomCellLength, width = a_Room.m_RoomCellWidth;
+
+		bool horizontal = FMath::RandBool();
+		FInt32Vector2 center = a_Room.GetRoomCenter();
+
+		if (horizontal)
+		{
+			int y1 = startY + offset;
+			if (y1 == center.Y) y1 += 1;
+			for (int x = startX; x < startX + length - offset; ++x)
+				cells.Add(FInt32Vector2(x, y1));
+			int y2 = startY + width - offset - 1;
+			if (y2 == center.Y) y2 += 1;
+			for (int x = startX + offset; x < startX + length; ++x)
+				cells.Add(FInt32Vector2(x, y2));
+		}
+		else
+		{
+			int x1 = startX + offset;
+			if (x1 == center.X) x1 += 1;
+			for (int y = startY; y < startY + width - offset; ++y)
+				cells.Add(FInt32Vector2(x1, y));
+			int x2 = startX + length - offset - 1;
+			if (x2 == center.X) x2 += 1;
+			for (int y = startY + offset; y < startY + width; ++y)
+				cells.Add(FInt32Vector2(x2, y));
+		}
+	
+		return cells;
+	}
+	else if (a_Room.m_RoomType == ERoomType::VARIANT_B)
+	{
+		TArray<FInt32Vector2> cells;
+		int offsetX = 2, offsetY = 2;
+		int startX = a_Room.m_RoomOrigin.X, startY = a_Room.m_RoomOrigin.Y;
+		int endX = startX + a_Room.m_RoomCellLength - 1, endY = startY + a_Room.m_RoomCellWidth - 1;
+
+		for (int x = 0; x < 2; x++)
+		{
+			for (int y = 0; y < 2; y++)
+			{
+				cells.Add(FInt32Vector2(startX + offsetX + x, startY + offsetY + y));
+				cells.Add(FInt32Vector2(endX - offsetX + x - 1, startY + offsetY + y));
+				cells.Add(FInt32Vector2(startX + offsetX + x, endY - offsetY + y - 1));
+				cells.Add(FInt32Vector2(endX - offsetX + x - 1, endY - offsetY + y - 1));
+			}
+		}
+
+		return cells;
+	}
+	else if (a_Room.m_RoomType == ERoomType::VARIANT_C)
+	{
+		TArray<FInt32Vector2> cells;
+		int offset = 2;
+		int startX = a_Room.m_RoomOrigin.X, startY = a_Room.m_RoomOrigin.Y;
+		int length = a_Room.m_RoomCellLength, width = a_Room.m_RoomCellWidth;
+
+		if (length > width)
+		{
+			int midY = startY + width / 2;
+			for (int x = startX + offset; x < startX + length - offset; x++)
+			{
+				cells.Add(FInt32Vector2(x, midY));
+			}
+		}
+		else
+		{
+			int midX = startX + length / 2;
+			for (int y = startY + offset; y < startY + length - offset; y++)
+			{
+				cells.Add(FInt32Vector2(midX, y));
+			}
+		}
+
+		return cells;
+	}
+	else return TArray<FInt32Vector2>();
 }

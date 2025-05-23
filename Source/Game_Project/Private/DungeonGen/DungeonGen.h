@@ -70,6 +70,8 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Dungeon Assets", meta = (DisplayName = "Wall Offset"))
 	float m_WallOffset;
 	FDungeonData m_Data;
+
+	UPROPERTY()
 	UDungeonBuilder* m_Builder;
 	FRandomStream m_DungeonRng;
 

@@ -51,11 +51,17 @@ void ADungeonGen::GenerateRooms()
 
 		if (overlapsWithRoom && !m_AllowOverlapingRooms) continue;
 
-		newRoom.SetRoomType(ERoomType::EMPTY);
+		newRoom.SetRoomType();
 		m_Data.m_AllRooms.Add(newRoom);
 		m_Data.m_AllRoomCenters.Add(newRoom.GetRoomCenter());
 		TArray<FInt32Vector2> affectedCells = UDungeonGridUtils::CollectAffectedCells(newRoomOrigin, newRoomSize);
 		UDungeonGridUtils::ChangeCellsInGrid(affectedCells, ECellType::FLOOR, m_Data.m_DungeonGrid);
+		//if (newRoom.m_RoomType < (ERoomType)4 && newRoom.m_RoomType != (ERoomType)0)
+		//{
+		//	affectedCells.Empty();
+		//	affectedCells = UDungeonGenUtils::GetCellsToModifyFromVariant(newRoom);
+		//	UDungeonGridUtils::ChangeCellsInGridForced(affectedCells, ECellType::EMPTYFORCED, m_Data.m_DungeonGrid);
+		//}
 	}
 }
 
@@ -113,10 +119,22 @@ void ADungeonGen::GenerateDungeon()
 	GenerateRooms();
 	GenerateCorridors();
 
-	// todo : makes unreal crash every time
-	// m_Data.m_DungeonAdjacencyList = UDungeonGenUtils::BuildAdjacencyList(m_Data.m_AllRoomCenters, m_Data.m_DungeonMST);
-	// m_Data.GetStartAndEndRoom(UDungeonGenUtils::DetermineDungeonDiameter(m_Data.m_AllRoomCenters, m_Data.m_DungeonAdjacencyList));
-	// m_Data.GetDeadEndRooms();
+	m_Data.m_DungeonAdjacencyList = UDungeonGenUtils::BuildAdjacencyList(m_Data.m_AllRoomCenters, m_Data.m_DungeonMST);
+	m_Data.GetStartAndEndRoom(UDungeonGenUtils::DetermineDungeonDiameter(m_Data.m_AllRoomCenters, m_Data.m_DungeonAdjacencyList));
+	m_Data.GetDeadEndRooms();
+
+	//todo: remove this from here and make this a method instead
+	TArray<FInt32Vector2> affectedCells;
+	for (int i = 0; i < m_Data.m_AllRooms.Num(); i++)
+	{
+		if (m_Data.m_AllRooms[i].m_RoomType < (ERoomType)4 && m_Data.m_AllRooms[i].m_RoomType != (ERoomType)0)
+		{
+			affectedCells.Empty();
+			affectedCells = UDungeonGenUtils::GetCellsToModifyFromVariant(m_Data.m_AllRooms[i]);
+			UDungeonGridUtils::ChangeCellsInGridForced(affectedCells, ECellType::EMPTYFORCED, m_Data.m_DungeonGrid);
+		}
+	}
+
 	m_Builder = NewObject<UDungeonBuilder>(this);
 	m_Builder->Init(m_UnitSize, m_DungeonTheme, &m_Data, GetWorld(), m_WallOffset);
 	m_Builder->BuildFloor();
