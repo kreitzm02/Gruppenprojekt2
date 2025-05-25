@@ -21,8 +21,11 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Meshes", meta = (DisplayName = "Void Mesh"))
 	UStaticMesh* m_VoidMesh;
 	
-	UPROPERTY(EditAnywhere, Category = "Meshes", meta= (DisplayName = "Wall Corner Mesh"))
+	UPROPERTY(EditAnywhere, Category = "Meshes", meta= (DisplayName = "Wall Inner Corner Mesh"))
 	UStaticMesh* m_WallCornerMesh;
+
+	UPROPERTY(EditAnywhere, Category = "Meshes", meta = (DisplayName = "Wall Outer Corner Mesh"))
+	UStaticMesh* m_WallOuterCornerMesh;
 	
 	UPROPERTY(EditAnywhere, Category = "Meshes", meta = (DisplayName = "Door Mesh"))
 	UStaticMesh* m_DoorMesh;
@@ -35,4 +38,19 @@ public:
 	
 	UPROPERTY(EditAnywhere, Category = "Meshes", meta = (DisplayName = "Decoration Meshes B"))
 	TArray <FDungeonMeshEntry> m_DecorationVarB;
+
+	UPROPERTY(EditAnywhere, Category = "Debug Only", meta = (DisplayName = "Start Cube"))
+	UStaticMesh* m_StartCubeMesh;
+
+	UPROPERTY(EditAnywhere, Category = "Debug Only", meta = (DisplayName = "Exit Cube"))
+	UStaticMesh* m_ExitCubeMesh;
+
+	UPROPERTY(EditAnywhere, Category = "Mesh Rotation and Position", meta = (DisplayName = "Floor Position Offset"))
+	FInt32Vector m_FloorPosOffset;
+
+	UPROPERTY(EditAnywhere, Category = "Mesh Rotation and Position", meta = (DisplayName = "Wall Rotation Offset"))
+	FInt32Vector m_WallRotOffset;
+
+	UPROPERTY(EditAnywhere, Category = "Mesh Rotation and Position", meta = (DisplayName = "Wall Corner Rotation Offset"))
+	FInt32Vector m_WallCornerRotOffset;
 };
