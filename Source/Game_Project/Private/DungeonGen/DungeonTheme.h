@@ -14,28 +14,31 @@ class GAME_PROJECT_API UDungeonTheme : public UDataAsset
 public:
 	UPROPERTY(EditAnywhere, Category = "Meshes", meta = (DisplayName = "Floor Meshes"))
 	TArray <FDungeonMeshEntry> m_FloorMeshes;
-	
+
 	UPROPERTY(EditAnywhere, Category = "Meshes", meta = (DisplayName = "Wall Meshes"))
 	TArray <FDungeonMeshEntry> m_WallMeshes;
 
 	UPROPERTY(EditAnywhere, Category = "Meshes", meta = (DisplayName = "Void Mesh"))
 	UStaticMesh* m_VoidMesh;
-	
-	UPROPERTY(EditAnywhere, Category = "Meshes", meta= (DisplayName = "Wall Inner Corner Mesh"))
+
+	UPROPERTY(EditAnywhere, Category = "Meshes", meta = (DisplayName = "Wall Inner Corner Mesh"))
 	UStaticMesh* m_WallCornerMesh;
 
 	UPROPERTY(EditAnywhere, Category = "Meshes", meta = (DisplayName = "Wall Outer Corner Mesh"))
 	UStaticMesh* m_WallOuterCornerMesh;
-	
+
 	UPROPERTY(EditAnywhere, Category = "Meshes", meta = (DisplayName = "Door Mesh"))
 	UStaticMesh* m_DoorMesh;
-	
-	UPROPERTY(EditAnywhere, Category = "Meshes", meta= (DisplayName = "Chest Mesh"))
+
+	UPROPERTY(EditAnywhere, Category = "Meshes", meta = (DisplayName = "Chest Mesh"))
 	UStaticMesh* m_ChestMesh;
-	
+
+	UPROPERTY(EditAnywhere, Category = "Meshes", meta = (DisplayName = "O Corner Wall Mesh"))
+	UStaticMesh* m_WallOCornerMesh;
+
 	UPROPERTY(EditAnywhere, Category = "Meshes", meta = (DisplayName = "Decoration Meshes A"))
 	TArray <FDungeonMeshEntry> m_DecorationVarA;
-	
+
 	UPROPERTY(EditAnywhere, Category = "Meshes", meta = (DisplayName = "Decoration Meshes B"))
 	TArray <FDungeonMeshEntry> m_DecorationVarB;
 
@@ -51,6 +54,15 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Mesh Rotation and Position", meta = (DisplayName = "Wall Rotation Offset"))
 	FInt32Vector m_WallRotOffset;
 
-	UPROPERTY(EditAnywhere, Category = "Mesh Rotation and Position", meta = (DisplayName = "Wall Corner Rotation Offset"))
+	UPROPERTY(EditAnywhere, Category = "Mesh Rotation and Position", meta = (DisplayName = "Wall Inner Corner Rotation Offset"))
 	FInt32Vector m_WallCornerRotOffset;
+
+	UPROPERTY(EditAnywhere, Category = "Mesh Rotation and Position", meta = (DisplayName = "Wall Outer Corner Rotation Offset"))
+	FInt32Vector m_WallCornerORotOffset;
+
+	UPROPERTY(EditAnywhere, Category = "Mesh Rotation and Position", meta = (DisplayName = "Wall Outer Corner Position Offset"))
+	FInt32Vector m_WallCornerOPosOffset;
+
+	UPROPERTY(EditAnywhere, Category = "Mesh Rotation and Position", meta = (DisplayName = "Wall O Corner Position Offset"))
+	FInt32Vector m_WallOPosOffset;
 };

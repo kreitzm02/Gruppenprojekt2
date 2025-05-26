@@ -50,67 +50,97 @@ void UDungeonBuilder::BuildFloor()
 
 void UDungeonBuilder::BuildWall()
 {
+	for (int x = 0; x < m_Data->m_DungeonGrid.Num(); x++)
+	{
+		for (int y = 0; y < m_Data->m_DungeonGrid[x].Num(); y++)
+		{
+			if (m_Data->m_DungeonGrid[x][y] != ECellType::FLOOR) continue;
+
+			//O corner wall
+
+			if (m_Data->m_DungeonGrid[x - 1][y] != ECellType::FLOOR && m_Data->m_DungeonGrid[x - 2][y] == ECellType::FLOOR &&
+				m_Data->m_DungeonGrid[x - 1][y - 1] == ECellType::FLOOR && m_Data->m_DungeonGrid[x - 1][y + 1] == ECellType::FLOOR)
+			{
+				m_Data->m_DungeonGrid[x - 1][y] = ECellType::WALLO;
+				FInt32Vector posOffset = m_DungeonTheme->m_WallOPosOffset;
+				FVector pos = { ((x - 1) * m_UnitSize) - posOffset.X, (y * m_UnitSize) + posOffset.Y, 0 };
+				AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0, 0, 0 }); // testing!
+				if (meshActor)
+				{
+					meshActor->GetStaticMeshComponent()->SetStaticMesh(m_DungeonTheme->m_WallOCornerMesh);
+					meshActor->SetMobility(EComponentMobility::Static);
+				}
+			}
+		}
+	}
 	//TODO outer corner fertigstellen, damit das snake tileset passt.
-	//for (int x = 0; x < m_Data->m_DungeonGrid.Num(); x++)
-	//{
-	//	for (int y = 0; y < m_Data->m_DungeonGrid[x].Num(); y++)
-	//	{
-	//		if (m_Data->m_DungeonGrid[x][y] != ECellType::FLOOR) continue;
-	//
-	//		//outer corner wall
-	//		if (m_Data->m_DungeonGrid[x - 1][y - 1] != ECellType::FLOOR && m_Data->m_DungeonGrid[x - 1][y] == ECellType::FLOOR && m_Data->m_DungeonGrid[x][y - 1] == ECellType::FLOOR)
-	//		{
-	//			m_Data->m_DungeonGrid[x - 1][y - 1] = ECellType::WALLCORNERO;
-	//			FVector pos = { ((x - 1) * m_UnitSize) - m_WallOffset, ((y - 1) * m_UnitSize) + m_WallOffset, 0 };
-	//			FInt32Vector rotOffset = m_DungeonTheme->m_WallCornerRotOffset;
-	//			AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0, 0, 0 }); // testing!
-	//			if (meshActor)
-	//			{
-	//				meshActor->GetStaticMeshComponent()->SetStaticMesh(m_DungeonTheme->m_WallOuterCornerMesh);
-	//				meshActor->SetMobility(EComponentMobility::Static);
-	//			}
-	//		}
-	//
-	//		if (m_Data->m_DungeonGrid[x - 1][y + 1] != ECellType::FLOOR && m_Data->m_DungeonGrid[x - 1][y] == ECellType::FLOOR && m_Data->m_DungeonGrid[x][y + 1] == ECellType::FLOOR)
-	//		{
-	//			m_Data->m_DungeonGrid[x - 1][y + 1] = ECellType::WALLCORNERO;
-	//			FVector pos = { ((x - 1) * m_UnitSize) - m_WallOffset, ((y + 1) * m_UnitSize) + m_WallOffset, 0 };
-	//			FInt32Vector rotOffset = m_DungeonTheme->m_WallCornerRotOffset;
-	//			AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0, -90, 0 }); // testing!
-	//			if (meshActor)
-	//			{
-	//				meshActor->GetStaticMeshComponent()->SetStaticMesh(m_DungeonTheme->m_WallOuterCornerMesh);
-	//				meshActor->SetMobility(EComponentMobility::Static);
-	//			}
-	//		}
-	//
-	//		if (m_Data->m_DungeonGrid[x + 1][y + 1] != ECellType::FLOOR && m_Data->m_DungeonGrid[x + 1][y] == ECellType::FLOOR && m_Data->m_DungeonGrid[x][y + 1] == ECellType::FLOOR)
-	//		{
-	//			m_Data->m_DungeonGrid[x + 1][y + 1] = ECellType::WALLCORNERO;
-	//			FVector pos = { ((x + 1) * m_UnitSize) - m_WallOffset, ((y + 1) * m_UnitSize) + m_WallOffset, 0 };
-	//			FInt32Vector rotOffset = m_DungeonTheme->m_WallCornerRotOffset;
-	//			AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0, 180, 0 }); // testing!
-	//			if (meshActor)
-	//			{
-	//				meshActor->GetStaticMeshComponent()->SetStaticMesh(m_DungeonTheme->m_WallOuterCornerMesh);
-	//				meshActor->SetMobility(EComponentMobility::Static);
-	//			}
-	//		}
-	//
-	//		if (m_Data->m_DungeonGrid[x + 1][y - 1] != ECellType::FLOOR && m_Data->m_DungeonGrid[x + 1][y] == ECellType::FLOOR && m_Data->m_DungeonGrid[x][y - 1] == ECellType::FLOOR)
-	//		{
-	//			m_Data->m_DungeonGrid[x + 1][y - 1] = ECellType::WALLCORNERO;
-	//			FVector pos = { ((x + 1) * m_UnitSize) - m_WallOffset, ((y - 1) * m_UnitSize) + m_WallOffset, 0 };
-	//			FInt32Vector rotOffset = m_DungeonTheme->m_WallCornerRotOffset;
-	//			AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0, 90, 0 }); // testing!
-	//			if (meshActor)
-	//			{
-	//				meshActor->GetStaticMeshComponent()->SetStaticMesh(m_DungeonTheme->m_WallOuterCornerMesh);
-	//				meshActor->SetMobility(EComponentMobility::Static);
-	//			}
-	//		}
-	//	}
-	//}
+	for (int x = 0; x < m_Data->m_DungeonGrid.Num(); x++)
+	{
+		for (int y = 0; y < m_Data->m_DungeonGrid[x].Num(); y++)
+		{
+			if (m_Data->m_DungeonGrid[x][y] != ECellType::FLOOR) continue;
+
+			//outer corner wall
+			if (m_Data->m_DungeonGrid[x - 1][y - 1] != ECellType::FLOOR && m_Data->m_DungeonGrid[x - 1][y - 1] != ECellType::WALLO && 
+				m_Data->m_DungeonGrid[x - 1][y] == ECellType::FLOOR && m_Data->m_DungeonGrid[x][y - 1] == ECellType::FLOOR)
+			{
+				m_Data->m_DungeonGrid[x - 1][y - 1] = ECellType::WALLCONVEX;
+				FInt32Vector posOffset = m_DungeonTheme->m_WallCornerOPosOffset;
+				FVector pos = { ((x - 1) * m_UnitSize) + posOffset.X, ((y - 1) * m_UnitSize) + posOffset.Y, 0 };
+				FInt32Vector rotOffset = m_DungeonTheme->m_WallCornerORotOffset;
+				AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0 + (float)rotOffset.X, 0 + (float)rotOffset.Y, 0 + (float)rotOffset.Z }); // testing!
+				if (meshActor)
+				{
+					meshActor->GetStaticMeshComponent()->SetStaticMesh(m_DungeonTheme->m_WallOuterCornerMesh);
+					meshActor->SetMobility(EComponentMobility::Static);
+				}
+			}
+	
+			if (m_Data->m_DungeonGrid[x - 1][y + 1] != ECellType::FLOOR && m_Data->m_DungeonGrid[x - 1][y + 1] != ECellType::WALLO && 
+				m_Data->m_DungeonGrid[x - 1][y] == ECellType::FLOOR && m_Data->m_DungeonGrid[x][y + 1] == ECellType::FLOOR)
+			{
+				m_Data->m_DungeonGrid[x - 1][y + 1] = ECellType::WALLCONVEX;
+				FInt32Vector posOffset = m_DungeonTheme->m_WallCornerOPosOffset;
+				FVector pos = { ((x - 1) * m_UnitSize) + posOffset.X, ((y + 1) * m_UnitSize) - posOffset.Y, 0 };
+				FInt32Vector rotOffset = m_DungeonTheme->m_WallCornerORotOffset;
+				AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0 + (float)rotOffset.X, -90 + (float)rotOffset.Y, 0 + (float)rotOffset.Z }); // testing!
+				if (meshActor)
+				{
+					meshActor->GetStaticMeshComponent()->SetStaticMesh(m_DungeonTheme->m_WallOuterCornerMesh);
+					meshActor->SetMobility(EComponentMobility::Static);
+				}
+			}
+	
+			if (m_Data->m_DungeonGrid[x + 1][y + 1] != ECellType::FLOOR && m_Data->m_DungeonGrid[x + 1][y + 1] != ECellType::WALLO && 
+				m_Data->m_DungeonGrid[x + 1][y] == ECellType::FLOOR && m_Data->m_DungeonGrid[x][y + 1] == ECellType::FLOOR)
+			{
+				m_Data->m_DungeonGrid[x + 1][y + 1] = ECellType::WALLCONVEX;
+				FInt32Vector posOffset = m_DungeonTheme->m_WallCornerOPosOffset;
+				FVector pos = { ((x + 1) * m_UnitSize) - posOffset.X, ((y + 1) * m_UnitSize) - posOffset.Y, 0 };
+				FInt32Vector rotOffset = m_DungeonTheme->m_WallCornerORotOffset;
+				AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0 + (float)rotOffset.X, 180 + (float)rotOffset.Y, 0 + (float)rotOffset.Z }); // testing!
+				if (meshActor)
+				{
+					meshActor->GetStaticMeshComponent()->SetStaticMesh(m_DungeonTheme->m_WallOuterCornerMesh);
+					meshActor->SetMobility(EComponentMobility::Static);
+				}
+			}
+	
+			if (m_Data->m_DungeonGrid[x + 1][y - 1] != ECellType::FLOOR && m_Data->m_DungeonGrid[x + 1][y - 1] != ECellType::WALLO && m_Data->m_DungeonGrid[x + 1][y] == ECellType::FLOOR && m_Data->m_DungeonGrid[x][y - 1] == ECellType::FLOOR)
+			{
+				m_Data->m_DungeonGrid[x + 1][y - 1] = ECellType::WALLCONVEX;
+				FInt32Vector posOffset = m_DungeonTheme->m_WallCornerOPosOffset;
+				FVector pos = { ((x + 1) * m_UnitSize) - posOffset.X, ((y - 1) * m_UnitSize) + posOffset.Y, 0 };
+				FInt32Vector rotOffset = m_DungeonTheme->m_WallCornerORotOffset;
+				AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0 + (float)rotOffset.X, 90 + (float)rotOffset.Y, 0 + (float)rotOffset.Z }); // testing!
+				if (meshActor)
+				{
+					meshActor->GetStaticMeshComponent()->SetStaticMesh(m_DungeonTheme->m_WallOuterCornerMesh);
+					meshActor->SetMobility(EComponentMobility::Static);
+				}
+			}
+		}
+	}
 	for (int x = 0; x < m_Data->m_DungeonGrid.Num(); x++)
 	{
 		for (int y = 0; y < m_Data->m_DungeonGrid[x].Num(); y++)
@@ -128,7 +158,7 @@ void UDungeonBuilder::BuildWall()
 
 			if (m_Data->m_DungeonGrid[x + 1][y - 1] != ECellType::FLOOR && m_Data->m_DungeonGrid[x + 1][y] != ECellType::FLOOR && m_Data->m_DungeonGrid[x][y - 1] != ECellType::FLOOR)
 			{
-				m_Data->m_DungeonGrid[x + 1][y - 1] = ECellType::WALLCORNER;
+				m_Data->m_DungeonGrid[x + 1][y - 1] = ECellType::WALLCONCAVE;
 				FVector pos = { ((x + 1) * m_UnitSize) - m_WallOffset, ((y - 1) * m_UnitSize) + m_WallOffset, 0 };
 				FInt32Vector rotOffset = m_DungeonTheme->m_WallCornerRotOffset;
 				AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0 + (float)rotOffset.X, 0 + (float)rotOffset.Y, 0 + (float)rotOffset.Z }); // testing!
@@ -140,7 +170,7 @@ void UDungeonBuilder::BuildWall()
 			}
 			if (m_Data->m_DungeonGrid[x + 1][y + 1] != ECellType::FLOOR && m_Data->m_DungeonGrid[x + 1][y] != ECellType::FLOOR && m_Data->m_DungeonGrid[x][y + 1] != ECellType::FLOOR)
 			{
-				m_Data->m_DungeonGrid[x + 1][y + 1] = ECellType::WALLCORNER;
+				m_Data->m_DungeonGrid[x + 1][y + 1] = ECellType::WALLCONCAVE;
 				FVector pos = { ((x + 1) * m_UnitSize) - m_WallOffset, ((y + 1) * m_UnitSize) - m_WallOffset, 0 };
 				FInt32Vector rotOffset = m_DungeonTheme->m_WallCornerRotOffset;
 				AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0 + (float)rotOffset.X, 90 + (float)rotOffset.Y, 0 + (float)rotOffset.Z }); // testing!
@@ -152,7 +182,7 @@ void UDungeonBuilder::BuildWall()
 			}
 			if (m_Data->m_DungeonGrid[x - 1][y + 1] != ECellType::FLOOR && m_Data->m_DungeonGrid[x - 1][y] != ECellType::FLOOR && m_Data->m_DungeonGrid[x][y + 1] != ECellType::FLOOR)
 			{
-				m_Data->m_DungeonGrid[x - 1][y + 1] = ECellType::WALLCORNER;
+				m_Data->m_DungeonGrid[x - 1][y + 1] = ECellType::WALLCONCAVE;
 				FVector pos = { ((x - 1) * m_UnitSize) + m_WallOffset, ((y + 1) * m_UnitSize) - m_WallOffset, 0 };
 				FInt32Vector rotOffset = m_DungeonTheme->m_WallCornerRotOffset;
 				AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0 + (float)rotOffset.X, 180 + (float)rotOffset.Y, 0 + (float)rotOffset.Z }); // testing!
@@ -164,7 +194,7 @@ void UDungeonBuilder::BuildWall()
 			}
 			if (m_Data->m_DungeonGrid[x - 1][y - 1] != ECellType::FLOOR && m_Data->m_DungeonGrid[x - 1][y] != ECellType::FLOOR && m_Data->m_DungeonGrid[x][y - 1] != ECellType::FLOOR)
 			{
-				m_Data->m_DungeonGrid[x - 1][y - 1] = ECellType::WALLCORNER;
+				m_Data->m_DungeonGrid[x - 1][y - 1] = ECellType::WALLCONCAVE;
 				FVector pos = { ((x - 1) * m_UnitSize) + m_WallOffset, ((y - 1) * m_UnitSize) + m_WallOffset, 0 };
 				FInt32Vector rotOffset = m_DungeonTheme->m_WallCornerRotOffset;
 				AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0 + (float)rotOffset.X, -90 + (float)rotOffset.Y, 0 + (float)rotOffset.Z }); // testing!
@@ -196,8 +226,8 @@ void UDungeonBuilder::BuildWall()
 			case ECellType::EMPTYFORCED:  Ch = TEXT('F'); break;
 			case ECellType::FLOOR:        Ch = TEXT(' '); break;
 			case ECellType::WALL:         Ch = TEXT('#'); break;
-			case ECellType::WALLCORNERO:  Ch = TEXT('O'); break;
-			case ECellType::WALLCORNER:   Ch = TEXT('C'); break;
+			case ECellType::WALLCONVEX:  Ch = TEXT('O'); break;
+			case ECellType::WALLCONCAVE:   Ch = TEXT('C'); break;
 			default:                      Ch = TEXT('?'); break;
 			}
 			Line.AppendChar(Ch);
@@ -242,7 +272,8 @@ void UDungeonBuilder::BuildDebugObjects()
 void UDungeonBuilder::TryPlaceWall(int32 a_GridX, int32 a_GridY, const FVector& a_Position, const FRotator& a_Rotation, int32 a_WallIndex) const
 {
 	if (!IsWithinBounds(a_GridX, a_GridY)) return;
-	if (m_Data->m_DungeonGrid[a_GridX][a_GridY] == ECellType::FLOOR || m_Data->m_DungeonGrid[a_GridX][a_GridY] == ECellType::WALLCORNERO) return;
+	if (m_Data->m_DungeonGrid[a_GridX][a_GridY] == ECellType::FLOOR || m_Data->m_DungeonGrid[a_GridX][a_GridY] == ECellType::WALLCONVEX || 
+		m_Data->m_DungeonGrid[a_GridX][a_GridY] == ECellType::WALLO) return;
 	m_Data->m_DungeonGrid[a_GridX][a_GridY] = ECellType::WALL;
 	FInt32Vector rotOffset = m_DungeonTheme->m_WallRotOffset;
 	FRotator rotation = { a_Rotation.Pitch + (float)rotOffset.X, a_Rotation.Yaw + (float)rotOffset.Y, a_Rotation.Roll + (float)rotOffset.Z };
