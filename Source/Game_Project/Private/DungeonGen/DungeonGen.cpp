@@ -5,6 +5,8 @@
 #include "Components/StaticMeshComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "UObject/ConstructorHelpers.h"
+#include "NavigationSystem.h"
+#include "DrawDebugHelpers.h"
 
 // Sets default values
 ADungeonGen::ADungeonGen()
@@ -140,5 +142,12 @@ void ADungeonGen::GenerateDungeon()
 	m_Builder->BuildFloor();
 	m_Builder->BuildWall();
 	m_Builder->BuildDebugObjects();
+	BuildNavMeshForDungeon();
+}
+
+void ADungeonGen::BuildNavMeshForDungeon()
+{
+	UNavigationSystemV1* navSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
+	navSystem->Build();
 }
 

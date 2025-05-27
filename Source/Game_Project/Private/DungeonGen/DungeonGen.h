@@ -10,6 +10,7 @@
 #include "DungeonBuilder.h"
 #include "DungeonGridUtils.h"
 #include "DungeonGenUtils.h"
+#include "NavMesh/NavMeshBoundsVolume.h"
 #include "DungeonGen.generated.h"
 
 UCLASS()
@@ -69,6 +70,7 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Dungeon Assets", meta = (DisplayName = "Wall Offset"))
 	float m_WallOffset;
+
 	FDungeonData m_Data;
 
 	UPROPERTY()
@@ -78,4 +80,5 @@ private:
 	void GenerateRooms();
 	void GenerateCorridors();
 	void GenerateDungeon();
+	void BuildNavMeshForDungeon();
 };
