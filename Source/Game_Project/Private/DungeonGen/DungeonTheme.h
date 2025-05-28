@@ -36,6 +36,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Meshes", meta = (DisplayName = "O Corner Wall Mesh"))
 	UStaticMesh* m_WallOCornerMesh;
 
+	UPROPERTY(EditAnywhere, Category = "Meshes", meta = (DisplayName = "U Corner Wall Mesh"))
+	UStaticMesh* m_WallUCornerMesh;
+
 	UPROPERTY(EditAnywhere, Category = "Meshes", meta = (DisplayName = "Decoration Meshes A"))
 	TArray <FDungeonMeshEntry> m_DecorationVarA;
 
