@@ -3,6 +3,7 @@
 
 #include "DungeonGen/DungeonBuilder.h"
 #include "Engine/StaticMeshActor.h"
+#include "DungeonGenUtils.h"
 
 void UDungeonBuilder::Init(float a_UnitSize, UDungeonTheme* a_Theme, FDungeonData* a_Data, UWorld* a_World, float a_WallOffset)
 {
@@ -567,6 +568,66 @@ void UDungeonBuilder::BuildDebugObjects()
 	}
 }
 
+void UDungeonBuilder::BuildDecorationObjects()
+{
+	for (int i = 0; i < m_Data->m_AllRooms.Num(); i++)
+	{
+		ERoomType curType = m_Data->m_AllRooms[i].m_RoomType;
+
+		if (curType == ERoomType::VARIANT_A || curType == ERoomType::VARIANT_B || curType == ERoomType::VARIANT_C)
+		{
+			for (int x = m_Data->m_AllRooms[i].m_RoomOrigin.X; x < m_Data->m_AllRooms[i].m_RoomOrigin.X + m_Data->m_AllRooms[i].m_RoomCellLength; x++)
+			{
+				for (int y = m_Data->m_AllRooms[i].m_RoomOrigin.Y; y < m_Data->m_AllRooms[i].m_RoomOrigin.Y + m_Data->m_AllRooms[i].m_RoomCellWidth; y++)
+				{
+					TryPlacePrefabCornerFacingCenter(m_Data->m_DungeonGrid, x, y, m_Data->m_AllRooms[i], m_DungeonTheme->m_DecorationVarB[FMath::RandRange(0, m_DungeonTheme->m_DecorationVarB.Num() - 1)].m_Mesh, 80);
+				}
+			}
+		}
+		else if (curType == ERoomType::EMPTY || curType == ERoomType::REWARD)
+		{
+			int32 randomIndex = FMath::RandRange(0, m_DungeonTheme->m_DecorationVarA.Num() - 1);
+			for (int x = m_Data->m_AllRooms[i].m_RoomOrigin.X; x < m_Data->m_AllRooms[i].m_RoomOrigin.X + m_Data->m_AllRooms[i].m_RoomCellLength; x++)
+			{
+				for (int y = m_Data->m_AllRooms[i].m_RoomOrigin.Y; y < m_Data->m_AllRooms[i].m_RoomOrigin.Y + m_Data->m_AllRooms[i].m_RoomCellWidth; y++)
+				{
+					TryPlacePrefabCornerOrthoRotation(m_Data->m_DungeonGrid, x, y, m_Data->m_AllRooms[i], m_DungeonTheme->m_DecorationVarA[randomIndex].m_Mesh, 100);
+				}
+			}
+		}
+	}
+}
+
+void UDungeonBuilder::BuildBossRoom()
+{
+	for (int i = 0; i < m_Data->m_AllRooms.Num(); i++)
+	{
+		ERoomType curType = m_Data->m_AllRooms[i].m_RoomType;
+
+		if (curType == ERoomType::EXIT)
+		{
+			for (int x = m_Data->m_AllRooms[i].m_RoomOrigin.X; x < m_Data->m_AllRooms[i].m_RoomOrigin.X + m_Data->m_AllRooms[i].m_RoomCellLength; x++)
+			{
+				for (int y = m_Data->m_AllRooms[i].m_RoomOrigin.Y; y < m_Data->m_AllRooms[i].m_RoomOrigin.Y + m_Data->m_AllRooms[i].m_RoomCellWidth; y++)
+				{
+					FVector pos = { static_cast<float>(x * m_UnitSize), static_cast<float>(y * m_UnitSize), 0.0f };
+					FInt32Vector posOffset = m_DungeonTheme->m_FloorPosOffset;
+					TArray<TArray<ECellType>> grid = m_Data->m_DungeonGrid;
+					pos.X += (float)posOffset.X;
+					pos.Y += (float)posOffset.Y;
+					pos.Z += (float)posOffset.Z + m_DungeonTheme->m_BossFloorZOffset;
+					AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, FRotator::ZeroRotator); // testing!
+					if (meshActor)
+					{
+						meshActor->GetStaticMeshComponent()->SetStaticMesh(m_DungeonTheme->m_BossFloorMesh);
+						meshActor->SetMobility(EComponentMobility::Static);
+					}
+				}
+			}
+		}
+	}
+}
+
 void UDungeonBuilder::TryPlaceWall(int32 a_GridX, int32 a_GridY, const FVector& a_Position, const FRotator& a_Rotation, int32 a_WallIndex) const
 {
 	if (!IsWithinBounds(a_GridX, a_GridY)) return;
@@ -587,4 +648,43 @@ void UDungeonBuilder::TryPlaceWall(int32 a_GridX, int32 a_GridY, const FVector& 
 bool UDungeonBuilder::IsWithinBounds(int32 a_GridX, int32 a_GridY) const
 {
 	return a_GridX >= 0 && a_GridY >= 0 && a_GridX < m_Data->m_DungeonGrid.Num() && a_GridY < m_Data->m_DungeonGrid[0].Num();
+}
+
+bool UDungeonBuilder::TryPlacePrefabCornerFacingCenter(TArray<TArray<ECellType>> a_Grid, int32 a_GridX, int32 a_GridY, FDungeonRoom a_Room, UStaticMesh *a_Mesh, int32 a_Probabilty)
+{
+	if (a_Grid[a_GridX][ a_GridY] == ECellType::FLOOR && UDungeonGenUtils::CellIsNeighbourOfPosition(a_GridX, a_GridY, ECellType::WALLCONCAVE, a_Grid, true))
+	{
+		if (FMath::RandRange(0, 100) < 100 - a_Probabilty) return false;
+		FVector targetPosition = FVector(a_GridX * m_UnitSize, a_GridY * m_UnitSize, 0);
+		FInt32Vector2 roomCenter = a_Room.GetRoomCenter();
+		FVector direction = FVector(roomCenter.X, roomCenter.Y, 0) * m_UnitSize - targetPosition;
+		direction.Z = 0;
+		FRotator targetRotation = FRotationMatrix::MakeFromX(direction).Rotator();
+		AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), targetPosition, targetRotation); // testing!
+		if (meshActor)
+		{
+			meshActor->GetStaticMeshComponent()->SetStaticMesh(a_Mesh);
+			meshActor->SetMobility(EComponentMobility::Static);
+		}
+	}
+	return false;
+}
+
+bool UDungeonBuilder::TryPlacePrefabCornerOrthoRotation(TArray<TArray<ECellType>> a_Grid, int32 a_GridX, int32 a_GridY, FDungeonRoom a_Room, UStaticMesh* a_Mesh, int32 a_Probabilty)
+{
+	if (a_Grid[a_GridX][a_GridY] == ECellType::FLOOR && UDungeonGenUtils::CellIsNeighbourOfPosition(a_GridX, a_GridY, ECellType::WALLCONCAVE, a_Grid, true))
+	{
+		if (FMath::RandRange(0, 100) < 100 - a_Probabilty) return false;
+		FVector targetPosition = FVector(a_GridX * m_UnitSize, a_GridY * m_UnitSize, 0);
+		FInt32Vector2 roomCenter = a_Room.GetRoomCenter();
+		int32 rotationY = UDungeonGenUtils::GetOrthogonalRotationBasedOnCenter(targetPosition, FVector(roomCenter.X, roomCenter.Y, 0) * m_UnitSize);
+		FRotator targetRotation = FRotator(0, (float)rotationY, 0);
+		AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), targetPosition, targetRotation); // testing!
+		if (meshActor)
+		{
+			meshActor->GetStaticMeshComponent()->SetStaticMesh(a_Mesh);
+			meshActor->SetMobility(EComponentMobility::Static);
+		}
+	}
+	return false;
 }

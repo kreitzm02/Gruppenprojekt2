@@ -142,6 +142,8 @@ void ADungeonGen::GenerateDungeon()
 	m_Builder->BuildFloor();
 	m_Builder->BuildWall();
 	m_Builder->BuildDebugObjects();
+	m_Builder->BuildDecorationObjects();
+	m_Builder->BuildBossRoom();
 	BuildNavMeshForDungeon();
 }
 

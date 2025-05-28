@@ -30,8 +30,11 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Meshes", meta = (DisplayName = "Door Mesh"))
 	UStaticMesh* m_DoorMesh;
 
+	UPROPERTY(EditAnywhere, Category = "Meshes", meta = (DisplayName = "Boss Floor Mesh"))
+	UStaticMesh* m_BossFloorMesh;
+
 	UPROPERTY(EditAnywhere, Category = "Meshes", meta = (DisplayName = "Chest Mesh"))
-	UStaticMesh* m_ChestMesh;
+	USkeletalMesh* m_ChestMesh;
 
 	UPROPERTY(EditAnywhere, Category = "Meshes", meta = (DisplayName = "O Corner Wall Mesh"))
 	UStaticMesh* m_WallOCornerMesh;
@@ -68,4 +71,7 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Mesh Rotation and Position", meta = (DisplayName = "Wall O Corner Position Offset"))
 	FInt32Vector m_WallOPosOffset;
+
+	UPROPERTY(EditAnywhere, Category = "Mesh Rotation and Position", meta = (DisplayName = "Boss Floor z Offset"))
+	int32 m_BossFloorZOffset;;
 };

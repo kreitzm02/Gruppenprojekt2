@@ -221,3 +221,35 @@ TArray<FInt32Vector2> UDungeonGenUtils::GetCellsToModifyFromVariant(const FDunge
 	}
 	else return TArray<FInt32Vector2>();
 }
+
+bool UDungeonGenUtils::CellIsNeighbourOfPosition(int32 a_GridX, int32 a_GridY, ECellType a_Cell, TArray<TArray<ECellType>> a_Grid, bool a_DiagonalIncluded)
+{
+	if (a_DiagonalIncluded)
+	{
+		return (a_Grid[a_GridX - 1][a_GridY + 1] == a_Cell ||
+			a_Grid[a_GridX][a_GridY + 1] == a_Cell ||
+			a_Grid[a_GridX + 1][a_GridY + 1] == a_Cell ||
+			a_Grid[a_GridX + 1][a_GridY] == a_Cell ||
+			a_Grid[a_GridX + 1][a_GridY - 1] == a_Cell ||
+			a_Grid[a_GridX][a_GridY - 1] == a_Cell ||
+			a_Grid[a_GridX - 1][a_GridY - 1] == a_Cell ||
+			a_Grid[a_GridX - 1][a_GridY] == a_Cell);
+	}
+	else
+	{
+		return (a_Grid[a_GridX][a_GridY + 1] == a_Cell ||
+			a_Grid[a_GridX + 1][a_GridY] == a_Cell ||
+			a_Grid[a_GridX][a_GridY - 1] == a_Cell ||
+			a_Grid[a_GridX - 1][a_GridY] == a_Cell);
+	}
+}
+
+int32 UDungeonGenUtils::GetOrthogonalRotationBasedOnCenter(FVector a_Pos, FVector a_Center)
+{
+	float differenceX = a_Pos.X - a_Center.X;
+	float differenceY = a_Pos.Y - a_Center.Y;
+	if (FMath::Abs(differenceX) > FMath::Abs(differenceY))
+		return differenceX > 0 ? 270 : 90;
+	else
+		return differenceY > 0 ? 180 : 0;
+}

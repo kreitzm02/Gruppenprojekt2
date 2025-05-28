@@ -27,8 +27,12 @@ public:
 	void BuildFloor();
 	void BuildWall();
 	void BuildDebugObjects();
+	void BuildDecorationObjects();
+	void BuildBossRoom();
 
 private:
 	void TryPlaceWall(int32 a_GridX, int32 a_GridY, const FVector& a_Position, const FRotator& a_Rotation, int32 a_WallIndex) const;
 	bool IsWithinBounds(int32 a_GridX, int32 a_GridY) const;
+	bool TryPlacePrefabCornerFacingCenter(TArray<TArray<ECellType>> a_Grid, int32 a_GridX, int32 a_GridY, FDungeonRoom a_Room, UStaticMesh* a_Mesh, int32 a_Probabilty);
+	bool TryPlacePrefabCornerOrthoRotation(TArray<TArray<ECellType>> a_Grid, int32 a_GridX, int32 a_GridY, FDungeonRoom a_Room, UStaticMesh* a_Mesh, int32 a_Probabilty);
 };
