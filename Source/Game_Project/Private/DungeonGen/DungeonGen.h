@@ -11,6 +11,7 @@
 #include "DungeonGridUtils.h"
 #include "DungeonGenUtils.h"
 #include "NavMesh/NavMeshBoundsVolume.h"
+#include "GameFramework/PlayerStart.h"
 #include "DungeonGen.generated.h"
 
 UCLASS()

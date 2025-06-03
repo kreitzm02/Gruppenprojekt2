@@ -7,6 +7,9 @@
 #include "UObject/ConstructorHelpers.h"
 #include "NavigationSystem.h"
 #include "DrawDebugHelpers.h"
+#include "EngineUtils.h"
+#include <Kismet/GameplayStatics.h>
+#include <Player/PlayerCharacter.h>
 
 // Sets default values
 ADungeonGen::ADungeonGen()
@@ -27,6 +30,19 @@ void ADungeonGen::BeginPlay()
 {
 	Super::BeginPlay();
 	GenerateDungeon();
+
+	for (TActorIterator<APlayerCharacter> It(GetWorld()); It; ++It)
+	{
+		APlayerCharacter* PC = *It;
+		if (PC)
+		{
+			FInt32Vector2 startPos = m_Data.m_StartRoom.GetRoomCenter();
+			PC->SetActorLocation(FVector((float)startPos.X * m_UnitSize, (float)startPos.Y * m_UnitSize, 100.0f));
+			PC->SetActorRotation(FRotator::ZeroRotator);
+			UE_LOG(LogTemp, Log, TEXT("PlayerCharacter (Iterator) auf Startraum gesetzt."));
+			break;
+		}
+	}
 }
 
 // Called every frame
