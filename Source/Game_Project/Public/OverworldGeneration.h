@@ -6,6 +6,7 @@
 #include "OverworldTileData.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "NavMesh/NavMeshBoundsVolume.h"
 #include "OverworldGeneration.generated.h"
 
 
@@ -41,7 +42,6 @@ private:
 		RoadFiveEdges,
 		RoadAllEdges
 	};
-
 
 	struct TileRoadWithRotationData
 	{
@@ -106,6 +106,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Overworld settings")
 	TArray<UStaticMesh*> natureDecorations = {};
+
+	UPROPERTY(EditAnywhere, Category = "AIMap")
+	ANavMeshBoundsVolume* navMesh;
 
 	//UPROPERTY(EditAnywhere, Category = "Overworld settings")
 	//TArray<ADungeonEntrance*> dungeonEntrance = {};

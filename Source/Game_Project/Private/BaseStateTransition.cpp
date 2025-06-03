@@ -3,4 +3,14 @@
 
 #include "BaseStateTransition.h"
 
+void UBaseStateTransition::Initialize()
+{
+	
+}
+
+
+bool UBaseStateTransition::IsConditionMet()
+{
+	return false;
+}
 

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "FSMData.h"
 #include "Components/ActorComponent.h"
 #include "EnemyStateMachineComponent.generated.h"
 
@@ -21,14 +22,28 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-public:
+private:
 	UPROPERTY(EditAnywhere, Instanced)
-	UBaseEnemyState* initialState;
-	
-	UBaseEnemyState* CurrentState;
+	UBaseEnemyState* initialState = nullptr;
+
+	UPROPERTY(EditAnywhere)
+	UFSMData* stateData = nullptr;
+
+	UPROPERTY()
+	UBaseEnemyState* currentState = nullptr;
+	//needed otherwise garbage collector deletes stuff
+	UPROPERTY()
+	TArray<UBaseStateTransition*> ownedTransitions;
+	//needed otherwise garbage collector deletes stuff
+	UPROPERTY()
+	TArray<UBaseEnemyState*> ownedStates;
+
+	TMap<TSubclassOf<UBaseEnemyState>, TArray<FTargetStateWithCondition>> stateStructure;
 
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-		
+	void InitializeTMap();
+
+	void TransitionHandler();
 };

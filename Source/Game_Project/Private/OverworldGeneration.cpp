@@ -2,11 +2,11 @@
 
 
 #include "OverworldGeneration.h"
-
 #include "IContentBrowserSingleton.h"
 #include "Engine/StaticMeshActor.h"
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+#include "NavigationSystem.h"
 
 // Sets default values
 AOverworldGeneration::AOverworldGeneration()
@@ -298,7 +298,7 @@ void AOverworldGeneration::BeginPlay()
 	    
     }
 
-    
+    //nature placement
     for (int i = emptyTiles->Num() - 1; i >= 0; i--)
     {
         int natureDensityRandom = randomNumber.RandRange(1, 100);
@@ -312,6 +312,19 @@ void AOverworldGeneration::BeginPlay()
                 tileActor->SetMobility(EComponentMobility::Static);
             }
             emptyTiles->RemoveAt(i);
+        }
+    }
+    if (!navMesh)
+    {
+        UE_LOG(LogTemp, Error, TEXT("NavMesh not Found"));
+    }
+    else
+    {
+	    navMesh->SetActorLocation(FVector(0,0,0));
+		navMesh->SetActorScale3D(FVector(worldSize * 2, worldSize * 2,0.2));
+        if (UNavigationSystemV1* navSys = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld()))
+        {
+            navSys->Build();
         }
     }
 }
@@ -331,7 +344,6 @@ void AOverworldGeneration::InitializeTMap()
     }
 	for (UOverworldTileData* a_tileData : tileData)
 	{
-        UE_LOG(LogTemp, Log, TEXT("Der spaß wird ausgeführt \n"));
         int roadCount = 0;
         tempData = GetRotatedTileAndEdges(a_tileData,roadCount);
         possibleTilesMap->Find(roadCount)->Add(tempData);
