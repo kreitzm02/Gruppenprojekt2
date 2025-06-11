@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
+#include "BaseAbility.h"
 #include "PlayerCharDataAsset.generated.h"
 
 /**
@@ -39,6 +40,33 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Character Stats", meta = (DisplayName = "Base Defense"))
 	int32 m_BaseDefense;
 
-	UPROPERTY(EditAnywhere, Category = "Placeholders", meta = (DisplayName = "Starting Ability (Placeholder)"))
-	int m_StartingAbility;
+	UPROPERTY(EditAnywhere, Category = "Placeholders", meta = (DisplayName = "Starting Ability"))
+	TSubclassOf<UBaseAbility> m_StartingAbility;
+
+	UPROPERTY(EditAnywhere, Category = "Placeholders", meta = (DisplayName = "Debug Ability 1"))
+	TSubclassOf<UBaseAbility> m_StartingAbility1Debug;
+
+	UPROPERTY(EditAnywhere, Category = "Placeholders", meta = (DisplayName = "Debug Ability 2"))
+	TSubclassOf<UBaseAbility> m_StartingAbility2Debug;
+
+	UPROPERTY(EditAnywhere, Category = "Placeholders", meta = (DisplayName = "Debug Ability 3"))
+	TSubclassOf<UBaseAbility> m_StartingAbility3Debug;
+
+	UPROPERTY(EditAnywhere, Category = "Animations", meta = (DisplayName = "Idle Animation"))
+	UAnimSequence* m_IdleAnim;
+
+	UPROPERTY(EditAnywhere, Category = "Animations", meta = (DisplayName = "Walk Animation"))
+	UAnimSequence* m_WalkAnim;
+
+	UPROPERTY(EditAnywhere, Category = "Animations", meta = (DisplayName = "Sprint Animation"))
+	UAnimSequence* m_SprintAnim;
+
+	UPROPERTY(EditAnywhere, Category = "Animations", meta = (DisplayName = "1H Attack Animation Variant A"))
+	UAnimSequence* m_1HAttackVar1Anim;
+
+	UPROPERTY(EditAnywhere, Category = "Animations", meta = (DisplayName = "1H Attack Animation Variant B"))
+	UAnimSequence* m_1HAttackVar2Anim;
+
+	UPROPERTY(EditAnywhere, Category = "Animations", meta = (DisplayName = "1H Attack Animation Variant C"))
+	UAnimSequence* m_1HAttackVar3Anim;
 };
