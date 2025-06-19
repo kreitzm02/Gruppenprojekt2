@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BaseStateTransition.h"
-#include "BaseEnemyState.h"
+#include "FSM_BaseStateTransition.h"
+#include "FSM_BaseEnemyState.h"
 #include "Engine/DataAsset.h"
 #include "FSMData.generated.h"
 
@@ -17,10 +17,10 @@ struct FTargetStateWithCondition
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, Instanced)
-	UBaseStateTransition* targetCondition;
+	UFSM_BaseStateTransition* targetCondition;
 
 	UPROPERTY(EditAnywhere, Instanced)
-	UBaseEnemyState* targetState;
+	UFSM_BaseEnemyState* targetState;
 };
 
 USTRUCT()
@@ -29,7 +29,7 @@ struct FStateData
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, Instanced)
-	UBaseEnemyState* originState;
+	UFSM_BaseEnemyState* originState;
 
 	UPROPERTY(EditAnywhere)
 	TArray<FTargetStateWithCondition> targetStateWithCond;

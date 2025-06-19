@@ -17,8 +17,9 @@ struct FDungeonRoom
 	GENERATED_BODY()
 
 	FInt32Vector2 m_RoomOrigin;
-	int32 m_RoomCellWidth;
 	int32 m_RoomCellLength;
+	int32 m_RoomCellWidth;
+	
 	ERoomType m_RoomType;
 
 	FDungeonRoom() : m_RoomOrigin(0, 0), m_RoomCellWidth(0), m_RoomCellLength(0), m_RoomType(ERoomType::EMPTY) {}
