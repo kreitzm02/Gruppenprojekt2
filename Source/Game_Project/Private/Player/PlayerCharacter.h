@@ -26,8 +26,20 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* m_PlayerCamera;
 
+	UPROPERTY(VisibleAnywhere, Category = "Abilities", meta = (AllowPrivateAccess = "true"))
+	class UAbilityComponent* m_PlayerAbilities;
+
 	void MoveForward(float a_Value);
 	void MoveRight(float a_Value);
+	void StartSprint();
+	void StopSprint();
+	void UseAbility();
+	void ChangeToAbilitySlot0();
+	void ChangeToAbilitySlot1();
+	void ChangeToAbilitySlot2();
+	void ChangeToAbilitySlot3();
+	void AbilitySlotIncrease();
+	void AbilitySlotDecrease();
 
 public:	
 	// Called every frame
@@ -36,12 +48,93 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UFUNCTION(BlueprintCallable, Category = "Weapons")
+	void SetWeaponVisibility(FName a_BoneName, bool a_SetVisible);
+	UFUNCTION(BlueprintCallable, Category = "Weapons")
+	void HideAllWeapons();
+	UFUNCTION(BlueprintCallable, Category = "Weapons")
+	void HideAllWeaponsExcept(FName a_BoneName);
+
 private:
 
-	UPROPERTY(EditAnywhere, Category = "Data Asset")
-	TArray<UPlayerCharDataAsset*> m_PlayerCharDataAssets;
+	// Player Settings
+	UPROPERTY(EditAnywhere, Category = "General Player Settings")
+	float m_WalkSpeed = 500.0f;
 
+	UPROPERTY(EditAnywhere, Category = "General Player Settings")
+	float m_RunSpeed = 1000.0f;
+
+	UPROPERTY(EditAnywhere, Category = "General Player Settings")
+	int32 m_AbilityNum = 4;
+
+	int32 m_CurrentAbilitySlot = 0;
+
+	//
+
+	UPROPERTY()
+	FVector m_PreviousLocation;
+	EPlayerState m_PlayerState;
+
+	// setup methods
 	void SetupCamera();
 	void SetupMovement();
+	void SetupAbilityComp();
+	void SetupPlayer();
+	void SetupWeapons();
 
+	// weapon meshes
+	UPROPERTY(EditAnywhere, Category = "Basic Weapon Meshes")
+	UStaticMesh* m_Axe;
+
+	UPROPERTY(EditAnywhere, Category = "Basic Weapon Meshes")
+	UStaticMesh* m_Crossbow;
+
+	UPROPERTY(EditAnywhere, Category = "Basic Weapon Meshes")
+	UStaticMesh* m_Dagger;
+
+	UPROPERTY(EditAnywhere, Category = "Basic Weapon Meshes")
+	UStaticMesh* m_Spellbook;
+
+	UPROPERTY(EditAnywhere, Category = "Basic Weapon Meshes")
+	UStaticMesh* m_Staff;
+
+	UPROPERTY(EditAnywhere, Category = "Basic Weapon Meshes")
+	UStaticMesh* m_Wand;
+
+	UPROPERTY(EditAnywhere, Category = "Basic Weapon Meshes")
+	UStaticMesh* m_Sword;
+
+	UPROPERTY(EditAnywhere, Category = "Basic Weapon Meshes")
+	UStaticMesh* m_Blade;
+
+	UPROPERTY(EditAnywhere, Category = "Basic Weapon Meshes")
+	UStaticMesh* m_Mace;
+
+	UPROPERTY(EditAnywhere, Category = "Basic Weapon Meshes")
+	UStaticMesh* m_Scythe;
+
+	// weapon setup helper functions
+
+	void GetChildBones(const FName& a_ParentBoneName, TArray<FName>& a_OutChildBones) const;
+
+	void GetWeaponSockets(const FName& a_ParentBoneName, TArray<FName>& a_OutSockets) const;
+
+	UStaticMeshComponent* AttachWeaponComponentToBone(FName a_BoneName, UStaticMesh* a_WeaponMesh);
+
+	
+
+	//
+
+	UPROPERTY()
+	TMap<FName, UStaticMeshComponent*> m_AttachedWeapons;
+
+public:
+	UPROPERTY(EditAnywhere, Category = "Data Asset")
+	TArray<UPlayerCharDataAsset*> m_PlayerCharDataAssets;
+};
+
+UENUM()
+enum class EPlayerState : uint8
+{
+	IDLE, WALK, SPRINT
 };
