@@ -26,17 +26,17 @@ public:
 
 	//void SetOwnerPawn(APawn* a_pawn)
 	//{
-	//	ownerPawn = a_pawn;
+	//	m_ownerPawn = a_pawn;
 	//}
 
 	//APawn* GetOwnerPawn()
 	//{
-	//	return ownerPawn;
+	//	return m_ownerPawn;
 	//}
 protected:
 	UPROPERTY()
-	APawn* ownerPawn;
+	APawn* m_ownerPawn;
 	UPROPERTY()
-	USkeletalMeshComponent* ownerSkeletalMesh;
+	USkeletalMeshComponent* m_ownerSkeletalMesh;
 
 };

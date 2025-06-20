@@ -21,12 +21,12 @@ void AOverworldGeneration::BeginPlay()
 {
 	Super::BeginPlay();
 
-    if (seed == 0)
+    if (m_seed == 0)
     {
-        seed = FMath::Rand();
-        UE_LOG(LogTemp, Log, TEXT("Random Seed: %d"), seed);
+        m_seed = FMath::Rand();
+        UE_LOG(LogTemp, Log, TEXT("Random Seed: %d"), m_seed);
     }
-    randomNumber.Initialize(seed);
+    m_randomNumber.Initialize(m_seed);
 
     InitializeTMap();
 
@@ -34,26 +34,26 @@ void AOverworldGeneration::BeginPlay()
 
     TArray<FVector> offset = {};
     
-    for (int i = 0; i <= worldSize + 10; i++)
+    for (int i = 0; i <= m_worldSize + 10; i++)
     {
         if (i == 0)
         {
             //generate starting tile
-            int roadCountIndex = randomNumber.RandRange(startRoadCountMin, startRoadCountMax);
-            int tileIndex = randomNumber.RandRange(0, (*possibleTilesMap)[roadCountIndex].Num() - 1);
-            int tileRotationIndex = randomNumber.RandRange(0, (*possibleTilesMap)[roadCountIndex][tileIndex].Num() - 1);
-            tileActor = GetWorld()->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), FVector::ZeroVector, (*possibleTilesMap)[roadCountIndex][tileIndex][tileRotationIndex].rotation);
+            int roadCountIndex = m_randomNumber.RandRange(m_startRoadCountMin, m_startRoadCountMax);
+            int tileIndex = m_randomNumber.RandRange(0, (*m_possibleTilesMap)[roadCountIndex].Num() - 1);
+            int tileRotationIndex = m_randomNumber.RandRange(0, (*m_possibleTilesMap)[roadCountIndex][tileIndex].Num() - 1);
+            tileActor = GetWorld()->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), FVector::ZeroVector, (*m_possibleTilesMap)[roadCountIndex][tileIndex][tileRotationIndex].m_rotation);
             if (tileActor)
             {
-                tileActor->GetStaticMeshComponent()->SetStaticMesh((*possibleTilesMap)[roadCountIndex][tileIndex][tileRotationIndex].tileMesh);
+                tileActor->GetStaticMeshComponent()->SetStaticMesh((*m_possibleTilesMap)[roadCountIndex][tileIndex][tileRotationIndex].m_tileMesh);
                 tileActor->SetMobility(EComponentMobility::Static);
             }
-            PositionAndEdgeData tempData = PositionAndEdgeData(FVector(0,0,0), (*possibleTilesMap)[roadCountIndex][tileIndex][tileRotationIndex].edgeHasRoad);
-            lastGeneratedTiles.Add(tempData);
-            currentGeneratedTiles.Add(tempData);
+            PositionAndEdgeData tempData = PositionAndEdgeData(FVector(0,0,0), (*m_possibleTilesMap)[roadCountIndex][tileIndex][tileRotationIndex].m_edgeHasRoad);
+            m_lastGeneratedTiles.Add(tempData);
+            m_currentGeneratedTiles.Add(tempData);
             
         }
-        else if (i <= worldSize)
+        else if (i <= m_worldSize)
         {
             TArray<FVector> worldPositions = NextPositionInWorldSpace(i);
         
@@ -143,16 +143,16 @@ void AOverworldGeneration::BeginPlay()
                 }
 
                 //dont get tile with more roads than needed on edge of world
-                if (i == worldSize - 1 && minRoadCount > 0)
+                if (i == m_worldSize - 1 && minRoadCount > 0)
                 {
                     maxRoadCount = minRoadCount;
                 }
 
                 //possibility of road spreading
-                if (minRoadCount <= 2 && maxRoadCount >= 2 && i < worldSize - 1)
+                if (minRoadCount <= 2 && maxRoadCount >= 2 && i < m_worldSize - 1)
                 {
-                    int roadSpreadRandom = randomNumber.RandRange(1, 100);
-                    if (roadSpreadRandom >= roadSpreadPossability)
+                    int roadSpreadRandom = m_randomNumber.RandRange(1, 100);
+                    if (roadSpreadRandom >= m_roadSpreadPossability)
                     {
                         minRoadCount = 2;
                         maxRoadCount = 3;
@@ -168,25 +168,25 @@ void AOverworldGeneration::BeginPlay()
 
                 for (int j = minRoadCount; j <= maxRoadCount; j++)
                 {
-                    if (j == 1 && i <= worldSize - 2)//no single road tile until end of world
+                    if (j == 1 && i <= m_worldSize - 2)//no single road tile until end of world
                     {
                         j++;
                     }
-                    for(TArray<TileRoadWithRotationData> a_tileArray : (*possibleTilesMap)[j])
+                    for(TArray<TileRoadWithRotationData> a_tileArray : (*m_possibleTilesMap)[j])
                     {
                         for(TileRoadWithRotationData a_tile : a_tileArray)//compare tiles bool array with neededEdgeData but ignoring the null data
                         {
-                            for (int k = 0; k < a_tile.edgeHasRoad.Num(); k++)
+                            for (int k = 0; k < a_tile.m_edgeHasRoad.Num(); k++)
                             {
                                 if (!neededEdgeData[k].IsSet())
                                 {
                                     
                                 }
-                                else if (neededEdgeData[k] != a_tile.edgeHasRoad[k])
+                                else if (neededEdgeData[k] != a_tile.m_edgeHasRoad[k])
                                 {
                                     break;
                                 }
-                                if (k == a_tile.edgeHasRoad.Num() - 1)
+                                if (k == a_tile.m_edgeHasRoad.Num() - 1)
                                 {
                                     possibleTiles.Add(a_tile);
                                 }
@@ -196,8 +196,8 @@ void AOverworldGeneration::BeginPlay()
                 }
 
                 int selectedTile = 0;
-                int roadStraightnessRandom = randomNumber.RandRange(1, 100);
-                if (roadStraightnessRandom <= roadStraightness)
+                int roadStraightnessRandom = m_randomNumber.RandRange(1, 100);
+                if (roadStraightnessRandom <= m_roadStraightness)
                 {
                     selectedTile = 0;
                     for (TileRoadWithRotationData a_tile : possibleTiles)
@@ -212,7 +212,7 @@ void AOverworldGeneration::BeginPlay()
 
                     if (selectedTile >= possibleTiles.Num())
                     {
-                        selectedTile = randomNumber.RandRange(0, possibleTiles.Num() - 1);
+                        selectedTile = m_randomNumber.RandRange(0, possibleTiles.Num() - 1);
                     }
                 }
                 else
@@ -236,37 +236,37 @@ void AOverworldGeneration::BeginPlay()
 
                     if (bigCurveRoadTiles.Num() > 0)
                     {
-                        selectedTile = bigCurveRoadTiles[randomNumber.RandRange(0, bigCurveRoadTiles.Num() - 1)];
+                        selectedTile = bigCurveRoadTiles[m_randomNumber.RandRange(0, bigCurveRoadTiles.Num() - 1)];
                     }
                     else if (threeRoadTiles.Num() > 0)
                     {
-                        selectedTile = threeRoadTiles[randomNumber.RandRange(0, threeRoadTiles.Num() - 1)];
+                        selectedTile = threeRoadTiles[m_randomNumber.RandRange(0, threeRoadTiles.Num() - 1)];
                     }
                     else
                     {
-                        selectedTile = randomNumber.RandRange(0, possibleTiles.Num() - 1);
+                        selectedTile = m_randomNumber.RandRange(0, possibleTiles.Num() - 1);
                     }
                 }
 
                 if (IsTileTileType(possibleTiles[selectedTile], RoadNoEdges))
                 {
-	                emptyTiles->Add(a_pos);
+	                m_emptyTiles->Add(a_pos);
                 }
-                else if (i >= worldSize - 1 && IsTileTileType(possibleTiles[selectedTile], RoadEnd))
+                else if (i >= m_worldSize - 1 && IsTileTileType(possibleTiles[selectedTile], RoadEnd))
                 {
-	                endTiles->Add(a_pos);
+	                m_endTiles->Add(a_pos);
                 }
 
                 //select a random tile out of the possible ones and spawns it
-                tileActor = GetWorld()->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), TilePosition(a_pos.X, a_pos.Y), possibleTiles[selectedTile].rotation);
+                tileActor = GetWorld()->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), TilePosition(a_pos.X, a_pos.Y), possibleTiles[selectedTile].m_rotation);
                 if (tileActor)
                 {
-                    tileActor->GetStaticMeshComponent()->SetStaticMesh(possibleTiles[selectedTile].tileMesh);
+                    tileActor->GetStaticMeshComponent()->SetStaticMesh(possibleTiles[selectedTile].m_tileMesh);
                     tileActor->SetMobility(EComponentMobility::Static);
                 }
 
-                currentGeneratedTiles.Add(PositionAndEdgeData(a_pos, possibleTiles[selectedTile].edgeHasRoad));
-                lastGeneratedTiles.Add(PositionAndEdgeData(a_pos, possibleTiles[selectedTile].edgeHasRoad));
+                m_currentGeneratedTiles.Add(PositionAndEdgeData(a_pos, possibleTiles[selectedTile].m_edgeHasRoad));
+                m_lastGeneratedTiles.Add(PositionAndEdgeData(a_pos, possibleTiles[selectedTile].m_edgeHasRoad));
 
         
             }
@@ -281,47 +281,47 @@ void AOverworldGeneration::BeginPlay()
             	tileActor = GetWorld()->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), TilePosition(a_pos.X, a_pos.Y), FRotator::ZeroRotator);
                 if (tileActor)
                 {
-                    tileActor->GetStaticMeshComponent()->SetStaticMesh((*possibleTilesMap)[0][0][0].tileMesh);
+                    tileActor->GetStaticMeshComponent()->SetStaticMesh((*m_possibleTilesMap)[0][0][0].m_tileMesh);
                     tileActor->SetMobility(EComponentMobility::Static);
                 }
                 tileActor = GetWorld()->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), TilePosition(a_pos.X, a_pos.Y), FRotator::ZeroRotator);
                 if (tileActor)
                 {
-                    tileActor->GetStaticMeshComponent()->SetStaticMesh(worldBorder[randomNumber.RandRange(0, worldBorder.Num() - 1)]);
+                    tileActor->GetStaticMeshComponent()->SetStaticMesh(m_worldBorder[m_randomNumber.RandRange(0, m_worldBorder.Num() - 1)]);
                     tileActor->SetMobility(EComponentMobility::Static);
                 }
             }
         }
-        lastGeneratedTiles = currentGeneratedTiles;
-        currentGeneratedTiles.Empty();
+        m_lastGeneratedTiles = m_currentGeneratedTiles;
+        m_currentGeneratedTiles.Empty();
 
 	    
     }
 
     //nature placement
-    for (int i = emptyTiles->Num() - 1; i >= 0; i--)
+    for (int i = m_emptyTiles->Num() - 1; i >= 0; i--)
     {
-        int natureDensityRandom = randomNumber.RandRange(1, 100);
-        FVector position = (*emptyTiles)[i];
-        if (natureDensityRandom <= natureDensity)
+        int natureDensityRandom = m_randomNumber.RandRange(1, 100);
+        FVector position = (*m_emptyTiles)[i];
+        if (natureDensityRandom <= m_natureDensity)
         {
             tileActor = GetWorld()->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), TilePosition(position.X, position.Y), FRotator::ZeroRotator);
             if (tileActor)
             {
-                tileActor->GetStaticMeshComponent()->SetStaticMesh(natureDecorations[randomNumber.RandRange(0, natureDecorations.Num() - 1)]);
+                tileActor->GetStaticMeshComponent()->SetStaticMesh(m_natureDecorations[m_randomNumber.RandRange(0, m_natureDecorations.Num() - 1)]);
                 tileActor->SetMobility(EComponentMobility::Static);
             }
-            emptyTiles->RemoveAt(i);
+            m_emptyTiles->RemoveAt(i);
         }
     }
-    if (!navMesh)
+    if (!m_navMesh)
     {
         UE_LOG(LogTemp, Error, TEXT("NavMesh not Found"));
     }
     else
     {
-	    navMesh->SetActorLocation(FVector(0,0,0));
-		navMesh->SetActorScale3D(FVector(worldSize * 2, worldSize * 2,0.2));
+	    m_navMesh->SetActorLocation(FVector(0,0,0));
+		m_navMesh->SetActorScale3D(FVector(m_worldSize * 2, m_worldSize * 2,0.2));
         if (UNavigationSystemV1* navSys = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld()))
         {
             navSys->Build();
@@ -340,13 +340,13 @@ void AOverworldGeneration::InitializeTMap()
 	TArray<TileRoadWithRotationData> tempData = {};
     for (int i = 0; i <= 6; i++)
     { 
-        possibleTilesMap->Add(i, TArray<TArray<TileRoadWithRotationData>>());
+        m_possibleTilesMap->Add(i, TArray<TArray<TileRoadWithRotationData>>());
     }
-	for (UOverworldTileData* a_tileData : tileData)
+	for (UOverworldTileData* a_tileData : m_tileData)
 	{
         int roadCount = 0;
         tempData = GetRotatedTileAndEdges(a_tileData,roadCount);
-        possibleTilesMap->Find(roadCount)->Add(tempData);
+        m_possibleTilesMap->Find(roadCount)->Add(tempData);
 	}
     
 }
@@ -375,7 +375,7 @@ TArray<AOverworldGeneration::TileRoadWithRotationData> AOverworldGeneration::Get
         }
 	    for (TileRoadWithRotationData a_data : shiftedEdgeDataAndRotation)
 	    {
-		    if (shiftedEdgeData == a_data.edgeHasRoad)
+		    if (shiftedEdgeData == a_data.m_edgeHasRoad)
 		    {
 			    allowToAdd = false;
                 break;
@@ -398,15 +398,15 @@ TArray<AOverworldGeneration::TileRoadWithRotationData> AOverworldGeneration::Get
     return shiftedEdgeDataAndRotation;
 }
 
-//calculates the actual placeing position of a tile based on the raw position
+//calculates the actual placeing m_position of a tile based on the raw m_position
 FVector AOverworldGeneration::TilePosition(int a_width, int a_height)
 {
-    float y = tileSize * (FMath::Sqrt(12.0f) / 2 * a_height);
-    float x = -1 * tileSize * (2 * a_width + a_height % 2);
+    float y = m_tileSize * (FMath::Sqrt(12.0f) / 2 * a_height);
+    float x = -1 * m_tileSize * (2 * a_width + a_height % 2);
     return FVector(x, y, 0);
 }
 
-//calculates the next raw position in a grid
+//calculates the next raw m_position in a grid
 TArray<FVector> AOverworldGeneration::NextPositionInWorldSpace(int a_circleIteration)
 {
     TArray<FVector> nextPositions;
@@ -490,16 +490,16 @@ TOptional<bool> AOverworldGeneration::GetNeighboringTilesEdgeData(FVector a_curr
 
     bool posFound = false;
 
-    for (PositionAndEdgeData a_tile : lastGeneratedTiles)
+    for (PositionAndEdgeData a_tile : m_lastGeneratedTiles)
     {
-	    if (a_tile.position == a_currentPos + a_offset)
+	    if (a_tile.m_position == a_currentPos + a_offset)
 	    {
 		    posFound = true;
 	    }
 
         if (posFound == true)
         {
-	        edgeData = a_tile.edgeHasRoad[(a_edgeToCheck + 3) % 6];
+	        edgeData = a_tile.m_edgeHasRoad[(a_edgeToCheck + 3) % 6];
             posFound = false;
             break;
         }
@@ -552,13 +552,13 @@ bool AOverworldGeneration::IsTileTileType(TileRoadWithRotationData a_tile, TileT
 	case RoadNoEdges:
         tilesBaseBool = {false,false,false,false,false,false};
 
-        for (int i = 0; i < a_tile.edgeHasRoad.Num(); i++)
+        for (int i = 0; i < a_tile.m_edgeHasRoad.Num(); i++)
         {
             bool match = true;
 
-	        for (int j = 0; j < a_tile.edgeHasRoad.Num(); j++)
+	        for (int j = 0; j < a_tile.m_edgeHasRoad.Num(); j++)
 	        {
-		        if (tilesBaseBool[j] != a_tile.edgeHasRoad[(j + i) % 6])
+		        if (tilesBaseBool[j] != a_tile.m_edgeHasRoad[(j + i) % 6])
 		        {
 			        match = false;
                     break;
@@ -575,13 +575,13 @@ bool AOverworldGeneration::IsTileTileType(TileRoadWithRotationData a_tile, TileT
     case RoadEnd:
         tilesBaseBool = { false,true,false,false,false,false };
 
-        for (int i = 0; i < a_tile.edgeHasRoad.Num(); i++)
+        for (int i = 0; i < a_tile.m_edgeHasRoad.Num(); i++)
         {
             bool match = true;
 
-            for (int j = 0; j < a_tile.edgeHasRoad.Num(); j++)
+            for (int j = 0; j < a_tile.m_edgeHasRoad.Num(); j++)
             {
-                if (tilesBaseBool[j] != a_tile.edgeHasRoad[(j + i) % 6])
+                if (tilesBaseBool[j] != a_tile.m_edgeHasRoad[(j + i) % 6])
                 {
                     match = false;
                     break;
@@ -598,13 +598,13 @@ bool AOverworldGeneration::IsTileTileType(TileRoadWithRotationData a_tile, TileT
     case RoadSmallCurve:
         tilesBaseBool = { false,true,true,false,false,false };
 
-        for (int i = 0; i < a_tile.edgeHasRoad.Num(); i++)
+        for (int i = 0; i < a_tile.m_edgeHasRoad.Num(); i++)
         {
             bool match = true;
 
-            for (int j = 0; j < a_tile.edgeHasRoad.Num(); j++)
+            for (int j = 0; j < a_tile.m_edgeHasRoad.Num(); j++)
             {
-                if (tilesBaseBool[j] != a_tile.edgeHasRoad[(j + i) % 6])
+                if (tilesBaseBool[j] != a_tile.m_edgeHasRoad[(j + i) % 6])
                 {
                     match = false;
                     break;
@@ -621,13 +621,13 @@ bool AOverworldGeneration::IsTileTileType(TileRoadWithRotationData a_tile, TileT
     case RoadBigCurve:
         tilesBaseBool = { false,true,false,true,false,false };
 
-        for (int i = 0; i < a_tile.edgeHasRoad.Num(); i++)
+        for (int i = 0; i < a_tile.m_edgeHasRoad.Num(); i++)
         {
             bool match = true;
 
-            for (int j = 0; j < a_tile.edgeHasRoad.Num(); j++)
+            for (int j = 0; j < a_tile.m_edgeHasRoad.Num(); j++)
             {
-                if (tilesBaseBool[j] != a_tile.edgeHasRoad[(j + i) % 6])
+                if (tilesBaseBool[j] != a_tile.m_edgeHasRoad[(j + i) % 6])
                 {
                     match = false;
                     break;
@@ -644,13 +644,13 @@ bool AOverworldGeneration::IsTileTileType(TileRoadWithRotationData a_tile, TileT
     case RoadStraight:
         tilesBaseBool = { false,true,false,false,true,false };
 
-        for (int i = 0; i < a_tile.edgeHasRoad.Num(); i++)
+        for (int i = 0; i < a_tile.m_edgeHasRoad.Num(); i++)
         {
             bool match = true;
 
-            for (int j = 0; j < a_tile.edgeHasRoad.Num(); j++)
+            for (int j = 0; j < a_tile.m_edgeHasRoad.Num(); j++)
             {
-                if (tilesBaseBool[j] != a_tile.edgeHasRoad[(j + i) % 6])
+                if (tilesBaseBool[j] != a_tile.m_edgeHasRoad[(j + i) % 6])
                 {
                     match = false;
                     break;
@@ -667,13 +667,13 @@ bool AOverworldGeneration::IsTileTileType(TileRoadWithRotationData a_tile, TileT
     case RoadE:
         tilesBaseBool = { true,true,true,false,false,false };
 
-        for (int i = 0; i < a_tile.edgeHasRoad.Num(); i++)
+        for (int i = 0; i < a_tile.m_edgeHasRoad.Num(); i++)
         {
             bool match = true;
 
-            for (int j = 0; j < a_tile.edgeHasRoad.Num(); j++)
+            for (int j = 0; j < a_tile.m_edgeHasRoad.Num(); j++)
             {
-                if (tilesBaseBool[j] != a_tile.edgeHasRoad[(j + i) % 6])
+                if (tilesBaseBool[j] != a_tile.m_edgeHasRoad[(j + i) % 6])
                 {
                     match = false;
                     break;
@@ -690,13 +690,13 @@ bool AOverworldGeneration::IsTileTileType(TileRoadWithRotationData a_tile, TileT
     case RoadYLeft:
         tilesBaseBool = { false,true,false,true,true,false };
 
-        for (int i = 0; i < a_tile.edgeHasRoad.Num(); i++)
+        for (int i = 0; i < a_tile.m_edgeHasRoad.Num(); i++)
         {
             bool match = true;
 
-            for (int j = 0; j < a_tile.edgeHasRoad.Num(); j++)
+            for (int j = 0; j < a_tile.m_edgeHasRoad.Num(); j++)
             {
-                if (tilesBaseBool[j] != a_tile.edgeHasRoad[(j + i) % 6])
+                if (tilesBaseBool[j] != a_tile.m_edgeHasRoad[(j + i) % 6])
                 {
                     match = false;
                     break;
@@ -713,13 +713,13 @@ bool AOverworldGeneration::IsTileTileType(TileRoadWithRotationData a_tile, TileT
     case RoadYRight:
         tilesBaseBool = { false,true,false,false,true,true };
 
-        for (int i = 0; i < a_tile.edgeHasRoad.Num(); i++)
+        for (int i = 0; i < a_tile.m_edgeHasRoad.Num(); i++)
         {
             bool match = true;
 
-            for (int j = 0; j < a_tile.edgeHasRoad.Num(); j++)
+            for (int j = 0; j < a_tile.m_edgeHasRoad.Num(); j++)
             {
-                if (tilesBaseBool[j] != a_tile.edgeHasRoad[(j + i) % 6])
+                if (tilesBaseBool[j] != a_tile.m_edgeHasRoad[(j + i) % 6])
                 {
                     match = false;
                     break;
@@ -736,13 +736,13 @@ bool AOverworldGeneration::IsTileTileType(TileRoadWithRotationData a_tile, TileT
     case RoadYWide:
         tilesBaseBool = { false,true,false,true,false,true };
 
-        for (int i = 0; i < a_tile.edgeHasRoad.Num(); i++)
+        for (int i = 0; i < a_tile.m_edgeHasRoad.Num(); i++)
         {
             bool match = true;
 
-            for (int j = 0; j < a_tile.edgeHasRoad.Num(); j++)
+            for (int j = 0; j < a_tile.m_edgeHasRoad.Num(); j++)
             {
-                if (tilesBaseBool[j] != a_tile.edgeHasRoad[(j + i) % 6])
+                if (tilesBaseBool[j] != a_tile.m_edgeHasRoad[(j + i) % 6])
                 {
                     match = false;
                     break;
@@ -759,13 +759,13 @@ bool AOverworldGeneration::IsTileTileType(TileRoadWithRotationData a_tile, TileT
     case RoadX:
         tilesBaseBool = { true,false,true,true,false,true };
 
-        for (int i = 0; i < a_tile.edgeHasRoad.Num(); i++)
+        for (int i = 0; i < a_tile.m_edgeHasRoad.Num(); i++)
         {
             bool match = true;
 
-            for (int j = 0; j < a_tile.edgeHasRoad.Num(); j++)
+            for (int j = 0; j < a_tile.m_edgeHasRoad.Num(); j++)
             {
-                if (tilesBaseBool[j] != a_tile.edgeHasRoad[(j + i) % 6])
+                if (tilesBaseBool[j] != a_tile.m_edgeHasRoad[(j + i) % 6])
                 {
                     match = false;
                     break;
@@ -782,13 +782,13 @@ bool AOverworldGeneration::IsTileTileType(TileRoadWithRotationData a_tile, TileT
     case RoadK:
         tilesBaseBool = { true,true,false,false,true,true };
 
-        for (int i = 0; i < a_tile.edgeHasRoad.Num(); i++)
+        for (int i = 0; i < a_tile.m_edgeHasRoad.Num(); i++)
         {
             bool match = true;
 
-            for (int j = 0; j < a_tile.edgeHasRoad.Num(); j++)
+            for (int j = 0; j < a_tile.m_edgeHasRoad.Num(); j++)
             {
-                if (tilesBaseBool[j] != a_tile.edgeHasRoad[(j + i) % 6])
+                if (tilesBaseBool[j] != a_tile.m_edgeHasRoad[(j + i) % 6])
                 {
                     match = false;
                     break;
@@ -805,13 +805,13 @@ bool AOverworldGeneration::IsTileTileType(TileRoadWithRotationData a_tile, TileT
     case RoadYPlusOne:
         tilesBaseBool = { true,true,true,false,true,false };
 
-        for (int i = 0; i < a_tile.edgeHasRoad.Num(); i++)
+        for (int i = 0; i < a_tile.m_edgeHasRoad.Num(); i++)
         {
             bool match = true;
 
-            for (int j = 0; j < a_tile.edgeHasRoad.Num(); j++)
+            for (int j = 0; j < a_tile.m_edgeHasRoad.Num(); j++)
             {
-                if (tilesBaseBool[j] != a_tile.edgeHasRoad[(j + i) % 6])
+                if (tilesBaseBool[j] != a_tile.m_edgeHasRoad[(j + i) % 6])
                 {
                     match = false;
                     break;
@@ -828,13 +828,13 @@ bool AOverworldGeneration::IsTileTileType(TileRoadWithRotationData a_tile, TileT
     case RoadFiveEdges:
         tilesBaseBool = { true,true,true,true,false,true };
 
-        for (int i = 0; i < a_tile.edgeHasRoad.Num(); i++)
+        for (int i = 0; i < a_tile.m_edgeHasRoad.Num(); i++)
         {
             bool match = true;
 
-            for (int j = 0; j < a_tile.edgeHasRoad.Num(); j++)
+            for (int j = 0; j < a_tile.m_edgeHasRoad.Num(); j++)
             {
-                if (tilesBaseBool[j] != a_tile.edgeHasRoad[(j + i) % 6])
+                if (tilesBaseBool[j] != a_tile.m_edgeHasRoad[(j + i) % 6])
                 {
                     match = false;
                     break;
@@ -851,13 +851,13 @@ bool AOverworldGeneration::IsTileTileType(TileRoadWithRotationData a_tile, TileT
     case RoadAllEdges:
         tilesBaseBool = { true,true,true,true,true,true };
 
-        for (int i = 0; i < a_tile.edgeHasRoad.Num(); i++)
+        for (int i = 0; i < a_tile.m_edgeHasRoad.Num(); i++)
         {
             bool match = true;
 
-            for (int j = 0; j < a_tile.edgeHasRoad.Num(); j++)
+            for (int j = 0; j < a_tile.m_edgeHasRoad.Num(); j++)
             {
-                if (tilesBaseBool[j] != a_tile.edgeHasRoad[(j + i) % 6])
+                if (tilesBaseBool[j] != a_tile.m_edgeHasRoad[(j + i) % 6])
                 {
                     match = false;
                     break;

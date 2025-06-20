@@ -16,11 +16,9 @@ class GAME_PROJECT_API UFSM_ConditionWarriorChargeStart : public UFSM_BaseStateT
 	GENERATED_BODY()
 
 private:
-	//UPROPERTY()
-	//AActor* owner = nullptr;
 
 	UPROPERTY()
-	AEnemy_Warrior* thisWarrior = nullptr;
+	AEnemy_Warrior* m_thisWarrior = nullptr;
 
 public:
 	void Initialize() override;

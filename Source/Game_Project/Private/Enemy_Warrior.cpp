@@ -7,14 +7,14 @@ void AEnemy_Warrior::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (!chargeReady && passedCooldownTime <= chargeCooldown)
+	if (!m_chargeReady && m_passedCooldownTime <= m_chargeCooldown)
 	{
-		passedCooldownTime += DeltaTime;
+		m_passedCooldownTime += DeltaTime;
 
-		if (passedCooldownTime >= chargeCooldown)
+		if (m_passedCooldownTime >= m_chargeCooldown)
 		{
-			chargeReady = true;
-			passedCooldownTime = 0.0f;
+			m_chargeReady = true;
+			m_passedCooldownTime = 0.0f;
 		}
 	}
 }

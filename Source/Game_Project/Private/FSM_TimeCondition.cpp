@@ -11,12 +11,12 @@ void UFSM_TimeCondition::Initialize()
 
 void UFSM_TimeCondition::ResetCondition()
 {
-	timeUntilTrue = FMath::RandRange(minTime,maxTime);
-	ellapsedTime = 0;
+	m_timeUntilTrue = FMath::RandRange(m_minTime,m_maxTime);
+	m_ellapsedTime = 0;
 }
 
 bool UFSM_TimeCondition::IsConditionMet(float a_deltaTime)
 {
-	ellapsedTime += GetWorld()->GetDeltaSeconds();
-	return ellapsedTime >= timeUntilTrue;
+	m_ellapsedTime += GetWorld()->GetDeltaSeconds();
+	return m_ellapsedTime >= m_timeUntilTrue;
 }

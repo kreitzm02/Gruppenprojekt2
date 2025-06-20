@@ -15,13 +15,13 @@ class GAME_PROJECT_API UFSM_TimeCondition : public UFSM_BaseStateTransition
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, Category = "Settings")
-	float minTime = 5.0f;
+	float m_minTime = 5.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Settings")
-	float maxTime = 5.0f;
+	float m_maxTime = 5.0f;
 
-	float timeUntilTrue = 0;
-	float ellapsedTime = 0;
+	float m_timeUntilTrue = 0;
+	float m_ellapsedTime = 0;
 public:
 	void Initialize() override;
 	void ResetCondition() override;

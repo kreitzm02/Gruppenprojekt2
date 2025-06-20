@@ -18,10 +18,10 @@ class GAME_PROJECT_API UFSM_ConditionZeroHealth : public UFSM_BaseStateTransitio
 	
 private:
 	UPROPERTY()
-	AActor* owner = nullptr;
+	AActor* m_owner = nullptr;
 
 	UPROPERTY()
-	AEnemyCharacter* enemy = nullptr;
+	AEnemyCharacter* m_enemy = nullptr;
 
 public:
 	void Initialize() override;

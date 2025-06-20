@@ -28,6 +28,8 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	virtual void OnConstruction(const FTransform& Transform) override;
+
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 	UFUNCTION()
@@ -36,71 +38,77 @@ public:
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* a_overlappedComponent, AActor* a_otherActor, UPrimitiveComponent* a_otherComp, int32 a_otherBodyIndex, bool a_bFromSweep, const FHitResult& a_sweepResult);
 
-	UAnimSequence* GetIdleAnimation() { return idleAnimation; }
+	UAnimSequence* GetIdleAnimation() { return m_idleAnimation; }
 
-	UAnimSequence* GetWalkAnimation() { return walkAnimation; }
+	UAnimSequence* GetWalkAnimation() { return m_walkAnimation; }
 
-	UAnimSequence* GetChaseAnimation() { return chaseAnimation; }
+	UAnimSequence* GetChaseAnimation() { return m_chaseAnimation; }
 
-	UAnimSequence* GetDeathAnimation() { return deathAnimation; }
+	UAnimSequence* GetDeathAnimation() { return m_deathAnimation; }
 
-	float GetPlayerDetectionRadius() { return playerDetectionRadius; }
+	float GetPlayerDetectionRadius() { return m_playerDetectionRadius; }
 
-	float GetPlayerChaseRadius() { return playerChaseRadius; }
+	float GetPlayerChaseRadius() { return m_playerChaseRadius; }
 
-	float GetIdleWalkSpeed() { return idleWalkSpeed; }
+	float GetIdleWalkSpeed() { return m_idleWalkSpeed; }
 
-	float GetChaseWalkSpeed() { return chaseWalkSpeed; }
+	float GetChaseWalkSpeed() { return m_chaseWalkSpeed; }
 
-	float GetAttackRange() { return attackRange; }
+	float GetAttackRange() { return m_attackRange; }
 
-	float GetCurrentHealth() { return currentHealth; }
+	float GetCurrentHealth() { return m_currentHealth; }
 
-	void SetDeathState(bool a_isDead) { isDead = a_isDead; }
+	void SetDeathState(bool a_isDead) { m_isDead = a_isDead; }
 private:
-	bool isDead = false;
+	bool m_isDead = false;
 
 	UPROPERTY(VisibleAnywhere)
-	USkeletalMeshComponent* skeletalMesh;
+	USkeletalMeshComponent* m_skeletalMesh;
 
 	UPROPERTY(VisibleAnywhere)
-	UFSM_EnemyStateMachineComponent* stateMachine;
+	UStaticMeshComponent* m_weaponMesh;
+
+	UPROPERTY(VisibleAnywhere)
+	UFSM_EnemyStateMachineComponent* m_stateMachine;
 
 	UPROPERTY(VisibleAnywhere, Category = "Enemy Properties")
-	class UBoxComponent* hitbox;
+	class UBoxComponent* m_characterHitbox;
+
+	UPROPERTY(VisibleAnywhere, Category = "Enemy Properties")
+	class UBoxComponent* m_axeHitbox;
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
-	UAnimSequence* idleAnimation = nullptr;
+	UAnimSequence* m_idleAnimation = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
-	UAnimSequence* walkAnimation = nullptr;
+	UAnimSequence* m_walkAnimation = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
-	UAnimSequence* chaseAnimation = nullptr;
+	UAnimSequence* m_chaseAnimation = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
-	UAnimSequence* deathAnimation = nullptr;
+	UAnimSequence* m_deathAnimation = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
-	float playerDetectionRadius = 1000.0f;
+	float m_playerDetectionRadius = 1000.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
-	float playerChaseRadius = 1100.0f;
+	float m_playerChaseRadius = 1100.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
-	float idleWalkSpeed = 200.0f;
+	float m_idleWalkSpeed = 200.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
-	float chaseWalkSpeed = 300.0f;
+	float m_chaseWalkSpeed = 300.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
-	float attackRange = 50.0f;
+	float m_attackRange = 50.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
-	float attackDamage = 1.0f;
+	float m_attackDamage = 1.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
-	float maxHealth = 100.0f;
+	float m_maxHealth = 100.0f;
 
-	float currentHealth;
+	float m_currentHealth;
 };

@@ -17,13 +17,13 @@ class GAME_PROJECT_API UFSM_ConditionPlayerInRange : public UFSM_BaseStateTransi
 
 private:
 	UPROPERTY()
-	AActor* owner = nullptr;
+	AActor* m_owner = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "Settings")
-	bool checkForInRange = true;
+	bool m_checkForInRange = true;
 
 	UPROPERTY()
-	float detectionRadius;
+	float m_detectionRadius;
 
 
 

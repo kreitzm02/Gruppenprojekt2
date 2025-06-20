@@ -17,35 +17,35 @@ class GAME_PROJECT_API AEnemy_Warrior : public AEnemyCharacter
 public:
 	virtual void Tick(float DeltaTime) override;
 
-	float GetChargeDuration() { return chargeDuration; }
+	float GetChargeDuration() { return m_chargeDuration; }
 
-	float GetChargeSpeed() { return chargeSpeed; }
+	float GetChargeSpeed() { return m_chargeSpeed; }
 
-	bool GetChargeReady() { return chargeReady; }
+	bool GetChargeReady() { return m_chargeReady; }
 
-	void SetChargeReady(bool a_chargeReady) { chargeReady = a_chargeReady; }
+	void SetChargeReady(bool a_chargeReady) { m_chargeReady = a_chargeReady; }
 
-	UAnimSequence* GetChargeAnimation() { return chargeAnimation; }
+	UAnimSequence* GetChargeAnimation() { return m_chargeAnimation; }
 
-	UAnimSequence* GetAttackAnimation() { return attackAnimation; }
+	UAnimSequence* GetAttackAnimation() { return m_attackAnimation; }
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
-	UAnimSequence* chargeAnimation = nullptr;
+	UAnimSequence* m_chargeAnimation = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
-	UAnimSequence* attackAnimation = nullptr;
+	UAnimSequence* m_attackAnimation = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
-	float chargeDuration = 4.0f;
+	float m_chargeDuration = 4.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
-	float chargeCooldown = 20.0f;
+	float m_chargeCooldown = 20.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
-	float chargeSpeed = 400.0f;
+	float m_chargeSpeed = 400.0f;
 
-	float passedCooldownTime = 0.0f;
+	float m_passedCooldownTime = 0.0f;
 
-	bool chargeReady = true;
+	bool m_chargeReady = true;
 };

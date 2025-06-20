@@ -25,5 +25,5 @@ public:
 
 private:
 	UPROPERTY()
-	UAnimSequence* idleAnimation;
+	UAnimSequence* m_idleAnimation;
 };

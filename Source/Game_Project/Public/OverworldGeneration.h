@@ -48,67 +48,67 @@ private:
 	private:
 		TileRoadWithRotationData();
 	public:
-		UStaticMesh* tileMesh = nullptr;
-		FRotator rotation = FRotator::ZeroRotator;
-		TArray<bool> edgeHasRoad = {};
+		UStaticMesh* m_tileMesh = nullptr;
+		FRotator m_rotation = FRotator::ZeroRotator;
+		TArray<bool> m_edgeHasRoad = {};
 
 		TileRoadWithRotationData(UStaticMesh* a_staticMesh, FRotator a_rotation, TArray<bool> a_edgeHasRoad)
 		{
-			tileMesh = a_staticMesh;
-			rotation = a_rotation;
-			edgeHasRoad = a_edgeHasRoad;
+			m_tileMesh = a_staticMesh;
+			m_rotation = a_rotation;
+			m_edgeHasRoad = a_edgeHasRoad;
 		}
 	};
 
 	struct PositionAndEdgeData
 	{
-		FVector position = FVector::ZeroVector;
-		TArray<bool> edgeHasRoad = {};
+		FVector m_position = FVector::ZeroVector;
+		TArray<bool> m_edgeHasRoad = {};
 
 		PositionAndEdgeData();
 		PositionAndEdgeData(FVector a_position, TArray<bool> a_edgeHasRoad)
 		{
-			position = a_position;
-			edgeHasRoad = a_edgeHasRoad;
+			m_position = a_position;
+			m_edgeHasRoad = a_edgeHasRoad;
 		}
 	};
 
 
 	UPROPERTY(EditAnywhere, Category = "Overworld settings")
-	int tileSize = 100;
+	int m_tileSize = 100;
 
 	UPROPERTY(EditAnywhere, Category = "Overworld settings")
-	int32 seed = 0;
+	int32 m_seed = 0;
 
 	UPROPERTY(EditAnywhere, Category = "Overworld settings")
-	int worldSize = 0;
+	int m_worldSize = 0;
 
 	UPROPERTY(EditAnywhere, Category = "Overworld settings", meta = (ClampMin = "0", ClampMax = "6", UIMin = "0", UIMax = "6"))
-	int startRoadCountMin = 0;
+	int m_startRoadCountMin = 0;
 
 	UPROPERTY(EditAnywhere, Category = "Overworld settings", meta = (ClampMin = "0", ClampMax = "6", UIMin = "0", UIMax = "6"))
-	int startRoadCountMax = 0;
+	int m_startRoadCountMax = 0;
 
 	UPROPERTY(EditAnywhere, Category = "Overworld settings", meta = (ClampMin = "0", ClampMax = "100", UIMin = "0", UIMax = "100"))
-	int roadSpreadPossability = 0;
+	int m_roadSpreadPossability = 0;
 
 	UPROPERTY(EditAnywhere, Category = "Overworld settings", meta = (ClampMin = "0", ClampMax = "100", UIMin = "0", UIMax = "100"))
-	int roadStraightness = 0;
+	int m_roadStraightness = 0;
 
 	UPROPERTY(EditAnywhere, Category = "Overworld settings", meta = (ClampMin = "0", ClampMax = "100", UIMin = "0", UIMax = "100"))
-	int natureDensity = 0;
+	int m_natureDensity = 0;
 
 	UPROPERTY(EditAnywhere, Category = "Overworld settings")
-	TArray<UOverworldTileData*> tileData = {};
+	TArray<UOverworldTileData*> m_tileData = {};
 
 	UPROPERTY(EditAnywhere, Category = "Overworld settings")
-	TArray<UStaticMesh*> worldBorder = {};
+	TArray<UStaticMesh*> m_worldBorder = {};
 
 	UPROPERTY(EditAnywhere, Category = "Overworld settings")
-	TArray<UStaticMesh*> natureDecorations = {};
+	TArray<UStaticMesh*> m_natureDecorations = {};
 
 	UPROPERTY(EditAnywhere, Category = "AIMap")
-	ANavMeshBoundsVolume* navMesh;
+	ANavMeshBoundsVolume* m_navMesh;
 
 	//UPROPERTY(EditAnywhere, Category = "Overworld settings")
 	//TArray<ADungeonEntrance*> dungeonEntrance = {};
@@ -116,17 +116,17 @@ private:
 	//UPROPERTY(EditAnywhere, Category = "Overworld settings")
 	//TArray<AEnemySpawn*> dungeonEntrance = {};
 
-	FRandomStream randomNumber;
+	FRandomStream m_randomNumber;
 
-	TArray<PositionAndEdgeData> lastGeneratedTiles = {};
-	TArray<PositionAndEdgeData> currentGeneratedTiles = {};
+	TArray<PositionAndEdgeData> m_lastGeneratedTiles = {};
+	TArray<PositionAndEdgeData> m_currentGeneratedTiles = {};
 
 
-	TArray<FVector>* endTiles = new TArray<FVector>;
-	TArray<FVector>* emptyTiles = new TArray<FVector>;
+	TArray<FVector>* m_endTiles = new TArray<FVector>;
+	TArray<FVector>* m_emptyTiles = new TArray<FVector>;
 
-	//map for each tile with each rotation and associated road data ordered after road count of roads on each edge
-	TMap<int, TArray<TArray<TileRoadWithRotationData>>>* possibleTilesMap = new TMap<int, TArray<TArray<TileRoadWithRotationData>>>();
+	//map for each tile with each m_rotation and associated road data ordered after road count of roads on each edge
+	TMap<int, TArray<TArray<TileRoadWithRotationData>>>* m_possibleTilesMap = new TMap<int, TArray<TArray<TileRoadWithRotationData>>>();
 
 
 	void InitializeTMap();

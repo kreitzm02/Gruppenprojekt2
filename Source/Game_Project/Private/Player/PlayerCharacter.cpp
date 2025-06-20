@@ -11,6 +11,7 @@
 #include "GameFramework/Controller.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Animation/AnimInstance.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -37,6 +38,36 @@ void APlayerCharacter::BeginPlay()
 
 	SetupWeapons();
 	HideAllWeapons();
+}
+
+float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	//currentHealth -= DamageAmount;
+	UE_LOG(LogTemp, Warning, TEXT("Player was hit"))
+	if (DamageCauser)
+	{
+		FVector knockbackDirection = GetActorLocation() - DamageCauser->GetActorLocation();
+		knockbackDirection.Z = 0;
+		knockbackDirection.Normalize();
+		HandleKnockback(knockbackDirection, 6000.0f /*get knockback strengh from damage causer*/);
+		//ACharacter* damagingUnit = Cast<ACharacter>(DamageCauser);
+		//damagingUnit->GetKnockback();
+	}
+
+	return DamageAmount;
+}
+
+void APlayerCharacter::HandleKnockback(FVector a_knockbackDirection, float a_knockbackStrength)
+{
+	LaunchCharacter(a_knockbackDirection * a_knockbackStrength, true, true);
+}
+
+void APlayerCharacter::OnHit(UPrimitiveComponent* a_overlappedComponent, AActor* a_otherActor, UPrimitiveComponent* a_otherComp, int32 a_otherBodyIndex, bool a_bFromSweep, const FHitResult& a_sweepResult)
+{
+	if (a_otherActor && a_otherActor != this && a_otherComp)
+	{
+		UGameplayStatics::ApplyDamage(a_otherActor, 1.0f/*get player damage*/, GetController(), this, nullptr);
+	}
 }
 
 void APlayerCharacter::MoveForward(float a_Value)
