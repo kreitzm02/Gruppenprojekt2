@@ -11,7 +11,7 @@
 #include "GameFramework/Controller.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Animation/AnimInstance.h"
-#include "Kismet/GameplayStatics.h"
+#include <Kismet/GameplayStatics.h>
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -31,8 +31,8 @@ void APlayerCharacter::BeginPlay()
 	
 	SetupPlayer();
 
-	if (m_PlayerCharDataAssets[0]->m_IdleAnim)
-		GetMesh()->PlayAnimation(m_PlayerCharDataAssets[0]->m_IdleAnim, true);
+	if (m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_IdleAnim)
+		GetMesh()->PlayAnimation(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_IdleAnim, true);
 
 	m_PreviousLocation = GetActorLocation();
 
@@ -40,35 +40,7 @@ void APlayerCharacter::BeginPlay()
 	HideAllWeapons();
 }
 
-float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
-{
-	//currentHealth -= DamageAmount;
-	UE_LOG(LogTemp, Warning, TEXT("Player was hit"))
-	if (DamageCauser)
-	{
-		FVector knockbackDirection = GetActorLocation() - DamageCauser->GetActorLocation();
-		knockbackDirection.Z = 0;
-		knockbackDirection.Normalize();
-		HandleKnockback(knockbackDirection, 6000.0f /*get knockback strengh from damage causer*/);
-		//ACharacter* damagingUnit = Cast<ACharacter>(DamageCauser);
-		//damagingUnit->GetKnockback();
-	}
-
-	return DamageAmount;
-}
-
-void APlayerCharacter::HandleKnockback(FVector a_knockbackDirection, float a_knockbackStrength)
-{
-	LaunchCharacter(a_knockbackDirection * a_knockbackStrength, true, true);
-}
-
-void APlayerCharacter::OnHit(UPrimitiveComponent* a_overlappedComponent, AActor* a_otherActor, UPrimitiveComponent* a_otherComp, int32 a_otherBodyIndex, bool a_bFromSweep, const FHitResult& a_sweepResult)
-{
-	if (a_otherActor && a_otherActor != this && a_otherComp)
-	{
-		UGameplayStatics::ApplyDamage(a_otherActor, 1.0f/*get player damage*/, GetController(), this, nullptr);
-	}
-}
+// INPUT 
 
 void APlayerCharacter::MoveForward(float a_Value)
 {
@@ -90,17 +62,17 @@ void APlayerCharacter::MoveRight(float a_Value)
 
 void APlayerCharacter::StartSprint()
 {
-	GetCharacterMovement()->MaxWalkSpeed = m_RunSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = m_PlayerMovementSpeed * m_RunMultiplier;
 }
 
 void APlayerCharacter::StopSprint()
 {
-	GetCharacterMovement()->MaxWalkSpeed = m_WalkSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = m_PlayerMovementSpeed;
 }
 
 void APlayerCharacter::UseAbility()
 {
-	m_PlayerAbilities->ActivateAbility(m_CurrentAbilitySlot); // TODO : 0 is temp only, param must be the index of the "active" ability (player can have multiple abilties)
+	m_PlayerAbilities->ActivateAbility(m_CurrentAbilitySlot); 
 }
 
 void APlayerCharacter::ChangeToAbilitySlot0()
@@ -143,10 +115,17 @@ void APlayerCharacter::AbilitySlotDecrease()
 	m_PlayerAbilities->EquipAbility(m_CurrentAbilitySlot);
 }
 
+//
+
 // Called every frame
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (!CheckIfCurrentPlayerClassIsValid())
+	{
+		UE_LOG(LogTemp, Fatal, TEXT("Fatal error: Current player class index is not valid!"));
+	}
 
 	const FVector currentLocation = GetActorLocation();
 	const float speed = FVector::Dist(currentLocation, m_PreviousLocation) / DeltaTime;
@@ -155,15 +134,15 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 	if (speed > movementThreshold)
 	{
-		if (speed > m_WalkSpeed + movementThreshold && m_PlayerState != EPlayerState::SPRINT)
+		if (speed > m_PlayerMovementSpeed + movementThreshold && m_PlayerState != EPlayerState::SPRINT)
 		{
 			m_PlayerState = EPlayerState::SPRINT;
-			GetMesh()->PlayAnimation(m_PlayerCharDataAssets[0]->m_SprintAnim, true);
+			GetMesh()->PlayAnimation(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_SprintAnim, true);
 		}
-		else if (speed < m_WalkSpeed + movementThreshold && m_PlayerState != EPlayerState::WALK)
+		else if (speed < m_PlayerMovementSpeed + movementThreshold && m_PlayerState != EPlayerState::WALK)
 		{
 			m_PlayerState = EPlayerState::WALK;
-			GetMesh()->PlayAnimation(m_PlayerCharDataAssets[0]->m_WalkAnim, true);
+			GetMesh()->PlayAnimation(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_WalkAnim, true);
 		}
 		
 	}
@@ -172,7 +151,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 		if (m_PlayerState != EPlayerState::IDLE)
 		{
 			m_PlayerState = EPlayerState::IDLE;
-			GetMesh()->PlayAnimation(m_PlayerCharDataAssets[0]->m_IdleAnim, true);
+			GetMesh()->PlayAnimation(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_IdleAnim, true);
 		}
 	}
 
@@ -193,17 +172,10 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction("EquipAbilityD", IE_Pressed, this, &APlayerCharacter::ChangeToAbilitySlot3);
 	PlayerInputComponent->BindAction("AbilityIncrease", IE_Pressed, this, &APlayerCharacter::AbilitySlotIncrease);
 	PlayerInputComponent->BindAction("AbilityDecrease", IE_Pressed, this, &APlayerCharacter::AbilitySlotDecrease);
-}
-
-void APlayerCharacter::SetWeaponVisibility(FName a_BoneName, bool a_SetVisible)
-{
-	if (UStaticMeshComponent** found = m_AttachedWeapons.Find(a_BoneName))
-	{
-		UStaticMeshComponent* component = *found;
-		component->SetVisibility(a_SetVisible, true);
-		component->SetHiddenInGame(!a_SetVisible, true);
-		component->SetCollisionEnabled(a_SetVisible ? ECollisionEnabled::QueryAndPhysics : ECollisionEnabled::NoCollision);
-	}
+	PlayerInputComponent->BindAction("PlayerClassA", IE_Pressed, this, &APlayerCharacter::ChangeToPlayerClassA);
+	PlayerInputComponent->BindAction("PlayerClassB", IE_Pressed, this, &APlayerCharacter::ChangeToPlayerClassB);
+	PlayerInputComponent->BindAction("PlayerClassC", IE_Pressed, this, &APlayerCharacter::ChangeToPlayerClassC);
+	PlayerInputComponent->BindAction("PlayerClassD", IE_Pressed, this, &APlayerCharacter::ChangeToPlayerClassD);
 }
 
 void APlayerCharacter::SetupCamera()
@@ -232,7 +204,7 @@ void APlayerCharacter::SetupMovement()
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 1440.0f, 0.0f);
 	GetCharacterMovement()->JumpZVelocity = 0.0f;
 	GetCharacterMovement()->AirControl = 0.0f;
-	GetCharacterMovement()->MaxWalkSpeed = m_WalkSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = m_PlayerMovementSpeed;
 
 }
 
@@ -243,12 +215,30 @@ void APlayerCharacter::SetupAbilityComp()
 
 void APlayerCharacter::SetupPlayer()
 {
-	GetMesh()->SetSkeletalMesh(m_PlayerCharDataAssets[0]->m_Mesh);
+	GetMesh()->SetSkeletalMesh(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_Mesh);
 	GetMesh()->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
-	m_PlayerAbilities->TryAddAbility(m_PlayerCharDataAssets[0]->m_StartingAbility);
-	m_PlayerAbilities->TryAddAbility(m_PlayerCharDataAssets[0]->m_StartingAbility1Debug);
-	m_PlayerAbilities->TryAddAbility(m_PlayerCharDataAssets[0]->m_StartingAbility2Debug);
-	m_PlayerAbilities->TryAddAbility(m_PlayerCharDataAssets[0]->m_StartingAbility3Debug);
+	m_PlayerAbilities->TryAddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility);
+
+	// only for debug purposes. the player would normally start with just 1 ability ( the m_StartingAbility)
+	m_PlayerAbilities->TryAddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility1Debug);
+	m_PlayerAbilities->TryAddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility2Debug);
+	m_PlayerAbilities->TryAddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility3Debug);
+
+	// setup the player stats with the default values from the given data asset
+	ResetStatsToDefault();
+} 
+
+// WEAPONS
+
+void APlayerCharacter::SetWeaponVisibility(FName a_BoneName, bool a_SetVisible)
+{
+	if (UStaticMeshComponent** found = m_AttachedWeapons.Find(a_BoneName))
+	{
+		UStaticMeshComponent* component = *found;
+		component->SetVisibility(a_SetVisible, true);
+		component->SetHiddenInGame(!a_SetVisible, true);
+		component->SetCollisionEnabled(a_SetVisible ? ECollisionEnabled::QueryAndPhysics : ECollisionEnabled::NoCollision);
+	}
 }
 
 void APlayerCharacter::SetupWeapons()
@@ -389,5 +379,136 @@ void APlayerCharacter::HideAllWeaponsExcept(FName a_BoneName)
 			SetWeaponVisibility(pair.Key, false);
 		else SetWeaponVisibility(pair.Key, true);
 	}
+}
+
+// GETTING DAMAGE
+
+float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	m_PlayerHealth -= DamageAmount;
+	if (m_PlayerHealth <= 0) m_PlayerHealth = 0;
+	UE_LOG(LogTemp, Warning, TEXT("Player was hit"))
+		if (DamageCauser)
+		{
+			FVector knockbackDirection = GetActorLocation() - DamageCauser->GetActorLocation();
+			knockbackDirection.Z = 0;
+			knockbackDirection.Normalize();
+			HandleKnockback(knockbackDirection, 6000.0f /*get knockback strengh from damage causer*/);
+			//ACharacter* damagingUnit = Cast<ACharacter>(DamageCauser);
+			//damagingUnit->GetKnockback();
+		}
+
+	return DamageAmount;
+}
+
+void APlayerCharacter::HandleKnockback(FVector a_knockbackDirection, float a_knockbackStrength)
+{
+	LaunchCharacter(a_knockbackDirection * a_knockbackStrength, true, true);
+}
+
+void APlayerCharacter::OnHit(UPrimitiveComponent* a_overlappedComponent, AActor* a_otherActor, UPrimitiveComponent* a_otherComp, int32 a_otherBodyIndex, bool a_bFromSweep, const FHitResult& a_sweepResult)
+{
+	if (a_otherActor && a_otherActor != this && a_otherComp)
+	{
+		UGameplayStatics::ApplyDamage(a_otherActor, 1.0f/*get player damage*/, GetController(), this, nullptr);
+	}
+}
+
+// void APlayerCharacter::TakeDamage(int32 a_Damage)
+// {
+// 	if (a_Damage <= 0) return; // negative values would increase the player health instead of decreasing it.
+// 	int32 clampedDefense = FMath::Clamp(m_PlayerDefense, 0, 100); // safety check
+// 	int32 totalDmg = a_Damage * (100 - clampedDefense) / 100;
+// 	m_PlayerHealth -= totalDmg;
+// 	if (m_PlayerHealth <= 0) m_PlayerHealth = 0;
+// }
+
+void APlayerCharacter::CheckForDeath()
+{
+}
+
+// PLAYER CLASS
+
+void APlayerCharacter::SetupChangedPlayerClass()
+{
+	GetMesh()->SetSkeletalMesh(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_Mesh);
+	GetMesh()->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
+	m_PlayerAbilities->RemoveAllAbilities();
+	m_PlayerAbilities->TryAddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility);
+
+	// only for debug purposes. the player would normally start with just 1 ability ( the m_StartingAbility)
+	m_PlayerAbilities->TryAddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility1Debug);
+	m_PlayerAbilities->TryAddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility2Debug);
+	m_PlayerAbilities->TryAddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility3Debug);
+
+	// setup the player stats with the default values from the given data asset
+	ResetStatsToDefault();
+	ChangeToAbilitySlot0();
+	GetMesh()->PlayAnimation(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_IdleAnim, true); // temporary fix, as the character plays the t-pose animation instead of idle
+}
+
+void APlayerCharacter::ChangeToPlayerClassA()
+{
+	m_CurrentPlayerClass = 0;
+	SetupChangedPlayerClass();
+}
+
+void APlayerCharacter::ChangeToPlayerClassB()
+{
+	m_CurrentPlayerClass = 1;
+	SetupChangedPlayerClass();
+}
+
+void APlayerCharacter::ChangeToPlayerClassC()
+{
+	m_CurrentPlayerClass = 2;
+	SetupChangedPlayerClass();
+}
+
+void APlayerCharacter::ChangeToPlayerClassD()
+{
+	m_CurrentPlayerClass = 3;
+	SetupChangedPlayerClass();
+}
+
+bool APlayerCharacter::CheckIfCurrentPlayerClassIsValid()
+{
+	if (m_PlayerCharDataAssets.Num() > m_CurrentPlayerClass && m_CurrentPlayerClass >= 0) return true;
+	else return false;
+}
+
+// PLAYER STATS
+
+void APlayerCharacter::ResetStatsToDefault()
+{
+	m_PlayerHealth = m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_BaseHealthPoints;
+	m_PlayerMovementSpeed = m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_BaseMoveSpeed;
+	m_PlayerDefense = m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_BaseDefense;
+	m_PlayerLuck = m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_BaseLuck;
+	m_PlayerAttackSpeed = m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_BaseAttackSpeed;
+}
+
+void APlayerCharacter::ChangeMovementSpeed(int32 a_Value)
+{
+	m_PlayerMovementSpeed += a_Value;
+	if (m_PlayerMovementSpeed <= 0) m_PlayerMovementSpeed = 0;
+}
+
+void APlayerCharacter::ChangeLuck(int32 a_Value)
+{
+	m_PlayerLuck += a_Value;
+	if (m_PlayerLuck <= 0) m_PlayerLuck = 0;
+}
+
+void APlayerCharacter::ChangeDefense(int32 a_Value)
+{
+	m_PlayerDefense += a_Value;
+	m_PlayerDefense = FMath::Clamp(m_PlayerDefense, 0, 100); // defense must be between 0 and 100 as it  decreases incoming damageby that percentage.
+}
+
+void APlayerCharacter::ChangeAttackSpeed(int32 a_Value)
+{
+	m_PlayerAttackSpeed += a_Value;
+	if (m_PlayerAttackSpeed <= 0) m_PlayerAttackSpeed = 0;
 }
 
