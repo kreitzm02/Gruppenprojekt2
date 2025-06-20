@@ -37,6 +37,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
 	void TryAddAbility(TSubclassOf<UBaseAbility> a_AbilityClass);
 
+	UFUNCTION(BlueprintCallable, Category = "Abilities")
+	void RemoveAllAbilities();
+
 private:
 	UPROPERTY(EditAnywhere)
 	TArray<UBaseAbility*> m_Abilities;
