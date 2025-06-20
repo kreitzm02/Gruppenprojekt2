@@ -57,7 +57,16 @@ public:
 	void HideAllWeaponsExcept(FName a_BoneName);
 
 	// manipulate player stats
-	void TakeDamage(int32 a_Damage);
+	// void TakeDamage(int32 a_Damage); redunant
+
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
+	UFUNCTION()
+	void HandleKnockback(FVector a_knockbackDirection, float a_knockbackStrength);
+
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* a_overlappedComponent, AActor* a_otherActor, UPrimitiveComponent* a_otherComp, int32 a_otherBodyIndex, bool a_bFromSweep, const FHitResult& a_sweepResult);
+
 	void ResetStatsToDefault();
 	void ChangeMovementSpeed(int32 a_Value);
 	void ChangeLuck(int32 a_Value);
