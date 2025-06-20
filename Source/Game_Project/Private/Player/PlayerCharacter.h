@@ -29,6 +29,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Abilities", meta = (AllowPrivateAccess = "true"))
 	class UAbilityComponent* m_PlayerAbilities;
 
+	// called from input
 	void MoveForward(float a_Value);
 	void MoveRight(float a_Value);
 	void StartSprint();
@@ -55,19 +56,60 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Weapons")
 	void HideAllWeaponsExcept(FName a_BoneName);
 
+	// manipulate player stats
+	void TakeDamage(int32 a_Damage);
+	void ResetStatsToDefault();
+	void ChangeMovementSpeed(int32 a_Value);
+	void ChangeLuck(int32 a_Value);
+	void ChangeDefense(int32 a_Value);
+	void ChangeAttackSpeed(int32 a_Value);
+
+	void CheckForDeath(); // no functionality yet
+
+	// external way to see and react to player stats
+	int32 GetPlayerHealth() { return m_PlayerHealth; }
+	int32 GetPlayerLuck() { return m_PlayerLuck; }
+	int32 GetPlayerDefense() { return m_PlayerDefense; }
+	int32 GetPlayerMovementSpeed() { return m_PlayerMovementSpeed; }
+	int32 GetPlayerAttackSpeed() { return m_PlayerAttackSpeed; }
+
+	// 
+	void ChangeToPlayerClassA();
+	void ChangeToPlayerClassB();
+	void ChangeToPlayerClassC();
+	void ChangeToPlayerClassD();
+	bool CheckIfCurrentPlayerClassIsValid();
+
 private:
 
 	// Player Settings
-	UPROPERTY(EditAnywhere, Category = "General Player Settings")
-	float m_WalkSpeed = 500.0f;
 
 	UPROPERTY(EditAnywhere, Category = "General Player Settings")
-	float m_RunSpeed = 1000.0f;
+	float m_RunMultiplier = 1.5f;
 
 	UPROPERTY(EditAnywhere, Category = "General Player Settings")
 	int32 m_AbilityNum = 4;
 
 	int32 m_CurrentAbilitySlot = 0;
+
+	int32 m_CurrentPlayerClass = 0;
+
+	// player stats
+
+	UPROPERTY(VisibleAnywhere)
+	int32 m_PlayerHealth;
+
+	UPROPERTY(VisibleAnywhere)
+	int32 m_PlayerMovementSpeed;
+
+	UPROPERTY(VisibleAnywhere)
+	int32 m_PlayerAttackSpeed;
+
+	UPROPERTY(VisibleAnywhere)
+	int32 m_PlayerDefense;
+
+	UPROPERTY(VisibleAnywhere)
+	int32 m_PlayerLuck;
 
 	//
 
@@ -121,7 +163,7 @@ private:
 
 	UStaticMeshComponent* AttachWeaponComponentToBone(FName a_BoneName, UStaticMesh* a_WeaponMesh);
 
-	
+	void SetupChangedPlayerClass();
 
 	//
 

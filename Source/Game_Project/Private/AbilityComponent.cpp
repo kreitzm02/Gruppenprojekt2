@@ -68,3 +68,8 @@ void UAbilityComponent::TryAddAbility(TSubclassOf<UBaseAbility> a_AbilityClass)
 	m_Abilities.Add(newAbility);
 }
 
+void UAbilityComponent::RemoveAllAbilities()
+{
+	m_Abilities.Empty();
+}
+
