@@ -23,25 +23,25 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	bool isDead = false;
+	bool m_isDead = false;
 
 	UPROPERTY(EditAnywhere, Instanced)
-	UFSM_BaseEnemyState* initialState = nullptr;
+	UFSM_BaseEnemyState* m_initialState = nullptr;
 
 	UPROPERTY(EditAnywhere)
-	UFSMData* stateData = nullptr;
+	UFSMData* m_stateData = nullptr;
 
 	UPROPERTY()
-	UFSM_BaseEnemyState* currentState = nullptr;
+	UFSM_BaseEnemyState* m_currentState = nullptr;
 
 	//needed otherwise garbage collector deletes stuff
 	UPROPERTY()
-	TArray<UFSM_BaseStateTransition*> ownedTransitions;
+	TArray<UFSM_BaseStateTransition*> m_ownedTransitions;
 	//needed otherwise garbage collector deletes stuff
 	UPROPERTY()
-	TArray<UFSM_BaseEnemyState*> ownedStates;
+	TArray<UFSM_BaseEnemyState*> m_ownedStates;
 
-	TMap<TSubclassOf<UFSM_BaseEnemyState>, TArray<FTargetStateWithCondition>> stateStructure;
+	TMap<TSubclassOf<UFSM_BaseEnemyState>, TArray<FTargetStateWithCondition>> m_stateStructure;
 
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;

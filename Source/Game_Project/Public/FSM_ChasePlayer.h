@@ -25,16 +25,13 @@ public:
 
 private:
 	UPROPERTY()
-	UAnimSequence* chaseAnimation;
+	UAnimSequence* m_chaseAnimation;
 
 	UPROPERTY()
-	float walkSpeed = 100.0f;
+	float m_walkSpeed = 100.0f;
 
 	UPROPERTY()
-	float chaseRange = 0.0f;
+	float m_chaseRange = 0.0f;
 
-	//UPROPERTY()
-	//TArray<FOverlapResult> overlaps;
-
-	FVector targetLocation;
+	FVector m_targetLocation;
 };

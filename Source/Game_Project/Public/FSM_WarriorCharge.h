@@ -25,12 +25,12 @@ public:
 
 private:
 	UPROPERTY()
-	UAnimSequence* chargeAnimation;
+	UAnimSequence* m_chargeAnimation;
 
 	UPROPERTY()
-	ACharacter* player = nullptr;
+	ACharacter* m_player = nullptr;
 
-	float chargeSpeed;
+	float m_chargeSpeed;
 
-	float chaseRange;
+	float m_chaseRange;
 };

@@ -9,18 +9,18 @@
 void UFSM_Attack::Initialize()
 {
 	Super::Initialize();
-	AEnemy_Warrior* enemy = Cast<AEnemy_Warrior>(ownerPawn);
-	attackAnimation = enemy->GetAttackAnimation();
+	AEnemy_Warrior* enemy = Cast<AEnemy_Warrior>(m_ownerPawn);
+	m_attackAnimation = enemy->GetAttackAnimation();
 }
 
 void UFSM_Attack::OnEnter()
 {
-	if (ACharacter* character = Cast<ACharacter>(ownerPawn))
+	if (ACharacter* character = Cast<ACharacter>(m_ownerPawn))
 	{
 		character->GetCharacterMovement()->StopMovementImmediately();
 	}
 	Super::OnEnter();
-	ownerSkeletalMesh->PlayAnimation(attackAnimation,true);
+	m_ownerSkeletalMesh->PlayAnimation(m_attackAnimation,true);
 }
 
 void UFSM_Attack::OnUpdate(float a_deltaTime)

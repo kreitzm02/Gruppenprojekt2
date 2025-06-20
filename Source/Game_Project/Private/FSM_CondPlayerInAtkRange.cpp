@@ -10,10 +10,10 @@
 
 void UFSM_CondPlayerInAtkRange::Initialize()
 {
-	owner = Cast<AActor>(GetOuter()->GetOuter());
+	m_owner = Cast<AActor>(GetOuter()->GetOuter());
 
-	AEnemyCharacter* enemy = Cast<AEnemyCharacter>(owner);
-	attackRange = enemy->GetAttackRange();
+	AEnemyCharacter* enemy = Cast<AEnemyCharacter>(m_owner);
+	m_attackRange = enemy->GetAttackRange();
 }
 
 void UFSM_CondPlayerInAtkRange::ResetCondition()
@@ -23,31 +23,31 @@ void UFSM_CondPlayerInAtkRange::ResetCondition()
 
 bool UFSM_CondPlayerInAtkRange::IsConditionMet(float a_deltaTime)
 {
-	if (owner == nullptr)
+	if (m_owner == nullptr)
 	{
 		UE_LOG(LogTemp, Error, TEXT("In Range Cond AActor not found!"))
 			return false;
 	}
 		TArray<FOverlapResult> overlaps;
 	FCollisionQueryParams queryParams;
-	queryParams.AddIgnoredActor(owner);
+	queryParams.AddIgnoredActor(m_owner);
 
 	FCollisionObjectQueryParams objectQueryParams;
 	objectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel1);
 
-	bool hasOverlap = owner->GetWorld()->OverlapMultiByObjectType(
+	bool hasOverlap = m_owner->GetWorld()->OverlapMultiByObjectType(
 		overlaps,
-		owner->GetActorLocation(),
+		m_owner->GetActorLocation(),
 		FQuat::Identity,
 		objectQueryParams,
-		FCollisionShape::MakeSphere(attackRange),
+		FCollisionShape::MakeSphere(m_attackRange),
 		queryParams
 	);
 
 	DrawDebugSphere(
-		owner->GetWorld(),
-		owner->GetActorLocation(),
-		attackRange,
+		m_owner->GetWorld(),
+		m_owner->GetActorLocation(),
+		m_attackRange,
 		16,
 		FColor::Red,
 		false,
@@ -56,7 +56,7 @@ bool UFSM_CondPlayerInAtkRange::IsConditionMet(float a_deltaTime)
 		1.0f
 	);
 	
-	if (checkForInRange)
+	if (m_checkForInRange)
 	{
 		if (!hasOverlap) return false;
 		else return true;

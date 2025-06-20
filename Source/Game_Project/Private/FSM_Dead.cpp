@@ -9,17 +9,17 @@
 void UFSM_Dead::Initialize()
 {
 	Super::Initialize();
-	AEnemyCharacter* enemy = Cast<AEnemyCharacter>(ownerPawn);
-	deathAnimation = enemy->GetDeathAnimation();
+	AEnemyCharacter* enemy = Cast<AEnemyCharacter>(m_ownerPawn);
+	m_deathAnimation = enemy->GetDeathAnimation();
 }
 
 void UFSM_Dead::OnEnter()
 {
 	Super::OnEnter();
 
-	ownerSkeletalMesh->PlayAnimation(deathAnimation, false);
+	m_ownerSkeletalMesh->PlayAnimation(m_deathAnimation, false);
 
-	if (ACharacter* character = Cast<ACharacter>(ownerPawn))
+	if (ACharacter* character = Cast<ACharacter>(m_ownerPawn))
 	{
 		character->GetCharacterMovement()->StopMovementImmediately();
 	}

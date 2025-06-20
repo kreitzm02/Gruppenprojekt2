@@ -6,9 +6,9 @@
 
 void UFSM_ConditionZeroHealth::Initialize()
 {
-	owner = Cast<AActor>(GetOuter()->GetOuter());
+	m_owner = Cast<AActor>(GetOuter()->GetOuter());
 
-	enemy = Cast<AEnemyCharacter>(owner);
+	m_enemy = Cast<AEnemyCharacter>(m_owner);
 }
 
 void UFSM_ConditionZeroHealth::ResetCondition()
@@ -18,6 +18,6 @@ void UFSM_ConditionZeroHealth::ResetCondition()
 
 bool UFSM_ConditionZeroHealth::IsConditionMet(float a_deltaTime)
 {
-	return enemy->GetCurrentHealth() <= 0.0f;
+	return m_enemy->GetCurrentHealth() <= 0.0f;
 	
 }

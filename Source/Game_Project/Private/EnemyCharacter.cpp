@@ -12,19 +12,39 @@ AEnemyCharacter::AEnemyCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	skeletalMesh = GetMesh();
+	m_skeletalMesh = GetMesh();
 
-	stateMachine = CreateDefaultSubobject<UFSM_EnemyStateMachineComponent>(TEXT("StateMachineComponent"));
+	m_weaponMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WeaponMesh"));
+	
 
-	hitbox = CreateDefaultSubobject<UBoxComponent>(TEXT("Hitbox"));
-	hitbox->SetupAttachment(skeletalMesh);
-	hitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	hitbox->SetCollisionObjectType(ECC_WorldDynamic);
-	hitbox->SetCollisionResponseToAllChannels(ECR_Ignore);
-	hitbox->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Overlap);
+
+	m_stateMachine = CreateDefaultSubobject<UFSM_EnemyStateMachineComponent>(TEXT("StateMachineComponent"));
+
+	m_characterHitbox = CreateDefaultSubobject<UBoxComponent>(TEXT("CharacterHitbox"));
+	m_characterHitbox->SetupAttachment(m_skeletalMesh);
+	m_characterHitbox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	m_characterHitbox->SetCollisionObjectType(ECC_WorldDynamic);
+	m_characterHitbox->SetCollisionResponseToAllChannels(ECR_Ignore);
+	m_characterHitbox->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Overlap);
+
+	m_axeHitbox = CreateDefaultSubobject<UBoxComponent>(TEXT("AxeHitbox"));
+	m_axeHitbox->SetupAttachment(m_weaponMesh);
+	m_axeHitbox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	m_axeHitbox->SetCollisionObjectType(ECC_WorldDynamic);
+	m_axeHitbox->SetCollisionResponseToAllChannels(ECR_Ignore);
+	m_axeHitbox->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Overlap);
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	AIControllerClass = AAIController::StaticClass();
+}
+
+void AEnemyCharacter::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+
+	FName boneName = FName("hand_r");
+
+	m_weaponMesh->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, boneName);
 }
 
 // Called when the game starts or when spawned
@@ -32,9 +52,10 @@ void AEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	hitbox->OnComponentBeginOverlap.AddDynamic(this, &AEnemyCharacter::OnHit);
+	m_characterHitbox->OnComponentBeginOverlap.AddDynamic(this, &AEnemyCharacter::OnHit);
+	m_axeHitbox->OnComponentBeginOverlap.AddDynamic(this, &AEnemyCharacter::OnHit);
 
-	currentHealth = maxHealth;
+	m_currentHealth = m_maxHealth;
 }
 
 // Called every frame
@@ -53,7 +74,7 @@ void AEnemyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 float AEnemyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	currentHealth -= DamageAmount;
+	m_currentHealth -= DamageAmount;
 
 	if (DamageCauser)
 	{
@@ -77,6 +98,7 @@ void AEnemyCharacter::OnHit(UPrimitiveComponent* a_overlappedComponent, AActor* 
 {
 	if (a_otherActor && a_otherActor != this && a_otherComp)
 	{
-		UGameplayStatics::ApplyDamage(a_otherActor, attackDamage, GetController(), this, nullptr);
+		UGameplayStatics::ApplyDamage(a_otherActor, m_attackDamage, GetController(), this, nullptr);
+		UE_LOG(LogTemp, Warning, TEXT("Enemy hit a player"))
 	}
 }

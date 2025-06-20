@@ -25,5 +25,5 @@ public:
 
 private:
 	UPROPERTY()
-	UAnimSequence* attackAnimation = nullptr;
+	UAnimSequence* m_attackAnimation = nullptr;
 };

@@ -24,12 +24,12 @@ public:
 
 private:
 	UPROPERTY()
-	UAnimSequence* walkAnimation;
+	UAnimSequence* m_walkAnimation;
 
 	UPROPERTY()
-	float walkSpeed = 100.0f;
+	float m_walkSpeed = 100.0f;
 
-	FVector targetLocation;
+	FVector m_targetLocation;
 
 	void ChooseRandomNavLocation(AActor* owner);
 };

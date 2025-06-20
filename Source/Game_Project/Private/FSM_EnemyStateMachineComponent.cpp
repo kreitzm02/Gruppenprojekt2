@@ -25,12 +25,12 @@ void UFSM_EnemyStateMachineComponent::BeginPlay()
 
 	InitializeTMap();
 
-	for (FTargetStateWithCondition a_transition : stateStructure[currentState->GetClass()])
+	for (FTargetStateWithCondition a_transition : m_stateStructure[m_currentState->GetClass()])
 	{
-		a_transition.targetCondition->Initialize();
+		a_transition.m_targetCondition->Initialize();
 	}
 
-	currentState->OnEnter();
+	m_currentState->OnEnter();
 }
 
 
@@ -39,9 +39,9 @@ void UFSM_EnemyStateMachineComponent::TickComponent(float DeltaTime, ELevelTick 
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (!isDead)
+	if (!m_isDead)
 	{
-		currentState->OnUpdate(DeltaTime);
+		m_currentState->OnUpdate(DeltaTime);
 		TransitionHandler(DeltaTime);
 	}
 	
@@ -50,65 +50,65 @@ void UFSM_EnemyStateMachineComponent::TickComponent(float DeltaTime, ELevelTick 
 
 void UFSM_EnemyStateMachineComponent::InitializeTMap()
 {
-	for (FStateData a_stateData : stateData->GetStateData())
+	for (FStateData a_stateData : m_stateData->GetStateData())
 	{
-		TSubclassOf<UFSM_BaseEnemyState> originState = a_stateData.originState->GetClass();
+		TSubclassOf<UFSM_BaseEnemyState> originState = a_stateData.m_originState->GetClass();
 		TArray<FTargetStateWithCondition> targetStateAndCond;
 
-		for (FTargetStateWithCondition a_targetStateAndCond : a_stateData.targetStateWithCond)
+		for (FTargetStateWithCondition a_targetStateAndCond : a_stateData.m_targetStateWithCond)
 		{
-			UFSM_BaseStateTransition* conditionTemp = DuplicateObject<UFSM_BaseStateTransition>(a_targetStateAndCond.targetCondition, this);
-			UFSM_BaseEnemyState* stateTemp = DuplicateObject<UFSM_BaseEnemyState>(a_targetStateAndCond.targetState, this);
+			UFSM_BaseStateTransition* conditionTemp = DuplicateObject<UFSM_BaseStateTransition>(a_targetStateAndCond.m_targetCondition, this);
+			UFSM_BaseEnemyState* stateTemp = DuplicateObject<UFSM_BaseEnemyState>(a_targetStateAndCond.m_targetState, this);
 
 			stateTemp->Initialize();
 			conditionTemp->Initialize();
 
 
-			ownedTransitions.Add(conditionTemp);
-			ownedStates.Add(stateTemp);
+			m_ownedTransitions.Add(conditionTemp);
+			m_ownedStates.Add(stateTemp);
 
 			FTargetStateWithCondition targetStateAndTransTemp = FTargetStateWithCondition();
-			targetStateAndTransTemp.targetCondition = conditionTemp;
-			targetStateAndTransTemp.targetState = stateTemp;
+			targetStateAndTransTemp.m_targetCondition = conditionTemp;
+			targetStateAndTransTemp.m_targetState = stateTemp;
 
 			targetStateAndCond.Add(targetStateAndTransTemp);
 
-			if (initialState->GetClass() == stateTemp->GetClass())
+			if (m_initialState->GetClass() == stateTemp->GetClass())
 			{
-				currentState = stateTemp;
-				UE_LOG(LogTemp, Warning, TEXT("currentState set\n"));
+				m_currentState = stateTemp;
+				UE_LOG(LogTemp, Warning, TEXT("m_currentState set\n"));
 			}
 		}
 
-		stateStructure.Add(originState,targetStateAndCond);
+		m_stateStructure.Add(originState,targetStateAndCond);
 		
 	}
 }
 
 void UFSM_EnemyStateMachineComponent::TransitionHandler(float a_deltaTime)
 {
-	for (FTargetStateWithCondition a_transition : stateStructure[currentState->GetClass()])
+	for (FTargetStateWithCondition a_transition : m_stateStructure[m_currentState->GetClass()])
 	{
-		if (a_transition.targetCondition->IsConditionMet(a_deltaTime))
+		if (a_transition.m_targetCondition->IsConditionMet(a_deltaTime))
 		{
-			currentState->OnExit();
-			currentState = a_transition.targetState;
-			currentState->OnEnter();
-			if (currentState->IsA(UFSM_Dead::StaticClass()))
+			m_currentState->OnExit();
+			m_currentState = a_transition.m_targetState;
+			m_currentState->OnEnter();
+			if (m_currentState->IsA(UFSM_Dead::StaticClass()))
 			{
 				AEnemyCharacter* ownerCharacter = Cast<AEnemyCharacter>(GetOwner());
 				ownerCharacter->SetDeathState(true);
-				isDead = true;
+				m_isDead = true;
 			}
 			else
 			{
-				for (FTargetStateWithCondition a_transition2 : stateStructure[currentState->GetClass()])
+				for (FTargetStateWithCondition a_transition2 : m_stateStructure[m_currentState->GetClass()])
 				{
-					a_transition2.targetCondition->ResetCondition();
+					a_transition2.m_targetCondition->ResetCondition();
 				}
 			}
 			
-			//currentState->OnEnter();
+			//m_currentState->OnEnter();
 			break;
 		}
 	}

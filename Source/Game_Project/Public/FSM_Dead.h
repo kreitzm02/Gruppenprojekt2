@@ -25,5 +25,5 @@ public:
 
 private:
 	UPROPERTY()
-	UAnimSequence* deathAnimation;
+	UAnimSequence* m_deathAnimation;
 };

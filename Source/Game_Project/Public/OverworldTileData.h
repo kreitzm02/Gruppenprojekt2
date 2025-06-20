@@ -16,19 +16,19 @@ class GAME_PROJECT_API UOverworldTileData : public UDataAsset
 
 
 	UPROPERTY(EditAnywhere, Category = "Data")
-	UStaticMesh* tileMesh;
+	UStaticMesh* m_tileMesh;
 
 	UPROPERTY(EditAnywhere, Category = "Data")
-	TArray<bool> edgeHasRoad;
+	TArray<bool> m_edgeHasRoad;
 
 public:
 	UStaticMesh* GetTileMeshPtr()
 	{
-		return tileMesh;
+		return m_tileMesh;
 	}
 
 	TArray<bool> GetEdgeData()
 	{
-		return edgeHasRoad;
+		return m_edgeHasRoad;
 	}
 };
