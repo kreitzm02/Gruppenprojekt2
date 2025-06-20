@@ -11,6 +11,7 @@
 #include "GameFramework/Controller.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Animation/AnimInstance.h"
+#include <Kismet/GameplayStatics.h>
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -382,14 +383,45 @@ void APlayerCharacter::HideAllWeaponsExcept(FName a_BoneName)
 
 // GETTING DAMAGE
 
-void APlayerCharacter::TakeDamage(int32 a_Damage)
+float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	if (a_Damage <= 0) return; // negative values would increase the player health instead of decreasing it.
-	int32 clampedDefense = FMath::Clamp(m_PlayerDefense, 0, 100); // safety check
-	int32 totalDmg = a_Damage * (100 - clampedDefense) / 100;
-	m_PlayerHealth -= totalDmg;
+	m_PlayerHealth -= DamageAmount;
 	if (m_PlayerHealth <= 0) m_PlayerHealth = 0;
+	UE_LOG(LogTemp, Warning, TEXT("Player was hit"))
+		if (DamageCauser)
+		{
+			FVector knockbackDirection = GetActorLocation() - DamageCauser->GetActorLocation();
+			knockbackDirection.Z = 0;
+			knockbackDirection.Normalize();
+			HandleKnockback(knockbackDirection, 6000.0f /*get knockback strengh from damage causer*/);
+			//ACharacter* damagingUnit = Cast<ACharacter>(DamageCauser);
+			//damagingUnit->GetKnockback();
+		}
+
+	return DamageAmount;
 }
+
+void APlayerCharacter::HandleKnockback(FVector a_knockbackDirection, float a_knockbackStrength)
+{
+	LaunchCharacter(a_knockbackDirection * a_knockbackStrength, true, true);
+}
+
+void APlayerCharacter::OnHit(UPrimitiveComponent* a_overlappedComponent, AActor* a_otherActor, UPrimitiveComponent* a_otherComp, int32 a_otherBodyIndex, bool a_bFromSweep, const FHitResult& a_sweepResult)
+{
+	if (a_otherActor && a_otherActor != this && a_otherComp)
+	{
+		UGameplayStatics::ApplyDamage(a_otherActor, 1.0f/*get player damage*/, GetController(), this, nullptr);
+	}
+}
+
+// void APlayerCharacter::TakeDamage(int32 a_Damage)
+// {
+// 	if (a_Damage <= 0) return; // negative values would increase the player health instead of decreasing it.
+// 	int32 clampedDefense = FMath::Clamp(m_PlayerDefense, 0, 100); // safety check
+// 	int32 totalDmg = a_Damage * (100 - clampedDefense) / 100;
+// 	m_PlayerHealth -= totalDmg;
+// 	if (m_PlayerHealth <= 0) m_PlayerHealth = 0;
+// }
 
 void APlayerCharacter::CheckForDeath()
 {
