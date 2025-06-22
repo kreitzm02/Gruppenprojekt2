@@ -356,7 +356,7 @@ UStaticMeshComponent* APlayerCharacter::AttachWeaponComponentToBone(FName a_Bone
 
 	FAttachmentTransformRules rules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, true);
 
-	newComponent->AttachToComponent(skeletonMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, a_BoneName);
+	newComponent->AttachToComponent(skeletonMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, TEXT("handslot_r"));
 	newComponent->RegisterComponent();
 
 	m_AttachedWeapons.Add(a_BoneName, newComponent);
