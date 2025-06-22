@@ -16,20 +16,18 @@ class GAME_PROJECT_API UFSM_ConditionWarriorChargeEnd : public UFSM_BaseStateTra
 	GENERATED_BODY()
 
 private:
-	//UPROPERTY()
-	//AActor* owner = nullptr;
 
 	UPROPERTY()
-	AEnemy_Warrior* thisWarrior = nullptr;
+	AEnemy_Warrior* m_thisWarrior = nullptr;
 
 	UPROPERTY()
-	ACharacter* player = nullptr;
+	ACharacter* m_player = nullptr;
 
-	float attackRange;
+	float m_attackRange;
 
-	float chargeDuration;
+	float m_chargeDuration;
 
-	float chargeCurrentDuration;
+	float m_chargeCurrentDuration;
 
 public:
 	void Initialize() override;

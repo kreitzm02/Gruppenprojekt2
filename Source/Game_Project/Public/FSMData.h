@@ -17,10 +17,10 @@ struct FTargetStateWithCondition
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, Instanced)
-	UFSM_BaseStateTransition* targetCondition;
+	UFSM_BaseStateTransition* m_targetCondition;
 
 	UPROPERTY(EditAnywhere, Instanced)
-	UFSM_BaseEnemyState* targetState;
+	UFSM_BaseEnemyState* m_targetState;
 };
 
 USTRUCT()
@@ -29,10 +29,10 @@ struct FStateData
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, Instanced)
-	UFSM_BaseEnemyState* originState;
+	UFSM_BaseEnemyState* m_originState;
 
 	UPROPERTY(EditAnywhere)
-	TArray<FTargetStateWithCondition> targetStateWithCond;
+	TArray<FTargetStateWithCondition> m_targetStateWithCond;
 };
 
 
@@ -43,11 +43,11 @@ class GAME_PROJECT_API UFSMData : public UDataAsset
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere)
-	TArray<FStateData> stateData;
+	TArray<FStateData> m_stateData;
 
 public:
 	TArray<FStateData> GetStateData()
 	{
-		return stateData;
+		return m_stateData;
 	}
 };

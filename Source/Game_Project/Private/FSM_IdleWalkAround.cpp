@@ -13,30 +13,30 @@
 void UFSM_IdleWalkAround::Initialize()
 {
     Super::Initialize();
-    AEnemyCharacter* enemy = Cast<AEnemyCharacter>(ownerPawn);
-    walkAnimation = enemy->GetWalkAnimation();
-	walkSpeed = enemy->GetIdleWalkSpeed();
+    AEnemyCharacter* enemy = Cast<AEnemyCharacter>(m_ownerPawn);
+    m_walkAnimation = enemy->GetWalkAnimation();
+	m_walkSpeed = enemy->GetIdleWalkSpeed();
 }
 
 void UFSM_IdleWalkAround::OnEnter()
 {
 	Super::OnEnter();
 
-    //ownerSkeletalMesh->PlayAnimation(walkAnimation, true);
+    //m_ownerSkeletalMesh->PlayAnimation(m_walkAnimation, true);
 
-    //UE_LOG(LogTemp, Warning, TEXT("owner of state: %s\n"), *ownerPawn->GetOwner()->GetName());
-    ACharacter* character = Cast<ACharacter>(ownerPawn);
-    character->GetCharacterMovement()->MaxWalkSpeed = walkSpeed;
+    //UE_LOG(LogTemp, Warning, TEXT("owner of state: %s\n"), *m_ownerPawn->GetOwner()->GetName());
+    ACharacter* character = Cast<ACharacter>(m_ownerPawn);
+    character->GetCharacterMovement()->MaxWalkSpeed = m_walkSpeed;
     
 
     //UE_LOG(LogTemp, Warning, TEXT("walk on enter\n"));
-    if (ownerPawn != nullptr)
+    if (m_ownerPawn != nullptr)
     {
-        ChooseRandomNavLocation(ownerPawn);
+        ChooseRandomNavLocation(m_ownerPawn);
         //UE_LOG(LogTemp, Warning, TEXT("aactor owner found\n"));
-        if (AAIController* AIController = Cast<AAIController>(ownerPawn->GetController()))
+        if (AAIController* AIController = Cast<AAIController>(m_ownerPawn->GetController()))
         {
-            AIController->MoveToLocation(targetLocation);
+            AIController->MoveToLocation(m_targetLocation);
             //UE_LOG(LogTemp, Warning, TEXT("aaicontroller found\n"));
         }
     }
@@ -54,7 +54,7 @@ void UFSM_IdleWalkAround::OnExit()
 {
 	Super::OnExit();
 
-    if (ACharacter* character = Cast<ACharacter>(ownerPawn))
+    if (ACharacter* character = Cast<ACharacter>(m_ownerPawn))
     {
         character->GetCharacterMovement()->StopMovementImmediately();
     }
@@ -84,8 +84,8 @@ void UFSM_IdleWalkAround::ChooseRandomNavLocation(AActor* a_owner)
             float distance = FVector::Dist(navLocation.Location, origin);
             if (distance >= minRadius)
             {
-                targetLocation = navLocation.Location;
-                ownerSkeletalMesh->PlayAnimation(walkAnimation, true);
+                m_targetLocation = navLocation.Location;
+                m_ownerSkeletalMesh->PlayAnimation(m_walkAnimation, true);
                 return;
             }
         }
@@ -94,10 +94,10 @@ void UFSM_IdleWalkAround::ChooseRandomNavLocation(AActor* a_owner)
 
     //if (found)
     //{
-    //    targetLocation = navLocation.Location;
+    //    m_targetLocation = navLocation.Location;
     //}
     //else
     //{
-    //    targetLocation = origin;
+    //    m_targetLocation = origin;
     //}
 }

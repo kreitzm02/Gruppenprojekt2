@@ -15,26 +15,26 @@
 void UFSM_ChasePlayer::Initialize()
 {
 	Super::Initialize();
-	AEnemyCharacter* enemy = Cast<AEnemyCharacter>(ownerPawn);
-	chaseAnimation = enemy->GetChaseAnimation();
-	chaseRange = enemy->GetPlayerChaseRadius(); 
-	walkSpeed = enemy->GetChaseWalkSpeed();
+	AEnemyCharacter* enemy = Cast<AEnemyCharacter>(m_ownerPawn);
+	m_chaseAnimation = enemy->GetChaseAnimation();
+	m_chaseRange = enemy->GetPlayerChaseRadius(); 
+	m_walkSpeed = enemy->GetChaseWalkSpeed();
 }
 
 void UFSM_ChasePlayer::OnEnter()
 {
     Super::OnEnter();
 
-	ownerSkeletalMesh->PlayAnimation(chaseAnimation, true);
+	m_ownerSkeletalMesh->PlayAnimation(m_chaseAnimation, true);
 
-	ACharacter* character = Cast<ACharacter>(ownerPawn);
-	character->GetCharacterMovement()->MaxWalkSpeed = walkSpeed;
+	ACharacter* character = Cast<ACharacter>(m_ownerPawn);
+	character->GetCharacterMovement()->MaxWalkSpeed = m_walkSpeed;
 }
 
 void UFSM_ChasePlayer::OnUpdate(float a_deltaTime)
 {
     Super::OnUpdate(a_deltaTime);
-	if (ownerPawn == nullptr)
+	if (m_ownerPawn == nullptr)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Player Chase has no Owner Pawn!"))
 	}
@@ -42,17 +42,17 @@ void UFSM_ChasePlayer::OnUpdate(float a_deltaTime)
 	{
 		TArray<FOverlapResult> overlaps;
 		FCollisionQueryParams queryParams;
-		queryParams.AddIgnoredActor(ownerPawn);
+		queryParams.AddIgnoredActor(m_ownerPawn);
 
 		FCollisionObjectQueryParams objectQueryParams;
 		objectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel1);
 
-		bool hasOverlap = ownerPawn->GetWorld()->OverlapMultiByObjectType(
+		bool hasOverlap = m_ownerPawn->GetWorld()->OverlapMultiByObjectType(
 			overlaps,
-			ownerPawn->GetActorLocation(),
+			m_ownerPawn->GetActorLocation(),
 			FQuat::Identity,
 			objectQueryParams,
-			FCollisionShape::MakeSphere(chaseRange),
+			FCollisionShape::MakeSphere(m_chaseRange),
 			queryParams
 		);
 		for(FOverlapResult& overlap : overlaps)
@@ -63,10 +63,10 @@ void UFSM_ChasePlayer::OnUpdate(float a_deltaTime)
 				ACharacter* player = Cast<ACharacter>(actor);
 				if (player)
 				{
-					AAIController* aiController = Cast<AAIController>(ownerPawn->GetController());
+					AAIController* aiController = Cast<AAIController>(m_ownerPawn->GetController());
 					if (aiController)
 					{
-						UNavigationSystemV1* navSystem = UNavigationSystemV1::GetCurrent(ownerPawn->GetWorld());
+						UNavigationSystemV1* navSystem = UNavigationSystemV1::GetCurrent(m_ownerPawn->GetWorld());
 						if (navSystem)
 						{
 							FNavLocation navLocation;

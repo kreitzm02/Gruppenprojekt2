@@ -16,13 +16,13 @@ class GAME_PROJECT_API UFSM_CondPlayerInAtkRange : public UFSM_BaseStateTransiti
 	
 private:
 	UPROPERTY()
-	AActor* owner = nullptr;
+	AActor* m_owner = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "Settings")
-	bool checkForInRange = true;
+	bool m_checkForInRange = true;
 
 	UPROPERTY()
-	float attackRange;
+	float m_attackRange;
 
 
 
