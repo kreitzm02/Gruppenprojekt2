@@ -628,6 +628,32 @@ void UDungeonBuilder::BuildBossRoom()
 	}
 }
 
+void UDungeonBuilder::GenerateEnemies()
+{
+	if (m_DungeonTheme->m_EnemyCharacters.Num() == 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Warning: TArray EnemyCharacters is empty!"));
+		return;
+	}
+
+	for (int i = 0; i < m_Data->m_AllRooms.Num(); i++)
+	{
+		ERoomType curType = m_Data->m_AllRooms[i].m_RoomType;
+		if (curType == ERoomType::EXIT || curType == ERoomType::ENTRANCE || curType == ERoomType::BOSS) continue;
+
+		FInt32Vector2 intPos = m_Data->m_AllRooms[i].GetRoomCenter();
+		FVector position = { (float)intPos.X * m_UnitSize, (float)intPos.Y * m_UnitSize, 0 };
+
+		int32 randIndex = FMath::RandRange(0, m_DungeonTheme->m_EnemyCharacters.Num() - 1);
+		TSubclassOf<AEnemyCharacter> enemyToSpawn = m_DungeonTheme->m_EnemyCharacters[randIndex];
+
+		if (enemyToSpawn)
+		{
+			GetWorld()->SpawnActor<AEnemyCharacter>(enemyToSpawn, position, {0, 0, 0});
+		}
+	}
+}
+
 void UDungeonBuilder::TryPlaceWall(int32 a_GridX, int32 a_GridY, const FVector& a_Position, const FRotator& a_Rotation, int32 a_WallIndex) const
 {
 	if (!IsWithinBounds(a_GridX, a_GridY)) return;

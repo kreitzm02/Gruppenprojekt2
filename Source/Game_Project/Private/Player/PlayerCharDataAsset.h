@@ -25,7 +25,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Character Stats", meta = (DisplayName = "Base Health Points"))
 	int32 m_BaseHealthPoints;
 
-	UPROPERTY(EditAnywhere, Category = "Character Stats", meta = (DisplayName = "Base Attack Points"))
+	UPROPERTY(EditAnywhere, Category = "Character Stats", meta = (DisplayName = "Base Attack Damage"))
 	int32 m_BaseAttackPoints;
 
 	UPROPERTY(EditAnywhere, Category = "Character Stats", meta = (DisplayName = "Base Attack Speed"))

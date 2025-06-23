@@ -29,6 +29,7 @@ public:
 	void BuildDebugObjects();
 	void BuildDecorationObjects();
 	void BuildBossRoom();
+	void GenerateEnemies();
 
 private:
 	void TryPlaceWall(int32 a_GridX, int32 a_GridY, const FVector& a_Position, const FRotator& a_Rotation, int32 a_WallIndex) const;
