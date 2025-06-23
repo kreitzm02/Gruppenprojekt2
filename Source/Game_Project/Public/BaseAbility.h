@@ -4,16 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include <AbilityActions/BaseAbilityAction.h>
 #include "BaseAbility.generated.h"
+
 
 /**
  * 
  */
-UCLASS(Abstract, Blueprintable)
+UCLASS(Blueprintable, EditInlineNew, DefaultToInstanced)
 class GAME_PROJECT_API UBaseAbility : public UObject
 {
 	GENERATED_BODY()
-	
+
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability")
 	FText m_AbilityName;
@@ -22,16 +24,23 @@ public:
 	float m_CooldownTime = 1.0f;
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
-	virtual bool CanUse() const { return !m_IsOnCooldown; }
+	bool CanUse() const { return !m_IsOnCooldown; }
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
-	virtual void UseAbility(AActor* a_AbilityUser);
+	void UseAbility(AActor* a_AbilityUser);
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
-	virtual void EquipAbility(AActor* a_AbilityUser);
+	void EquipAbility(AActor* a_AbilityUser);
 
 private:
 	bool m_IsOnCooldown = false;
 
+	bool m_IsInitialized = false;
+
+	float m_ConstCooldownTime = 1.0f;
+
 	void StartCooldown(UWorld* a_World);
+
+	UPROPERTY(EditAnywhere, Instanced, Category = "Ability", meta = (DisplayName = "Enemy Abilities"))
+	TArray<UBaseAbilityAction*> m_AbilityActions;
 };

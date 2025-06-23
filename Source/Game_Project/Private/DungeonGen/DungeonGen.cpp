@@ -160,6 +160,7 @@ void ADungeonGen::GenerateDungeon()
 	m_Builder->BuildDebugObjects();
 	m_Builder->BuildDecorationObjects();
 	m_Builder->BuildBossRoom();
+	m_Builder->GenerateEnemies();
 	BuildNavMeshForDungeon();
 }
 

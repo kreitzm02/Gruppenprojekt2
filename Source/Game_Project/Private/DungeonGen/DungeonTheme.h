@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
 #include "DungeonMeshEntry.h"
+#include "EnemyCharacter.h"
 #include "DungeonTheme.generated.h"
 
 UCLASS()
@@ -73,5 +74,8 @@ public:
 	FInt32Vector m_WallOPosOffset;
 
 	UPROPERTY(EditAnywhere, Category = "Mesh Rotation and Position", meta = (DisplayName = "Boss Floor z Offset"))
-	int32 m_BossFloorZOffset;;
+	int32 m_BossFloorZOffset;
+
+	UPROPERTY(EditAnywhere, Category = "Enemies", meta = (DisplayName = "Default Spawnable Enemies"))
+	TArray<TSubclassOf<class AEnemyCharacter>> m_EnemyCharacters;
 };
