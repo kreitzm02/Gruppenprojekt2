@@ -474,7 +474,6 @@ void APlayerCharacter::SetupChangedPlayerClass()
 	// setup the player stats with the default values from the given data asset
 	ResetStatsToDefault();
 	ChangeToAbilitySlot0();
-	GetMesh()->PlayAnimation(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_IdleAnim, true); // temporary fix, as the character plays the t-pose animation instead of idle
 }
 
 void APlayerCharacter::ChangeToPlayerClassA()

@@ -217,6 +217,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	UAnimMontage* m_ChopAttackMontage;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	UAnimMontage* m_ShootSpellcastMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	UAnimMontage* m_RaiseSpellcastMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	UAnimMontage* m_LongSpellcastMontage;
+
 	UPROPERTY()
 	UPlayerAnimInstance* m_AnimInstance;
 };
