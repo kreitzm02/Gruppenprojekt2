@@ -5,7 +5,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "PlayerCharDataAsset.h"
+#include <Components/BoxComponent.h>
+#include "PlayerAnimInstance.h"
 #include "PlayerCharacter.generated.h"
+
+
 
 UCLASS()
 class APlayerCharacter : public ACharacter
@@ -39,6 +43,7 @@ protected:
 	void ChangeToAbilitySlot1();
 	void ChangeToAbilitySlot2();
 	void ChangeToAbilitySlot3();
+	void ChangeToAbilitySlot(int32 a_Index);
 	void AbilitySlotIncrease();
 	void AbilitySlotDecrease();
 
@@ -56,8 +61,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Weapons")
 	void HideAllWeaponsExcept(FName a_BoneName);
 
-	// manipulate player stats
-	// void TakeDamage(int32 a_Damage); redunant
+	void HideMeleeHitbox();
+	void ShowMeleeHitbox();
+	void ClearAlreadyHitActors();
+
+	// take and deal damage
 
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
@@ -66,12 +74,15 @@ public:
 
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* a_overlappedComponent, AActor* a_otherActor, UPrimitiveComponent* a_otherComp, int32 a_otherBodyIndex, bool a_bFromSweep, const FHitResult& a_sweepResult);
+	
+	// manipulate player stats
 
 	void ResetStatsToDefault();
 	void ChangeMovementSpeed(int32 a_Value);
 	void ChangeLuck(int32 a_Value);
 	void ChangeDefense(int32 a_Value);
 	void ChangeAttackSpeed(int32 a_Value);
+	void ChangeAttackDamage(int32 a_Value);
 
 	void CheckForDeath(); // no functionality yet
 
@@ -81,6 +92,7 @@ public:
 	int32 GetPlayerDefense() { return m_PlayerDefense; }
 	int32 GetPlayerMovementSpeed() { return m_PlayerMovementSpeed; }
 	int32 GetPlayerAttackSpeed() { return m_PlayerAttackSpeed; }
+	int32 GetPlayerAttackDamage() { return m_AttackDamage; }
 
 	// 
 	void ChangeToPlayerClassA();
@@ -90,6 +102,11 @@ public:
 	bool CheckIfCurrentPlayerClassIsValid();
 
 private:
+
+	TSet<AActor*> m_AlreadyHitActors;
+
+	UPROPERTY()
+	UBoxComponent* m_MeleeHitBox;
 
 	// Player Settings
 
@@ -102,6 +119,8 @@ private:
 	int32 m_CurrentAbilitySlot = 0;
 
 	int32 m_CurrentPlayerClass = 0;
+
+	bool m_IsPlayerAlive = true;
 
 	// player stats
 
@@ -120,11 +139,13 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	int32 m_PlayerLuck;
 
+	UPROPERTY(VisibleAnywhere)
+	int32 m_AttackDamage;
+
 	//
 
 	UPROPERTY()
 	FVector m_PreviousLocation;
-	EPlayerState m_PlayerState;
 
 	// setup methods
 	void SetupCamera();
@@ -132,6 +153,7 @@ private:
 	void SetupAbilityComp();
 	void SetupPlayer();
 	void SetupWeapons();
+	void SetupMeleeHitbox();
 
 	// weapon meshes
 	UPROPERTY(EditAnywhere, Category = "Basic Weapon Meshes")
@@ -164,6 +186,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Basic Weapon Meshes")
 	UStaticMesh* m_Scythe;
 
+
 	// weapon setup helper functions
 
 	void GetChildBones(const FName& a_ParentBoneName, TArray<FName>& a_OutChildBones) const;
@@ -182,10 +205,18 @@ private:
 public:
 	UPROPERTY(EditAnywhere, Category = "Data Asset")
 	TArray<UPlayerCharDataAsset*> m_PlayerCharDataAssets;
-};
 
-UENUM()
-enum class EPlayerState : uint8
-{
-	IDLE, WALK, SPRINT
+	// anim montages
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	UAnimMontage* m_SliceAttackMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	UAnimMontage* m_StabAttackMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	UAnimMontage* m_ChopAttackMontage;
+
+	UPROPERTY()
+	UPlayerAnimInstance* m_AnimInstance;
 };

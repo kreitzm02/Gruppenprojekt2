@@ -20,7 +20,6 @@ APlayerCharacter::APlayerCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	SetupCamera();
-	SetupMovement();
 	SetupAbilityComp();
 }
 
@@ -28,16 +27,17 @@ APlayerCharacter::APlayerCharacter()
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
 	SetupPlayer();
 
-	if (m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_IdleAnim)
-		GetMesh()->PlayAnimation(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_IdleAnim, true);
+	m_AnimInstance = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 
 	m_PreviousLocation = GetActorLocation();
 
 	SetupWeapons();
+	SetupMeleeHitbox();
 	HideAllWeapons();
+	ChangeToAbilitySlot0(); // the char equips his default ability
+	SetupMovement();
 }
 
 // INPUT 
@@ -77,26 +77,29 @@ void APlayerCharacter::UseAbility()
 
 void APlayerCharacter::ChangeToAbilitySlot0()
 {
-	m_CurrentAbilitySlot = 0;
-	m_PlayerAbilities->EquipAbility(0);
+	ChangeToAbilitySlot(0);
 }
 
 void APlayerCharacter::ChangeToAbilitySlot1()
 {
-	m_CurrentAbilitySlot = 1;
-	m_PlayerAbilities->EquipAbility(1);
+	ChangeToAbilitySlot(1);
 }
 
 void APlayerCharacter::ChangeToAbilitySlot2()
 {
-	m_CurrentAbilitySlot = 2;
-	m_PlayerAbilities->EquipAbility(2);
+	ChangeToAbilitySlot(2);
 }
 
 void APlayerCharacter::ChangeToAbilitySlot3()
 {
-	m_CurrentAbilitySlot = 3;
-	m_PlayerAbilities->EquipAbility(3);
+	ChangeToAbilitySlot(3);
+}
+
+void APlayerCharacter::ChangeToAbilitySlot(int32 a_Index)
+{
+	m_CurrentAbilitySlot = a_Index;
+	m_AttackDamage = m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_BaseAttackPoints; // reset current attack damage
+	m_PlayerAbilities->EquipAbility(a_Index); // new damage will be set here if needed
 }
 
 void APlayerCharacter::AbilitySlotIncrease()
@@ -130,31 +133,29 @@ void APlayerCharacter::Tick(float DeltaTime)
 	const FVector currentLocation = GetActorLocation();
 	const float speed = FVector::Dist(currentLocation, m_PreviousLocation) / DeltaTime;
 	m_PreviousLocation = currentLocation;
-	const float movementThreshold = 5.0f;
+	const float movementThreshold = 1.0f;
 
-	if (speed > movementThreshold)
+	if (m_AnimInstance)
 	{
-		if (speed > m_PlayerMovementSpeed + movementThreshold && m_PlayerState != EPlayerState::SPRINT)
-		{
-			m_PlayerState = EPlayerState::SPRINT;
-			GetMesh()->PlayAnimation(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_SprintAnim, true);
-		}
-		else if (speed < m_PlayerMovementSpeed + movementThreshold && m_PlayerState != EPlayerState::WALK)
-		{
-			m_PlayerState = EPlayerState::WALK;
-			GetMesh()->PlayAnimation(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_WalkAnim, true);
-		}
-		
+		m_AnimInstance->m_IsRunning = speed > m_PlayerMovementSpeed + movementThreshold;
+		m_AnimInstance->m_IsWalking = speed > movementThreshold && speed <= m_PlayerMovementSpeed + movementThreshold;
+		// to avoid t posing when no montage is playing in upper body slot
+		float targetWeight = m_AnimInstance->Montage_IsPlaying(nullptr) ? 1.0f : 0.0f;
+		m_AnimInstance->m_BlendWeight = FMath::FInterpTo(m_AnimInstance->m_BlendWeight, targetWeight, DeltaTime, 9.5f);
+		m_AnimInstance->m_PlayerAlive = m_IsPlayerAlive;
 	}
-	else
-	{
-		if (m_PlayerState != EPlayerState::IDLE)
-		{
-			m_PlayerState = EPlayerState::IDLE;
-			GetMesh()->PlayAnimation(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_IdleAnim, true);
-		}
-	}
+	
+	CheckForDeath();
 
+	if (UAnimMontage* activeMontage = m_AnimInstance->GetCurrentActiveMontage())
+	{
+		float progress = m_AnimInstance->Montage_GetPosition(activeMontage) / activeMontage->GetPlayLength();
+
+		if (progress > 0.9f)
+		{
+			HideMeleeHitbox();
+		}
+	}
 }
 
 // Called to bind functionality to input
@@ -276,6 +277,21 @@ void APlayerCharacter::SetupWeapons()
 	}
 }
 
+void APlayerCharacter::SetupMeleeHitbox()
+{
+	m_MeleeHitBox = NewObject<UBoxComponent>(this, TEXT("MeleeHitBox"));
+	m_MeleeHitBox->SetupAttachment(GetMesh(), TEXT("handslot_r"));
+	m_MeleeHitBox->SetBoxExtent(FVector(0.25f, 0.25f, 0.25f));
+	m_MeleeHitBox->SetRelativeLocation(FVector(0.0f, -0.57f, -0.1f));
+	m_MeleeHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	m_MeleeHitBox->SetCollisionObjectType(ECollisionChannel::ECC_Pawn);
+	m_MeleeHitBox->SetCollisionResponseToAllChannels(ECR_Ignore);
+	m_MeleeHitBox->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	m_MeleeHitBox->RegisterComponent();
+
+	m_MeleeHitBox->OnComponentBeginOverlap.AddDynamic(this, &APlayerCharacter::OnHit);
+}
+
 void APlayerCharacter::GetChildBones(const FName& a_ParentBoneName, TArray<FName>& a_OutChildBones) const
 {
 	USkeletalMeshComponent* skeletalMesh = GetMesh();
@@ -324,7 +340,6 @@ void APlayerCharacter::GetWeaponSockets(const FName& a_ParentBoneName, TArray<FN
 		return;
 	}
 
-	// Schau alle Sockets durch, die auf genau diesem Bone sitzen
 	for (USkeletalMeshSocket* socket : Skeleton->Sockets)
 	{
 		if (socket->BoneName == a_ParentBoneName)
@@ -356,8 +371,9 @@ UStaticMeshComponent* APlayerCharacter::AttachWeaponComponentToBone(FName a_Bone
 
 	FAttachmentTransformRules rules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, true);
 
-	newComponent->AttachToComponent(skeletonMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, a_BoneName);
+	newComponent->AttachToComponent(skeletonMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, TEXT("handslot_r"));
 	newComponent->RegisterComponent();
+	newComponent->SetRelativeRotation(FRotator(0.0f, 180.0f, 90.0f));
 
 	m_AttachedWeapons.Add(a_BoneName, newComponent);
 	return newComponent;
@@ -381,24 +397,40 @@ void APlayerCharacter::HideAllWeaponsExcept(FName a_BoneName)
 	}
 }
 
+void APlayerCharacter::HideMeleeHitbox()
+{
+	m_MeleeHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void APlayerCharacter::ShowMeleeHitbox()
+{
+	m_MeleeHitBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+}
+
+void APlayerCharacter::ClearAlreadyHitActors()
+{
+	m_AlreadyHitActors.Empty();
+}
+
 // GETTING DAMAGE
 
 float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	m_PlayerHealth -= DamageAmount;
+	int32 totalDmg = DamageAmount * (100 - m_PlayerDefense) / 100;
+	m_PlayerHealth -= totalDmg;
 	if (m_PlayerHealth <= 0) m_PlayerHealth = 0;
-	UE_LOG(LogTemp, Warning, TEXT("Player was hit"))
+	//UE_LOG(LogTemp, Warning, TEXT("Player was hit"))
 		if (DamageCauser)
 		{
 			FVector knockbackDirection = GetActorLocation() - DamageCauser->GetActorLocation();
 			knockbackDirection.Z = 0;
 			knockbackDirection.Normalize();
-			HandleKnockback(knockbackDirection, 6000.0f /*get knockback strengh from damage causer*/);
+			HandleKnockback(knockbackDirection, 0.0f /*get knockback strengh from damage causer*/);
 			//ACharacter* damagingUnit = Cast<ACharacter>(DamageCauser);
 			//damagingUnit->GetKnockback();
 		}
 
-	return DamageAmount;
+	return totalDmg;
 }
 
 void APlayerCharacter::HandleKnockback(FVector a_knockbackDirection, float a_knockbackStrength)
@@ -410,21 +442,19 @@ void APlayerCharacter::OnHit(UPrimitiveComponent* a_overlappedComponent, AActor*
 {
 	if (a_otherActor && a_otherActor != this && a_otherComp)
 	{
-		UGameplayStatics::ApplyDamage(a_otherActor, 1.0f/*get player damage*/, GetController(), this, nullptr);
+		if (m_AlreadyHitActors.Contains(a_otherActor)) return;
+		m_AlreadyHitActors.Add(a_otherActor);
+		UGameplayStatics::ApplyDamage(a_otherActor, m_AttackDamage, GetController(), this, nullptr);
 	}
 }
 
-// void APlayerCharacter::TakeDamage(int32 a_Damage)
-// {
-// 	if (a_Damage <= 0) return; // negative values would increase the player health instead of decreasing it.
-// 	int32 clampedDefense = FMath::Clamp(m_PlayerDefense, 0, 100); // safety check
-// 	int32 totalDmg = a_Damage * (100 - clampedDefense) / 100;
-// 	m_PlayerHealth -= totalDmg;
-// 	if (m_PlayerHealth <= 0) m_PlayerHealth = 0;
-// }
-
 void APlayerCharacter::CheckForDeath()
 {
+	if (m_PlayerHealth <= 0)
+	{
+		m_IsPlayerAlive = false;
+		DisableInput(Cast<APlayerController>(GetController()));
+	}
 }
 
 // PLAYER CLASS
@@ -510,5 +540,10 @@ void APlayerCharacter::ChangeAttackSpeed(int32 a_Value)
 {
 	m_PlayerAttackSpeed += a_Value;
 	if (m_PlayerAttackSpeed <= 0) m_PlayerAttackSpeed = 0;
+}
+
+void APlayerCharacter::ChangeAttackDamage(int32 a_Value)
+{
+	m_AttackDamage += a_Value;
 }
 
