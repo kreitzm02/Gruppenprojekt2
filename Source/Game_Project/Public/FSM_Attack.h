@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Enemy_Warrior.h"
 #include "FSM_BaseEnemyState.h"
 #include "FSM_Attack.generated.h"
 
@@ -26,4 +27,7 @@ public:
 private:
 	UPROPERTY()
 	UAnimSequence* m_attackAnimation = nullptr;
+
+	UPROPERTY()
+	AEnemy_Warrior* m_thisEnemy = nullptr;
 };
