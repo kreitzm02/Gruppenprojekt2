@@ -90,14 +90,4 @@ void UFSM_IdleWalkAround::ChooseRandomNavLocation(AActor* a_owner)
             }
         }
     }
-    
-
-    //if (found)
-    //{
-    //    m_targetLocation = navLocation.Location;
-    //}
-    //else
-    //{
-    //    m_targetLocation = origin;
-    //}
 }

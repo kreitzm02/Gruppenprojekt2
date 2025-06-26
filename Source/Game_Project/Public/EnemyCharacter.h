@@ -64,7 +64,7 @@ public:
 	float GetAttackDuration() { return m_attackDuration; }
 
 	void SetDeathState(bool a_isDead) { m_isDead = a_isDead; }
-private:
+protected:
 	bool m_isDead = false;
 
 	UPROPERTY(VisibleAnywhere)
@@ -115,8 +115,10 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
 	float m_maxHealth = 100.0f;
 
+	UPROPERTY(EditAnywhere, Category = "Weapon Rotation")
+	FRotator m_weaponRotation = FRotator::ZeroRotator;
+
 	float m_currentHealth;
 
-protected:
 	float m_attackDuration = 0.0f;
 };
