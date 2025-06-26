@@ -6,6 +6,7 @@
 #include "EnemyCharacter.h"
 #include "Enemy_Necromancer.generated.h"
 
+
 /**
  * 
  */
@@ -49,7 +50,16 @@ private:
 	float m_summonCooldown = 20.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
+	UClass* m_necroSummonBP;
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
 	int m_maxSummons = 4;
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
+	float m_summonSpawnRadius = 600.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Properties", meta = (ToolTip = "Summon height offset to spawn in ground and arise from it"))
+	float m_summonsHeightOffset = -50.0f;
 
 	int m_currentSummons = 0;
 

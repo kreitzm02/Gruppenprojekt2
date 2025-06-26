@@ -24,14 +24,14 @@ AEnemyCharacter::AEnemyCharacter()
 	m_characterHitbox->SetupAttachment(m_skeletalMesh);
 	m_characterHitbox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	m_characterHitbox->SetCollisionObjectType(ECC_WorldDynamic);
-	m_characterHitbox->SetCollisionResponseToAllChannels(ECR_Ignore);
+	m_characterHitbox->SetCollisionResponseToAllChannels(ECR_Block);
 	m_characterHitbox->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Overlap);
 
 	m_weaponHitbox = CreateDefaultSubobject<UBoxComponent>(TEXT("AxeHitbox"));
 	m_weaponHitbox->SetupAttachment(m_weaponMesh);
 	m_weaponHitbox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	m_weaponHitbox->SetCollisionObjectType(ECC_WorldDynamic);
-	m_weaponHitbox->SetCollisionResponseToAllChannels(ECR_Ignore);
+	m_weaponHitbox->SetCollisionResponseToAllChannels(ECR_Block);
 	m_weaponHitbox->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Overlap);
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
@@ -45,6 +45,7 @@ void AEnemyCharacter::OnConstruction(const FTransform& Transform)
 	FName boneName = FName("hand_r");
 
 	m_weaponMesh->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, boneName);
+	m_weaponMesh->SetRelativeRotation(m_weaponRotation);
 }
 
 // Called when the game starts or when spawned
@@ -100,7 +101,10 @@ void AEnemyCharacter::OnHit(UPrimitiveComponent* a_overlappedComponent, AActor* 
 {
 	if (a_otherActor && a_otherActor != this && a_otherComp)
 	{
-		UGameplayStatics::ApplyDamage(a_otherActor, m_attackDamage, GetController(), this, nullptr);
-		UE_LOG(LogTemp, Warning, TEXT("Enemy hit a player"))
+		//if (a_otherComp->GetCollisionObjectType() == ECC_GameTraceChannel1)
+		//{
+			UGameplayStatics::ApplyDamage(a_otherActor, m_attackDamage, GetController(), this, nullptr);
+			UE_LOG(LogTemp, Warning, TEXT("Enemy hit a player"))
+		//}
 	}
 }
