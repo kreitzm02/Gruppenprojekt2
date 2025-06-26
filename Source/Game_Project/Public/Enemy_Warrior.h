@@ -14,6 +14,11 @@ class GAME_PROJECT_API AEnemy_Warrior : public AEnemyCharacter
 {
 	GENERATED_BODY()
 
+protected:
+	virtual void PreInitializeComponents() override;
+
+	virtual void BeginPlay() override;
+
 public:
 	virtual void Tick(float DeltaTime) override;
 

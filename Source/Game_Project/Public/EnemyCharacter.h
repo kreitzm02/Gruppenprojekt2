@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/BoxComponent.h"
 #include "GameFramework/Character.h"
 #include "EnemyCharacter.generated.h"
 
@@ -46,6 +47,8 @@ public:
 
 	UAnimSequence* GetDeathAnimation() { return m_deathAnimation; }
 
+	UBoxComponent* GetWeaponHitbox() { return m_weaponHitbox; }
+
 	float GetPlayerDetectionRadius() { return m_playerDetectionRadius; }
 
 	float GetPlayerChaseRadius() { return m_playerChaseRadius; }
@@ -57,6 +60,8 @@ public:
 	float GetAttackRange() { return m_attackRange; }
 
 	float GetCurrentHealth() { return m_currentHealth; }
+
+	float GetAttackDuration() { return m_attackDuration; }
 
 	void SetDeathState(bool a_isDead) { m_isDead = a_isDead; }
 private:
@@ -72,10 +77,10 @@ private:
 	UFSM_EnemyStateMachineComponent* m_stateMachine;
 
 	UPROPERTY(VisibleAnywhere, Category = "Enemy Properties")
-	class UBoxComponent* m_characterHitbox;
+	UBoxComponent* m_characterHitbox;
 
 	UPROPERTY(VisibleAnywhere, Category = "Enemy Properties")
-	class UBoxComponent* m_axeHitbox;
+	UBoxComponent* m_weaponHitbox;
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
 	UAnimSequence* m_idleAnimation = nullptr;
@@ -111,4 +116,7 @@ private:
 	float m_maxHealth = 100.0f;
 
 	float m_currentHealth;
+
+protected:
+	float m_attackDuration = 0.0f;
 };

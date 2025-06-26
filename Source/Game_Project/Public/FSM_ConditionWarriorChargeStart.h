@@ -15,13 +15,12 @@ class GAME_PROJECT_API UFSM_ConditionWarriorChargeStart : public UFSM_BaseStateT
 {
 	GENERATED_BODY()
 
-private:
-
-	UPROPERTY()
-	AEnemy_Warrior* m_thisWarrior = nullptr;
-
 public:
 	void Initialize() override;
 	void ResetCondition() override;
 	bool IsConditionMet(float a_deltaTime) override;
+
+private:
+	UPROPERTY()
+	AEnemy_Warrior* m_thisWarrior = nullptr;
 };
