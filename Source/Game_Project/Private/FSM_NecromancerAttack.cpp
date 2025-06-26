@@ -52,7 +52,7 @@ void UFSM_NecromancerAttack::OnEnter()
 			break;
 		}
 	}
-	//m_thisEnemy->GetWeaponHitbox()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	m_thisEnemy->GetWeaponHitbox()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	m_ownerSkeletalMesh->PlayAnimation(m_attackAnimation, true);
 }
 

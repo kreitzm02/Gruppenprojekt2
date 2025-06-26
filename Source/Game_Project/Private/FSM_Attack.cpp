@@ -9,8 +9,8 @@
 void UFSM_Attack::Initialize()
 {
 	Super::Initialize();
-	AEnemy_Warrior* enemy = Cast<AEnemy_Warrior>(m_ownerPawn);
-	m_attackAnimation = enemy->GetAttackAnimation();
+	m_thisEnemy = Cast<AEnemy_Warrior>(m_ownerPawn);
+	m_attackAnimation = m_thisEnemy->GetAttackAnimation();
 }
 
 void UFSM_Attack::OnEnter()
@@ -21,6 +21,7 @@ void UFSM_Attack::OnEnter()
 	}
 	Super::OnEnter();
 	m_ownerSkeletalMesh->PlayAnimation(m_attackAnimation,true);
+	m_thisEnemy->GetWeaponHitbox()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 }
 
 void UFSM_Attack::OnUpdate(float a_deltaTime)
@@ -31,4 +32,6 @@ void UFSM_Attack::OnUpdate(float a_deltaTime)
 void UFSM_Attack::OnExit()
 {
 	Super::OnExit();
+
+	m_thisEnemy->GetWeaponHitbox()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
