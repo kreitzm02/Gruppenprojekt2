@@ -13,7 +13,12 @@ UCLASS()
 class GAME_PROJECT_API UFSM_CondPlayerInAtkRange : public UFSM_BaseStateTransition
 {
 	GENERATED_BODY()
-	
+
+public:
+	void Initialize() override;
+	void ResetCondition() override;
+	bool IsConditionMet(float a_deltaTime) override;
+
 private:
 	UPROPERTY()
 	AActor* m_owner = nullptr;
@@ -23,11 +28,4 @@ private:
 
 	UPROPERTY()
 	float m_attackRange;
-
-
-
-public:
-	void Initialize() override;
-	void ResetCondition() override;
-	bool IsConditionMet(float a_deltaTime) override;
 };
