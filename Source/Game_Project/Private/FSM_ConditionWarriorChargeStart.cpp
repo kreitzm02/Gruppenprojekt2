@@ -8,7 +8,6 @@
 void UFSM_ConditionWarriorChargeStart::Initialize()
 {
 	Super::Initialize();
-	//owner = Cast<AActor>(GetOuter()->GetOuter());
 	m_thisWarrior = Cast<AEnemy_Warrior>(GetOuter()->GetOuter());
 }
 
@@ -26,5 +25,4 @@ bool UFSM_ConditionWarriorChargeStart::IsConditionMet(float a_deltaTime)
 	}
 
 	return false;
-
 }

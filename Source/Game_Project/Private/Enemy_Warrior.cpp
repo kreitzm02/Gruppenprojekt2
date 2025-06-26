@@ -3,6 +3,19 @@
 
 #include "Enemy_Warrior.h"
 
+void AEnemy_Warrior::PreInitializeComponents()
+{
+	Super::PreInitializeComponents();
+
+	m_attackDuration = m_attackAnimation->GetPlayLength();
+}
+
+void AEnemy_Warrior::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
+
 void AEnemy_Warrior::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);

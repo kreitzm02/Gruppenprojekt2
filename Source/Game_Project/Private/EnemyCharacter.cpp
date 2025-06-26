@@ -27,12 +27,12 @@ AEnemyCharacter::AEnemyCharacter()
 	m_characterHitbox->SetCollisionResponseToAllChannels(ECR_Ignore);
 	m_characterHitbox->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Overlap);
 
-	m_axeHitbox = CreateDefaultSubobject<UBoxComponent>(TEXT("AxeHitbox"));
-	m_axeHitbox->SetupAttachment(m_weaponMesh);
-	m_axeHitbox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	m_axeHitbox->SetCollisionObjectType(ECC_WorldDynamic);
-	m_axeHitbox->SetCollisionResponseToAllChannels(ECR_Ignore);
-	m_axeHitbox->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Overlap);
+	m_weaponHitbox = CreateDefaultSubobject<UBoxComponent>(TEXT("AxeHitbox"));
+	m_weaponHitbox->SetupAttachment(m_weaponMesh);
+	m_weaponHitbox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	m_weaponHitbox->SetCollisionObjectType(ECC_WorldDynamic);
+	m_weaponHitbox->SetCollisionResponseToAllChannels(ECR_Ignore);
+	m_weaponHitbox->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Overlap);
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	AIControllerClass = AAIController::StaticClass();
@@ -53,9 +53,11 @@ void AEnemyCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	m_characterHitbox->OnComponentBeginOverlap.AddDynamic(this, &AEnemyCharacter::OnHit);
-	m_axeHitbox->OnComponentBeginOverlap.AddDynamic(this, &AEnemyCharacter::OnHit);
+	m_weaponHitbox->OnComponentBeginOverlap.AddDynamic(this, &AEnemyCharacter::OnHit);
 
 	m_currentHealth = m_maxHealth;
+
+	m_weaponHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 // Called every frame
