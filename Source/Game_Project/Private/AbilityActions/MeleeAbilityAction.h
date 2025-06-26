@@ -7,7 +7,7 @@
 #include "MeleeAbilityAction.generated.h"
 
 UENUM(BlueprintType)
-enum class EWeaponNames : uint8
+enum class EMeleeAbilityWeaponNames : uint8
 {
 	MESH_1H_AXE			UMETA(DisplayName = "1H_Axe"),
 	MESH_1H_SWORD		UMETA(DisplayName = "1H_Sword"),
@@ -22,7 +22,7 @@ enum class EWeaponNames : uint8
 };
 
 UENUM(BlueprintType)
-enum class EAnimationNames : uint8
+enum class EMeleeAbilityAnimationNames : uint8
 {
 	ANIM_1H_MELEE_ATTACK_CHOP			UMETA(DisplayName = "1H_Melee_Attack_Chop"),
 	ANIM_1H_MELEE_ATTACK_SLICE_DIAGONAL	UMETA(DisplayName = "1H_Melee_Attack_Slice_Diagonal"),
@@ -42,13 +42,13 @@ public:
 	bool m_AllowCriticalHits;
 
 	UPROPERTY(EditAnywhere, Category = "Melee Ability Action Settings", meta = (DisplayName = "Weapon Mesh Name"))
-	EWeaponNames m_WeaponMeshName;
+	EMeleeAbilityWeaponNames m_WeaponMeshName;
 
-	UPROPERTY(EditAnywhere, Category = "Melee Ability Action Settings", meta = (DisplayName = "Custom Weapon Mesh Name", EditCondition = "m_WeaponMeshName == EWeaponNames::MESH_CUSTOM", EditConditionHides))
+	UPROPERTY(EditAnywhere, Category = "Melee Ability Action Settings", meta = (DisplayName = "Custom Weapon Mesh Name", EditCondition = "m_WeaponMeshName == EMeleeAbilityWeaponNames::MESH_CUSTOM", EditConditionHides))
 	FName m_CustomWeaponMeshName;
 
 	UPROPERTY(EditAnywhere, Category = "Melee Ability Action Settings", meta = (DisplayName = "Animation Name"))
-	EAnimationNames m_AnimName;
+	EMeleeAbilityAnimationNames m_AnimName;
 
 	FName GetWeaponMeshName() const;
 
