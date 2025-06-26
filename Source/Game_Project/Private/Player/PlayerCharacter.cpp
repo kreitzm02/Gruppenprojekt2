@@ -133,11 +133,11 @@ void APlayerCharacter::Tick(float DeltaTime)
 	const FVector currentLocation = GetActorLocation();
 	const float speed = FVector::Dist(currentLocation, m_PreviousLocation) / DeltaTime;
 	m_PreviousLocation = currentLocation;
-	const float movementThreshold = 1.0f;
+	const float movementThreshold = 0.0f;
 
 	if (m_AnimInstance)
 	{
-		m_AnimInstance->m_IsRunning = speed > m_PlayerMovementSpeed + movementThreshold;
+		m_AnimInstance->m_IsRunning = speed > m_PlayerMovementSpeed + movementThreshold ;
 		m_AnimInstance->m_IsWalking = speed > movementThreshold && speed <= m_PlayerMovementSpeed + movementThreshold;
 		// to avoid t posing when no montage is playing in upper body slot
 		float targetWeight = m_AnimInstance->Montage_IsPlaying(nullptr) ? 1.0f : 0.0f;
@@ -474,7 +474,6 @@ void APlayerCharacter::SetupChangedPlayerClass()
 	// setup the player stats with the default values from the given data asset
 	ResetStatsToDefault();
 	ChangeToAbilitySlot0();
-	GetMesh()->PlayAnimation(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_IdleAnim, true); // temporary fix, as the character plays the t-pose animation instead of idle
 }
 
 void APlayerCharacter::ChangeToPlayerClassA()
