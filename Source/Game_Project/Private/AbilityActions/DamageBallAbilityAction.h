@@ -82,7 +82,7 @@ public:
 
 	FName GetWeaponMeshName() const;
 	void EndAbilityAction();
-	void DrawDebug(AActor* a_AbilityUser);
+	void UpdateBallMovement(AActor* a_AbilityUser);
 
 	virtual void PrepareAbilityAction(AActor* a_AbilityUser) override;
 	virtual void PlayAbilityAction(AActor* a_AbilityUser) override;
@@ -90,6 +90,12 @@ public:
 private:
 
 	UAnimMontage* m_AttackMontage;
-	FTimerHandle m_DebugDrawTimerHandle;
+	FTimerHandle m_EndTimerHandle;
+	FTimerHandle m_MoveTickHandle;
 	TSet<AActor*> m_AlreadyHitActors;
+
+	int32 m_HitAmount;
+	FVector m_Direction;
+	FVector m_CurrPosition;
+
 };
