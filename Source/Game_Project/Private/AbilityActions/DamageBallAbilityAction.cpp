@@ -43,72 +43,6 @@ FName UDamageBallAbilityAction::GetWeaponMeshName() const
 	}
 }
 
-void UDamageBallAbilityAction::EndAbilityAction()
-{
-	if (UWorld* World = GetWorld())
-	{
-		World->GetTimerManager().ClearTimer(m_MoveTickHandle);
-		World->GetTimerManager().ClearTimer(m_EndTimerHandle);
-		UE_LOG(LogTemp, Warning, TEXT("Damage Ball Ability Action Ended"));
-	}
-}
-
-void UDamageBallAbilityAction::UpdateBallMovement(AActor* a_AbilityUser)
-{
-	const float step = m_Speed * 0.01f;
-	const FVector nextPos = m_CurrPosition + m_Direction * step;
-
-	FHitResult hit;
-	const bool wallHit = a_AbilityUser->GetWorld()->LineTraceSingleByChannel(hit, m_CurrPosition, nextPos, ECC_Visibility);
-
-	if (wallHit)
-	{
-		AActor* hitActor = hit.GetActor();
-		if (m_BouncesOfWalls && hitActor->IsRootComponentStatic())
-		{
-			const FVector Normal = hit.Normal;
-			m_Direction = m_Direction.MirrorByPlane(FPlane(hit.Normal, 0)).GetSafeNormal();
-			m_CurrPosition = hit.Location + m_Direction * 2.0f;
-			return;
-		}
-		else
-		{
-			EndAbilityAction();
-			return;
-		}
-	}
-	TArray<FOverlapResult> overlapResults;
-
-	FCollisionShape collisionShape = FCollisionShape::MakeSphere(m_BallSize);
-
-	bool hasOverlap = a_AbilityUser->GetWorld()->OverlapMultiByChannel(overlapResults, nextPos, FQuat::Identity, ECollisionChannel::ECC_Pawn, collisionShape);
-
-	if (hasOverlap)
-	{
-		for (int i = 0; i < overlapResults.Num(); i++)
-		{
-			AActor* hitActor = overlapResults[i].GetActor();
-			if (hitActor && hitActor != a_AbilityUser)
-			{
-				if (m_AlreadyHitActors.Contains(hitActor)) continue;
-				m_AlreadyHitActors.Add(hitActor);
-				m_HitAmount++;
-				UGameplayStatics::ApplyDamage(hitActor, m_Damage, nullptr, a_AbilityUser, nullptr);
-
-				if (m_HitAmount >= m_CollisionsBeforeDestruction)
-				{
-					EndAbilityAction();
-					return;
-				}
-			}
-		}
-	}
-
-	DrawDebugSphere(a_AbilityUser->GetWorld(), nextPos, m_BallSize, 16, m_Color, false, 0.05f);
-
-	m_CurrPosition = nextPos;
-}
-
 void UDamageBallAbilityAction::PrepareAbilityAction(AActor* a_AbilityUser)
 {
 	Super::PrepareAbilityAction(a_AbilityUser);
@@ -134,17 +68,79 @@ void UDamageBallAbilityAction::PlayAbilityAction(AActor* a_AbilityUser)
 		player->m_AnimInstance->Montage_Play(m_AttackMontage);
 		// sound
 		UE_LOG(LogTemp, Warning, TEXT("Player just used an ability that included damage ball ability action!"));
-
+		
 		const FRotator playerRotation = a_AbilityUser->GetActorRotation();
 		const FVector forward = playerRotation.RotateVector(FVector::ForwardVector);
-		const FVector offsetRotated = FRotator(0.0f, m_BallInitialRotation, 0.0f).RotateVector(forward); 
-		m_Direction = offsetRotated.GetSafeNormal();
+		const FVector offsetRotated = FRotator(0.0f, m_BallInitialRotation, 0.0f).RotateVector(forward);
+		const FVector startPosition = a_AbilityUser->GetActorLocation() + offsetRotated * m_OffsetFromSpawn;
+		
+		TSharedRef<FDamageBallInstance> ballInstance = MakeShared<FDamageBallInstance>();
+		ballInstance->m_Direction = offsetRotated.GetSafeNormal();
+		ballInstance->m_CurrPosition = startPosition;
 
-		m_CurrPosition = a_AbilityUser->GetActorLocation() + offsetRotated * m_OffsetFromSpawn;
-		m_HitAmount = 0;
-		m_AlreadyHitActors.Empty();
+		FTimerHandle endTimerHandle;
+		FTimerHandle moveTickHandle;
 
-		a_AbilityUser->GetWorld()->GetTimerManager().SetTimer(m_MoveTickHandle, FTimerDelegate::CreateUObject(this, &UDamageBallAbilityAction::UpdateBallMovement, a_AbilityUser), 0.01f, true);
-		a_AbilityUser->GetWorld()->GetTimerManager().SetTimer(m_EndTimerHandle, this, &UDamageBallAbilityAction::EndAbilityAction, m_MaxDuration, false);
+		a_AbilityUser->GetWorld()->GetTimerManager().SetTimer(moveTickHandle, FTimerDelegate::CreateLambda([=, this, &moveTickHandle, &endTimerHandle]()
+		{
+			const float step = m_Speed * 0.01f;
+			const FVector nextPos = ballInstance->m_CurrPosition + ballInstance->m_Direction * step;
+		
+			FHitResult hit;
+			bool wallHit = a_AbilityUser->GetWorld()->LineTraceSingleByChannel(hit, ballInstance->m_CurrPosition, nextPos, ECC_Visibility);
+		
+			if (wallHit)
+			{
+				AActor* hitActor = hit.GetActor();
+				if (m_BouncesOfWalls && hitActor && hitActor->IsRootComponentStatic() && ballInstance->m_HitCount <= m_CollisionsBeforeDestruction)
+				{
+					const FVector Normal = hit.Normal;
+					ballInstance->m_Direction = ballInstance->m_Direction.MirrorByPlane(FPlane(Normal, 0)).GetSafeNormal();
+					ballInstance->m_Direction.Z = 0.0f;
+					ballInstance->m_CurrPosition = hit.Location + ballInstance->m_Direction * 2.0f;
+					ballInstance->m_HitCount++;
+					return;
+				}
+				else
+				{
+					a_AbilityUser->GetWorld()->GetTimerManager().ClearTimer(moveTickHandle);
+					return;
+				}
+			}
+		
+			TArray<FOverlapResult> overlaps;
+			FCollisionShape shape = FCollisionShape::MakeSphere(m_BallSize);
+			bool overlap = a_AbilityUser->GetWorld()->OverlapMultiByChannel(overlaps, nextPos, FQuat::Identity, ECC_Pawn, shape);
+		
+			if (overlap)
+			{
+				for (const FOverlapResult& result : overlaps)
+				{
+					AActor* hitActor = result.GetActor();
+					if (hitActor && hitActor != a_AbilityUser && !ballInstance->m_AlreadyHitActors.Contains(hitActor))
+					{
+						ballInstance->m_AlreadyHitActors.Add(hitActor);
+						ballInstance->m_HitCount++;
+						UGameplayStatics::ApplyDamage(hitActor, m_Damage, nullptr, a_AbilityUser, nullptr);
+		
+						if (ballInstance->m_HitCount >= m_CollisionsBeforeDestruction)
+						{
+							a_AbilityUser->GetWorld()->GetTimerManager().ClearTimer(moveTickHandle);
+							a_AbilityUser->GetWorld()->GetTimerManager().ClearTimer(endTimerHandle);
+							return;
+						}
+					}
+				}
+			}
+		
+			DrawDebugSphere(a_AbilityUser->GetWorld(), nextPos, m_BallSize, 16, m_Color, false, 0.05f);
+			ballInstance->m_CurrPosition = nextPos;
+		}), 0.01f, true);
+		
+		a_AbilityUser->GetWorld()->GetTimerManager().SetTimer(endTimerHandle, FTimerDelegate::CreateLambda([=, this, &moveTickHandle, &endTimerHandle]()
+		{
+			a_AbilityUser->GetWorld()->GetTimerManager().ClearTimer(moveTickHandle);
+			UE_LOG(LogTemp, Warning, TEXT("Damage Ball Auto-ended after duration"));
+		}), m_MaxDuration, false);
 	}
 }

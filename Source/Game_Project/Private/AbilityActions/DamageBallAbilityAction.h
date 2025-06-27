@@ -29,6 +29,14 @@ enum class EDamageBallAnimationNames : uint8
 	ANIM_SPELLCAST_SHOOT	UMETA(DisplayName = "Spellcast_Shoot")
 };
 
+struct FDamageBallInstance
+{
+	FVector m_Direction;
+	FVector m_CurrPosition;
+	int32 m_HitCount = 0;
+	TSet<AActor*> m_AlreadyHitActors;
+};
+
 UCLASS(Blueprintable, EditInlineNew)
 class UDamageBallAbilityAction : public UBaseAbilityAction
 {
@@ -81,8 +89,6 @@ public:
 	EDamageBallAnimationNames m_AnimName;
 
 	FName GetWeaponMeshName() const;
-	void EndAbilityAction();
-	void UpdateBallMovement(AActor* a_AbilityUser);
 
 	virtual void PrepareAbilityAction(AActor* a_AbilityUser) override;
 	virtual void PlayAbilityAction(AActor* a_AbilityUser) override;
@@ -90,12 +96,4 @@ public:
 private:
 
 	UAnimMontage* m_AttackMontage;
-	FTimerHandle m_EndTimerHandle;
-	FTimerHandle m_MoveTickHandle;
-	TSet<AActor*> m_AlreadyHitActors;
-
-	int32 m_HitAmount;
-	FVector m_Direction;
-	FVector m_CurrPosition;
-
 };
