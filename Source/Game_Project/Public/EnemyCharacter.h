@@ -63,6 +63,8 @@ public:
 
 	float GetAttackDuration() { return m_attackDuration; }
 
+	float GetAttackDamage() { return m_attackDamage; }
+
 	void SetDeathState(bool a_isDead) { m_isDead = a_isDead; }
 protected:
 	bool m_isDead = false;

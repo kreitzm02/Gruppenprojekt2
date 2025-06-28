@@ -50,6 +50,7 @@ bool UFSM_ConditionPlayerInRange::IsConditionMet(float a_deltaTime)
 		queryParams
 	);
 
+	if (m_enableDebug)
 	DrawDebugSphere(
 		m_owner->GetWorld(),
 		m_owner->GetActorLocation(),

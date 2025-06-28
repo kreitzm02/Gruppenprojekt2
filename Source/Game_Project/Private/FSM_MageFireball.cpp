@@ -86,7 +86,7 @@ void UFSM_MageFireball::OnUpdate(float a_deltaTime)
 
 	if (!m_fireballFired && m_passedTime >= m_castDuration + m_shootAtAnimStartOffset)
 	{
-		m_thisEnemy->FireFireball(Cast<ACharacter>(m_player));
+		m_thisEnemy->FireFireball(m_player);
 		m_fireballFired = true;
 	}
 }

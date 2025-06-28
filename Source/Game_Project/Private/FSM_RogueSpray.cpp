@@ -13,8 +13,6 @@ void UFSM_RogueSpray::Initialize()
 
 	m_thisEnemy = Cast<AEnemy_Rogue>(m_ownerPawn);
 	m_attackAnimation = m_thisEnemy->GetArrowSprayAnimation();
-
-	m_animDuration = m_attackAnimation->GetPlayLength();
 }
 
 void UFSM_RogueSpray::OnEnter()
@@ -70,7 +68,6 @@ void UFSM_RogueSpray::OnUpdate(float a_deltaTime)
 		playerDirection.Z = 0.0f;
 		m_ownerPawn->SetActorRotation(playerDirection.Rotation());
 	}
-	
 
 	m_passedTime += a_deltaTime;
 
@@ -80,13 +77,12 @@ void UFSM_RogueSpray::OnUpdate(float a_deltaTime)
 		m_ownerSkeletalMesh->PlayAnimation(m_attackAnimation, false);
 
 		m_passedTime = 0.0f;
-
 		m_shotFired = false;
 	}
 
 	if (!m_shotFired && m_passedTime >= m_shootAtAnimStartOffset)
 	{
-		m_thisEnemy->FireArrow(FVector::ForwardVector);
+		m_thisEnemy->FireArrow(m_player);
 		m_shotFired = true;
 	}
 }
