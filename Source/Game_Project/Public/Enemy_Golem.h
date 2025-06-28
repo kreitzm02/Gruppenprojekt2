@@ -20,6 +20,8 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
+	AEnemy_Golem();
+
 	virtual void Tick(float DeltaTime) override;
 
 	void CreateShockwave();
@@ -45,6 +47,21 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
 	float m_abilityCooldown = 20.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
+	UClass* m_shockwaveBP = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
+	float m_shockwaveExpansionSpeed = 20.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
+	float m_shockwaveMaxRadius = 200.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
+	float m_shockwaveStartRadius = 100.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
+	UArrowComponent* m_shockwaveSpawnPoint = nullptr;
 
 	float m_passedCooldownTime = 0.0f;
 

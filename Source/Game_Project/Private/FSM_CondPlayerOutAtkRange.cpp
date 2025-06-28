@@ -46,7 +46,7 @@ bool UFSM_CondPlayerOutAtkRange::IsConditionMet(float a_deltaTime)
 		FCollisionShape::MakeSphere(m_attackRange),
 		queryParams
 	);
-
+	if (m_enableDebug)
 	DrawDebugSphere(
 		m_owner->GetWorld(),
 		m_owner->GetActorLocation(),

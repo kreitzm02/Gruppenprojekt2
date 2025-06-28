@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-           
+
+#include "AbilityActions/DamageCircleAbilityAction.h"         
 #include "Kismet/GameplayStatics.h"
 #include "Engine/OverlapResult.h"
-#include "AbilityActions/DamageCircleAbilityAction.h"
 #include <Player/PlayerCharacter.h>
 
 void UDamageCircleAbilityAction::PrepareAbilityAction(AActor* a_AbilityUser)

@@ -14,6 +14,9 @@ class GAME_PROJECT_API AEnemy_Mage : public AEnemyCharacter
 {
 	GENERATED_BODY()
 
+public:
+	AEnemy_Mage();
+
 protected:
 	virtual void PreInitializeComponents() override;
 
@@ -22,9 +25,9 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 
-	void FireProjectile(FVector a_direction);
+	void FireProjectile(AActor* a_target);
 
-	void FireFireball(ACharacter* a_playerToFollow);
+	void FireFireball(AActor* a_target);
 
 	bool GetAbilityReady() { return m_abilityReady; }
 
@@ -52,6 +55,27 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
 	float m_abilityCooldown = 20.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
+	float m_projectileSpeed = 1000.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
+	float m_projectileLifetime = 8.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
+	UClass* m_projectileBP = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
+	float m_fireballSpeed = 1000.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
+	float m_fireballLifetime = 8.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
+	UClass* m_fireballBP = nullptr;
+
+	UPROPERTY(EditAnywhere)
+	UArrowComponent* m_projectileSpawnPoint = nullptr;
 
 	float m_passedCooldownTime = 0.0f;
 

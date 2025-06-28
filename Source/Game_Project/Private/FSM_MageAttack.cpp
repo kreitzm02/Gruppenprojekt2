@@ -84,7 +84,7 @@ void UFSM_MageAttack::OnUpdate(float a_deltaTime)
 
 	if (!m_shotFired && m_passedTime >= m_shootAtAnimStartOffset)
 	{
-		m_thisEnemy->FireProjectile(FVector::ForwardVector);
+		m_thisEnemy->FireProjectile(m_player);
 		m_shotFired = true;
 	}
 }

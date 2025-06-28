@@ -20,6 +20,9 @@ public:
 	bool IsConditionMet(float a_deltaTime) override;
 
 private:
+	UPROPERTY(EditAnywhere, Category = "Debug")
+	bool m_enableDebug = true;
+
 	UPROPERTY()
 	AActor* m_owner = nullptr;
 

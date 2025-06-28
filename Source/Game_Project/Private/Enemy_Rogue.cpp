@@ -2,6 +2,15 @@
 
 
 #include "Enemy_Rogue.h"
+#include "Enemy_RogueArrow.h"
+#include "Components/ArrowComponent.h"
+#include "Kismet/GameplayStatics.h"
+
+AEnemy_Rogue::AEnemy_Rogue()
+{
+	m_projectileSpawnPoint = CreateDefaultSubobject<UArrowComponent>(TEXT("ProjectileSpawnPoint"));
+	m_projectileSpawnPoint->SetupAttachment(m_weaponMesh);
+}
 
 void AEnemy_Rogue::PreInitializeComponents()
 {
@@ -32,7 +41,14 @@ void AEnemy_Rogue::Tick(float DeltaTime)
 	}
 }
 
-void AEnemy_Rogue::FireArrow(FVector a_dirction)
+void AEnemy_Rogue::FireArrow(AActor* a_target)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Firing arrow!"));
+	FTransform transform = FTransform(FRotator(0.0f, 0.0f, 0.0f), m_projectileSpawnPoint->GetComponentLocation(),FVector(1.0f, 1.0f, 1.0f));
+
+	AEnemy_RogueArrow* arrow = GetWorld()->SpawnActorDeferred<AEnemy_RogueArrow>(m_arrowBP, transform);
+	arrow->SetOwnerEnemy(this);
+	arrow->SetProjectileSpeed(m_arrowSpeed);
+	arrow->SetProjectileLifeSpan(m_arrowLifetime);
+	arrow->SetTarget(a_target);
+	UGameplayStatics::FinishSpawningActor(arrow, transform);
 }
