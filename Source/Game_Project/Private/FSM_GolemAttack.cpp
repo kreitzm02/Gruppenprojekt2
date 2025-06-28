@@ -43,7 +43,7 @@ void UFSM_GolemAttack::OnEnter()
 			m_ownerPawn->GetActorLocation(),
 			FQuat::Identity,
 			objectQueryParams,
-			FCollisionShape::MakeSphere(thisEnemy->GetPlayerChaseRadius()),
+			FCollisionShape::MakeSphere(thisEnemy->GetAttackRange()),
 			queryParams
 		);
 		for (FOverlapResult& overlap : overlaps)
