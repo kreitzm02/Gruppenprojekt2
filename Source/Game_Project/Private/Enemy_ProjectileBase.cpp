@@ -51,13 +51,15 @@ void AEnemy_ProjectileBase::MoveInDirection(float a_deltaTime)
 
 void AEnemy_ProjectileBase::OnHit(UPrimitiveComponent* a_overlappedComponent, AActor* a_otherActor, UPrimitiveComponent* a_otherComp, int32 a_otherBodyIndex, bool a_bFromSweep, const FHitResult& a_sweepResult)
 {
+	UE_LOG(LogTemp, Warning, TEXT("projectile hit something"));
 	if (a_otherActor && a_otherActor != this && a_otherComp)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("projectile hit something"));
 		if (a_otherComp->GetCollisionObjectType() == ECC_GameTraceChannel1)
 		{
-			//UE_LOG(LogTemp,Warning,TEXT("projectile hit player"));
+			UE_LOG(LogTemp,Warning,TEXT("projectile hit player"));
 			UGameplayStatics::ApplyDamage(a_otherActor, m_enemyCharacter->GetAttackDamage(), m_enemyCharacter->GetController(), m_enemyCharacter, nullptr);
-			Destroy();
+			this->Destroy();
 		}
 		else
 		{
