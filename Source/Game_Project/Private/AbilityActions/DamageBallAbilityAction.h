@@ -35,6 +35,7 @@ struct FDamageBallInstance
 	FVector m_CurrPosition;
 	int32 m_HitCount = 0;
 	TSet<AActor*> m_AlreadyHitActors;
+	float m_CircleAngle;
 };
 
 UCLASS(Blueprintable, EditInlineNew)
@@ -55,7 +56,14 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Damage Ball Action Settings", meta = (DisplayName = "Offset"))
 	float m_OffsetFromSpawn;
 
-	UPROPERTY(EditAnywhere, Category = "Damage Ball Action Settings", meta = (DisplayName = "Starting Delay"))
+	UPROPERTY(EditAnywhere, Category = "Damage Ball Action Settings", meta = (DisplayName = "Circular Motion Circle Radius", EditCondition = "m_Speed == 0.0", EditConditionHides))
+	float m_CircularMotionCircleRadius;
+
+	UPROPERTY(EditAnywhere, Category = "Damage Ball Action Settings", meta = (DisplayName = "Circular Rotation Speed", EditCondition = "m_Speed == 0.0", EditConditionHides))
+	float m_CircularRotationSpeed;
+
+	UPROPERTY(EditAnywhere, Category = "Damage Ball Action Settings", meta = (DisplayName = "Starting Delay",
+		ClampMin = "0.01", UIMin = "0.01"))
 	float m_Delay;
 
 	UPROPERTY(EditAnywhere, Category = "Damage Ball Action Settings", meta = (DisplayName = "Initial Z Rotation"))
@@ -73,9 +81,6 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Damage Ball Action Settings", meta = (DisplayName = "Color Glow Strength"))
 	float m_ColorGlowStrength;
 
-	UPROPERTY(EditAnywhere, Category = "Damage Ball Action Settings", meta = (DisplayName = "Ball Follows The Enemy"))
-	bool m_BallFollowsEnemy;
-
 	UPROPERTY(EditAnywhere, Category = "Damage Ball Action Settings", meta = (DisplayName = "Ball Can Bounce Of Walls"))
 	bool m_BouncesOfWalls;
 
@@ -89,6 +94,7 @@ public:
 	EDamageBallAnimationNames m_AnimName;
 
 	FName GetWeaponMeshName() const;
+	void PlayDamageBall(AActor* a_AbilityUser);
 
 	virtual void PrepareAbilityAction(AActor* a_AbilityUser) override;
 	virtual void PlayAbilityAction(AActor* a_AbilityUser) override;
@@ -96,4 +102,5 @@ public:
 private:
 
 	UAnimMontage* m_AttackMontage;
+	FTimerHandle m_StartTimerHandle;
 };
