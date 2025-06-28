@@ -2,6 +2,15 @@
 
 
 #include "Enemy_Golem.h"
+#include "Components/ArrowComponent.h"
+#include "Enemy_GolemShockwave.h"
+#include "Kismet/GameplayStatics.h"
+
+AEnemy_Golem::AEnemy_Golem()
+{
+	m_shockwaveSpawnPoint = CreateDefaultSubobject<UArrowComponent>(TEXT("ShockwaveSpawnPoint"));
+	m_shockwaveSpawnPoint->SetupAttachment(m_weaponMesh);
+}
 
 void AEnemy_Golem::PreInitializeComponents()
 {
@@ -35,5 +44,13 @@ void AEnemy_Golem::Tick(float DeltaTime)
 
 void AEnemy_Golem::CreateShockwave()
 {
+	FTransform transform = FTransform(FRotator(0.0f, 0.0f, 0.0f), m_shockwaveSpawnPoint->GetComponentLocation(), FVector(1.0f, 1.0f, 1.0f));
+
+	AEnemy_GolemShockwave* shockwave = GetWorld()->SpawnActorDeferred<AEnemy_GolemShockwave>(m_shockwaveBP, transform);
+	shockwave->SetOwnerEnemy(this);
+	shockwave->SetExpansionSpeed(m_shockwaveExpansionSpeed);
+	shockwave->SetMaxRadius(m_shockwaveMaxRadius);
+	shockwave->SetStartRadius(m_shockwaveStartRadius);
+	UGameplayStatics::FinishSpawningActor(shockwave, transform);
 	UE_LOG(LogTemp, Warning, TEXT("Shockwave fired"))
 }

@@ -101,10 +101,11 @@ void AEnemyCharacter::OnHit(UPrimitiveComponent* a_overlappedComponent, AActor* 
 {
 	if (a_otherActor && a_otherActor != this && a_otherComp)
 	{
-		//if (a_otherComp->GetCollisionObjectType() == ECC_GameTraceChannel1)
-		//{
+		if (a_otherComp->GetCollisionObjectType() == ECC_GameTraceChannel1)
+		{
+			//this->m_weaponHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			UGameplayStatics::ApplyDamage(a_otherActor, m_attackDamage, GetController(), this, nullptr);
 			UE_LOG(LogTemp, Warning, TEXT("Enemy hit a player"))
-		//}
+		}
 	}
 }

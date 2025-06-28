@@ -20,6 +20,8 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
+	AEnemy_Rogue();
+
 	virtual void Tick(float DeltaTime) override;
 
 	float GetArrowSprayDuration() { return m_arrowSprayDuration; }
@@ -28,7 +30,7 @@ public:
 
 	void SetArrowSprayReady(bool a_chargeReady) { m_arrowSprayReady = a_chargeReady; }
 
-	void FireArrow(FVector a_direction);
+	void FireArrow(AActor* a_target);
 
 	UAnimSequence* GetArrowSprayAnimation() { return m_arrowSprayAnimation; }
 
@@ -54,6 +56,15 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
 	float m_arrowSpeed = 1000.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
+	float m_arrowLifetime = 8.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
+	UClass* m_arrowBP = nullptr;
+
+	UPROPERTY(EditAnywhere)
+	UArrowComponent* m_projectileSpawnPoint = nullptr;
 
 	float m_passedCooldownTime = 0.0f;
 

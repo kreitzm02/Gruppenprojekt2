@@ -16,6 +16,9 @@ class GAME_PROJECT_API UFSM_ConditionPlayerInRange : public UFSM_BaseStateTransi
 	GENERATED_BODY()
 
 private:
+	UPROPERTY(EditAnywhere, Category = "Debug")
+	bool m_enableDebug = true;
+
 	UPROPERTY()
 	AActor* m_owner = nullptr;
 

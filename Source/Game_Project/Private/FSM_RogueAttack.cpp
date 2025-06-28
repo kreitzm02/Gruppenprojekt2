@@ -91,7 +91,7 @@ void UFSM_RogueAttack::OnUpdate(float a_deltaTime)
 
 	if (!m_shotFired && m_passedTime >= m_shootAtAnimStartOffset)
 	{
-		m_thisEnemy->FireArrow(FVector::ForwardVector);
+		m_thisEnemy->FireArrow(m_player);
 		m_shotFired = true;
 	}
 }
