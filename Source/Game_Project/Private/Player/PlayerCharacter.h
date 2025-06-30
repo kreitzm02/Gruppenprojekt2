@@ -78,21 +78,22 @@ public:
 	// manipulate player stats
 
 	void ResetStatsToDefault();
-	void ChangeMovementSpeed(int32 a_Value);
-	void ChangeLuck(int32 a_Value);
-	void ChangeDefense(int32 a_Value);
-	void ChangeAttackSpeed(int32 a_Value);
-	void ChangeAttackDamage(int32 a_Value);
+	void ChangeMovementSpeed(float a_Value);
+	void ChangeLuck(float a_Value);
+	void ChangeDefense(float a_Value);
+	void ChangeAttackSpeed(float a_Value);
+	void ChangeAttackDamage(float a_Value);
 
 	void CheckForDeath(); // no functionality yet
 
 	// external way to see and react to player stats
-	int32 GetPlayerHealth() { return m_PlayerHealth; }
-	int32 GetPlayerLuck() { return m_PlayerLuck; }
-	int32 GetPlayerDefense() { return m_PlayerDefense; }
-	int32 GetPlayerMovementSpeed() { return m_PlayerMovementSpeed; }
-	int32 GetPlayerAttackSpeed() { return m_PlayerAttackSpeed; }
-	int32 GetPlayerAttackDamage() { return m_AttackDamage; }
+	float GetPlayerHealth() { return m_PlayerHealth; }
+	float GetPlayerLuck() { return m_PlayerLuck; }
+	float GetPlayerDefense() { return m_PlayerDefense; }
+	float GetPlayerMovementSpeed() { return m_PlayerMovementSpeed; }
+	float GetPlayerAttackSpeed() { return m_PlayerAttackSpeed; }
+	float GetPlayerAttackDamage() { return m_AttackDamage; }
+	TArray<float> GetPlayerAbilityCooldownTimes() { return m_AbilityCooldownTimes; }
 
 	// 
 	void ChangeToPlayerClassA();
@@ -104,6 +105,8 @@ public:
 private:
 
 	TSet<AActor*> m_AlreadyHitActors;
+
+	TArray<float> m_AbilityCooldownTimes;
 
 	UPROPERTY()
 	UBoxComponent* m_MeleeHitBox;
@@ -125,22 +128,22 @@ private:
 	// player stats
 
 	UPROPERTY(VisibleAnywhere)
-	int32 m_PlayerHealth;
+	float m_PlayerHealth;
 
 	UPROPERTY(VisibleAnywhere)
-	int32 m_PlayerMovementSpeed;
+	float m_PlayerMovementSpeed;
 
 	UPROPERTY(VisibleAnywhere)
-	int32 m_PlayerAttackSpeed;
+	float m_PlayerAttackSpeed;
 
 	UPROPERTY(VisibleAnywhere)
-	int32 m_PlayerDefense;
+	float m_PlayerDefense;
 
 	UPROPERTY(VisibleAnywhere)
-	int32 m_PlayerLuck;
+	float m_PlayerLuck;
 
 	UPROPERTY(VisibleAnywhere)
-	int32 m_AttackDamage;
+	float m_AttackDamage;
 
 	//
 

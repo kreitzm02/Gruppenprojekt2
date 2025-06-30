@@ -73,3 +73,8 @@ void UAbilityComponent::RemoveAllAbilities()
 	m_Abilities.Empty();
 }
 
+float UAbilityComponent::GetRemainingCooldownFromAbility(int32 a_Index)
+{
+	return m_Abilities[a_Index]->GetCooldownTime(GetOwner()->GetWorld());
+}
+
