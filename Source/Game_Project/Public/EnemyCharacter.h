@@ -3,7 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Widget_EnemyHealthBar.h"
 #include "Components/BoxComponent.h"
+#include "Components/WidgetComponent.h"
 #include "GameFramework/Character.h"
 #include "EnemyCharacter.generated.h"
 
@@ -67,6 +69,10 @@ public:
 
 	void SetDeathState(bool a_isDead) { m_isDead = a_isDead; }
 protected:
+	void UpdateHealthBar();
+
+	virtual void OnDeath();
+
 	bool m_isDead = false;
 
 	UPROPERTY(VisibleAnywhere)
@@ -119,6 +125,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Weapon Rotation")
 	FRotator m_weaponRotation = FRotator::ZeroRotator;
+
+	UPROPERTY(VisibleAnywhere, Category = "UI")
+	UWidgetComponent* m_healthBarComponent = nullptr;
+
+	UPROPERTY()
+	UWidget_EnemyHealthBar* m_widgetHealthBar = nullptr;
 
 	float m_currentHealth;
 
