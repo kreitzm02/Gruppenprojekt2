@@ -27,6 +27,8 @@ public:
 
 	void Summon();
 
+	void SubstractSummon();
+
 	bool GetSummonReady() { return m_summonReady; }
 
 	void SetSummonReady(bool a_chargeReady) { m_summonReady = a_chargeReady; }

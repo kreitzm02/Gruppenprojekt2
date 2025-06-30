@@ -23,6 +23,8 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void OnDeath() override;
+
 	float GetRiseDuration() { return m_riseDuration; }
 
 	void SetHeightOffset(float a_heightOffset) { m_heightOffset = a_heightOffset; }

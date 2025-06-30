@@ -4,6 +4,7 @@
 #include "EnemyCharacter.h"
 #include "FSM_EnemyStateMachineComponent.h"
 #include "Components/BoxComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -36,6 +37,10 @@ AEnemyCharacter::AEnemyCharacter()
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	AIControllerClass = AAIController::StaticClass();
+
+	m_healthBarComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthBar"));
+	m_healthBarComponent->SetupAttachment(RootComponent);
+	m_healthBarComponent->SetWidgetSpace(EWidgetSpace::Screen);
 }
 
 void AEnemyCharacter::OnConstruction(const FTransform& Transform)
@@ -46,6 +51,7 @@ void AEnemyCharacter::OnConstruction(const FTransform& Transform)
 
 	m_weaponMesh->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, boneName);
 	m_weaponMesh->SetRelativeRotation(m_weaponRotation);
+
 }
 
 // Called when the game starts or when spawned
@@ -59,6 +65,9 @@ void AEnemyCharacter::BeginPlay()
 	m_currentHealth = m_maxHealth;
 
 	m_weaponHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	UUserWidget* widgetObject = m_healthBarComponent->GetUserWidgetObject();
+	m_widgetHealthBar = Cast<UWidget_EnemyHealthBar>(widgetObject);
 }
 
 // Called every frame
@@ -75,9 +84,16 @@ void AEnemyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 }
 
+void AEnemyCharacter::UpdateHealthBar()
+{
+	float healthPercent = m_currentHealth / m_maxHealth;
+	m_widgetHealthBar->SetHealthPercent(healthPercent);
+}
+
+
 float AEnemyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	m_currentHealth -= DamageAmount;
+	m_currentHealth = FMath::Clamp(m_currentHealth - DamageAmount, 0.0f, m_maxHealth);
 
 	if (DamageCauser)
 	{
@@ -89,8 +105,24 @@ float AEnemyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 		//damagingUnit->GetKnockback();
 	}
 
+	UpdateHealthBar();
+
+	if (m_currentHealth <= 0.0f)
+	{
+		OnDeath();
+	}
+
 	return DamageAmount;
 }
+
+void AEnemyCharacter::OnDeath()
+{
+	SetActorEnableCollision(false);
+	GetCharacterMovement()->GravityScale = 0.1f;
+	m_widgetHealthBar->SetVisibility(ESlateVisibility::Collapsed);
+	SetLifeSpan(4);
+}
+
 
 void AEnemyCharacter::HandleKnockback(FVector a_knockbackDirection, float a_knockbackStrength)
 {
