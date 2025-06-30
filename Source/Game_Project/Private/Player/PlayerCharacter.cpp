@@ -13,6 +13,7 @@
 #include "Animation/AnimInstance.h"
 #include <Kismet/GameplayStatics.h>
 
+
 // Sets default values
 APlayerCharacter::APlayerCharacter()
 {
@@ -39,6 +40,12 @@ void APlayerCharacter::BeginPlay()
 	ChangeToAbilitySlot0(); // the char equips his default ability
 	SetupMovement();
 	m_AbilityCooldownTimes.Init(0.0f, m_AbilityNum);
+
+	if (m_playerUI)
+	{
+		m_playerUIInstance = CreateWidget<UWidget_PlayerUI>(GetWorld(),m_playerUI);
+		m_playerUIInstance->AddToViewport();
+	}
 }
 
 // INPUT 
@@ -423,8 +430,11 @@ void APlayerCharacter::ClearAlreadyHitActors()
 float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	float totalDmg = DamageAmount * (100 - m_PlayerDefense) / 100;
+	UE_LOG(LogTemp, Warning, TEXT("player got damage: %f"),totalDmg)
+	UE_LOG(LogTemp, Warning, TEXT("Player health: %f"),m_PlayerHealth)
 	m_PlayerHealth -= totalDmg;
 	if (m_PlayerHealth <= 0) m_PlayerHealth = 0;
+	UpdateHealthBar();
 	//UE_LOG(LogTemp, Warning, TEXT("Player was hit"))
 		if (DamageCauser)
 		{
@@ -438,6 +448,13 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 
 	return totalDmg;
 }
+
+void APlayerCharacter::UpdateHealthBar()
+{
+	float healthPercentage = m_PlayerHealth / m_PlayerMaxHealth;
+	m_playerUIInstance->SetHealthPercent(healthPercentage);
+}
+
 
 void APlayerCharacter::HandleKnockback(FVector a_knockbackDirection, float a_knockbackStrength)
 {
@@ -517,6 +534,7 @@ bool APlayerCharacter::CheckIfCurrentPlayerClassIsValid()
 void APlayerCharacter::ResetStatsToDefault()
 {
 	m_PlayerHealth = m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_BaseHealthPoints;
+	m_PlayerMaxHealth = m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_BaseHealthPoints;
 	m_PlayerMovementSpeed = m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_BaseMoveSpeed;
 	m_PlayerDefense = m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_BaseDefense;
 	m_PlayerLuck = m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_BaseLuck;
