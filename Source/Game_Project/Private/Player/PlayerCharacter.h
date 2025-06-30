@@ -7,6 +7,7 @@
 #include "PlayerCharDataAsset.h"
 #include <Components/BoxComponent.h>
 #include "PlayerAnimInstance.h"
+#include "Widget_PlayerUI.h"
 #include "PlayerCharacter.generated.h"
 
 
@@ -103,6 +104,8 @@ public:
 
 private:
 
+	void UpdateHealthBar();
+
 	TSet<AActor*> m_AlreadyHitActors;
 
 	UPROPERTY()
@@ -126,6 +129,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	int32 m_PlayerHealth;
+
+	UPROPERTY(VisibleAnywhere)
+	int32 m_PlayerMaxHealth;
 
 	UPROPERTY(VisibleAnywhere)
 	int32 m_PlayerMovementSpeed;
@@ -197,6 +203,11 @@ private:
 
 	void SetupChangedPlayerClass();
 
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UUserWidget> m_playerUI = nullptr;
+
+	UPROPERTY()
+	UWidget_PlayerUI* m_playerUIInstance = nullptr;
 	//
 
 	UPROPERTY()

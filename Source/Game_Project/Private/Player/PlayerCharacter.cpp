@@ -38,6 +38,12 @@ void APlayerCharacter::BeginPlay()
 	HideAllWeapons();
 	ChangeToAbilitySlot0(); // the char equips his default ability
 	SetupMovement();
+
+	if (m_playerUI)
+	{
+		m_playerUIInstance = CreateWidget<UWidget_PlayerUI>(GetWorld(), m_playerUI);
+		m_playerUIInstance->AddToViewport();
+	}
 }
 
 // INPUT 
@@ -419,6 +425,7 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	int32 totalDmg = DamageAmount * (100 - m_PlayerDefense) / 100;
 	m_PlayerHealth -= totalDmg;
 	if (m_PlayerHealth <= 0) m_PlayerHealth = 0;
+	UpdateHealthBar();
 	//UE_LOG(LogTemp, Warning, TEXT("Player was hit"))
 		if (DamageCauser)
 		{
@@ -432,6 +439,14 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 
 	return totalDmg;
 }
+
+void APlayerCharacter::UpdateHealthBar()
+{
+	float healthPercent = (float)m_PlayerHealth / (float)m_PlayerMaxHealth;
+	UE_LOG(LogTemp,Warning,TEXT("player health percentage: %f"), healthPercent)
+	m_playerUIInstance->SetHealthPercent(healthPercent);
+}
+
 
 void APlayerCharacter::HandleKnockback(FVector a_knockbackDirection, float a_knockbackStrength)
 {
@@ -511,6 +526,7 @@ bool APlayerCharacter::CheckIfCurrentPlayerClassIsValid()
 void APlayerCharacter::ResetStatsToDefault()
 {
 	m_PlayerHealth = m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_BaseHealthPoints;
+	m_PlayerMaxHealth = m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_BaseHealthPoints;
 	m_PlayerMovementSpeed = m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_BaseMoveSpeed;
 	m_PlayerDefense = m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_BaseDefense;
 	m_PlayerLuck = m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_BaseLuck;

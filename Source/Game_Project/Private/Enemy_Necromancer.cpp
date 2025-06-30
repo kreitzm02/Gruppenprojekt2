@@ -77,3 +77,8 @@ void AEnemy_Necromancer::Summon()
 		UGameplayStatics::FinishSpawningActor(necroSummon, spawnTransform);
 	}
 }
+
+void AEnemy_Necromancer::SubstractSummon()
+{
+	m_currentSummons -= 1;
+}
