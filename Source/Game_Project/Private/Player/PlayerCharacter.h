@@ -7,6 +7,8 @@
 #include "PlayerCharDataAsset.h"
 #include <Components/BoxComponent.h>
 #include "PlayerAnimInstance.h"
+#include "Widget_PlayerUI.h"
+#include "Blueprint/UserWidget.h"
 #include "PlayerCharacter.generated.h"
 
 
@@ -104,6 +106,8 @@ public:
 
 private:
 
+	void UpdateHealthBar();
+
 	TSet<AActor*> m_AlreadyHitActors;
 
 	TArray<float> m_AbilityCooldownTimes;
@@ -126,6 +130,9 @@ private:
 	bool m_IsPlayerAlive = true;
 
 	// player stats
+
+	UPROPERTY(VisibleAnywhere)
+	float m_PlayerMaxHealth;
 
 	UPROPERTY(VisibleAnywhere)
 	float m_PlayerHealth;
@@ -201,6 +208,12 @@ private:
 	void SetupChangedPlayerClass();
 
 	//
+
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UUserWidget> m_playerUI = nullptr;
+
+	UPROPERTY()
+	UWidget_PlayerUI* m_playerUIInstance = nullptr;
 
 	UPROPERTY()
 	TMap<FName, UStaticMeshComponent*> m_AttachedWeapons;

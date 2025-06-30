@@ -36,7 +36,7 @@ void UBaseAbility::EquipAbility(AActor* a_AbilityUser)
 float UBaseAbility::GetCooldownTime(UWorld* a_World)
 {
 	float elapsedTime = a_World->GetTimerManager().GetTimerElapsed(m_CooldownTimerHandle);
-	UE_LOG(LogTemp, Warning, TEXT("Cooldown Time: %f"), elapsedTime);
+	//UE_LOG(LogTemp, Warning, TEXT("Cooldown Time: %f"), elapsedTime);
 	return a_World->GetTimerManager().GetTimerElapsed(m_CooldownTimerHandle);
 }
 
