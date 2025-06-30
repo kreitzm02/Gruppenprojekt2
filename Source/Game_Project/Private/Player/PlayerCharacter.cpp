@@ -38,12 +38,7 @@ void APlayerCharacter::BeginPlay()
 	HideAllWeapons();
 	ChangeToAbilitySlot0(); // the char equips his default ability
 	SetupMovement();
-
-	if (m_playerUI)
-	{
-		m_playerUIInstance = CreateWidget<UWidget_PlayerUI>(GetWorld(), m_playerUI);
-		m_playerUIInstance->AddToViewport();
-	}
+	m_AbilityCooldownTimes.Init(0.0f, m_AbilityNum);
 }
 
 // INPUT 
@@ -161,6 +156,11 @@ void APlayerCharacter::Tick(float DeltaTime)
 		{
 			HideMeleeHitbox();
 		}
+	}
+
+	for (int i = 0; i < m_AbilityNum; i++)
+	{
+		m_AbilityCooldownTimes[i] = m_PlayerAbilities->GetRemainingCooldownFromAbility(i);
 	}
 }
 
@@ -422,10 +422,9 @@ void APlayerCharacter::ClearAlreadyHitActors()
 
 float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	int32 totalDmg = DamageAmount * (100 - m_PlayerDefense) / 100;
+	float totalDmg = DamageAmount * (100 - m_PlayerDefense) / 100;
 	m_PlayerHealth -= totalDmg;
 	if (m_PlayerHealth <= 0) m_PlayerHealth = 0;
-	UpdateHealthBar();
 	//UE_LOG(LogTemp, Warning, TEXT("Player was hit"))
 		if (DamageCauser)
 		{
@@ -439,14 +438,6 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 
 	return totalDmg;
 }
-
-void APlayerCharacter::UpdateHealthBar()
-{
-	float healthPercent = (float)m_PlayerHealth / (float)m_PlayerMaxHealth;
-	UE_LOG(LogTemp,Warning,TEXT("player health percentage: %f"), healthPercent)
-	m_playerUIInstance->SetHealthPercent(healthPercent);
-}
-
 
 void APlayerCharacter::HandleKnockback(FVector a_knockbackDirection, float a_knockbackStrength)
 {
@@ -526,38 +517,37 @@ bool APlayerCharacter::CheckIfCurrentPlayerClassIsValid()
 void APlayerCharacter::ResetStatsToDefault()
 {
 	m_PlayerHealth = m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_BaseHealthPoints;
-	m_PlayerMaxHealth = m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_BaseHealthPoints;
 	m_PlayerMovementSpeed = m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_BaseMoveSpeed;
 	m_PlayerDefense = m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_BaseDefense;
 	m_PlayerLuck = m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_BaseLuck;
 	m_PlayerAttackSpeed = m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_BaseAttackSpeed;
 }
 
-void APlayerCharacter::ChangeMovementSpeed(int32 a_Value)
+void APlayerCharacter::ChangeMovementSpeed(float a_Value)
 {
 	m_PlayerMovementSpeed += a_Value;
 	if (m_PlayerMovementSpeed <= 0) m_PlayerMovementSpeed = 0;
 }
 
-void APlayerCharacter::ChangeLuck(int32 a_Value)
+void APlayerCharacter::ChangeLuck(float a_Value)
 {
 	m_PlayerLuck += a_Value;
 	if (m_PlayerLuck <= 0) m_PlayerLuck = 0;
 }
 
-void APlayerCharacter::ChangeDefense(int32 a_Value)
+void APlayerCharacter::ChangeDefense(float a_Value)
 {
 	m_PlayerDefense += a_Value;
 	m_PlayerDefense = FMath::Clamp(m_PlayerDefense, 0, 100); // defense must be between 0 and 100 as it  decreases incoming damageby that percentage.
 }
 
-void APlayerCharacter::ChangeAttackSpeed(int32 a_Value)
+void APlayerCharacter::ChangeAttackSpeed(float a_Value)
 {
 	m_PlayerAttackSpeed += a_Value;
 	if (m_PlayerAttackSpeed <= 0) m_PlayerAttackSpeed = 0;
 }
 
-void APlayerCharacter::ChangeAttackDamage(int32 a_Value)
+void APlayerCharacter::ChangeAttackDamage(float a_Value)
 {
 	m_AttackDamage += a_Value;
 }
