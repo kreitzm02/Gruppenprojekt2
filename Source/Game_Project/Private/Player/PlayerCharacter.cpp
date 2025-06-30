@@ -38,6 +38,7 @@ void APlayerCharacter::BeginPlay()
 	HideAllWeapons();
 	ChangeToAbilitySlot0(); // the char equips his default ability
 	SetupMovement();
+	m_AbilityCooldownTimes.Init(0.0f, m_AbilityNum);
 }
 
 // INPUT 
@@ -155,6 +156,11 @@ void APlayerCharacter::Tick(float DeltaTime)
 		{
 			HideMeleeHitbox();
 		}
+	}
+
+	for (int i = 0; i < m_AbilityNum; i++)
+	{
+		m_AbilityCooldownTimes[i] = m_PlayerAbilities->GetRemainingCooldownFromAbility(i);
 	}
 }
 
@@ -416,7 +422,7 @@ void APlayerCharacter::ClearAlreadyHitActors()
 
 float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	int32 totalDmg = DamageAmount * (100 - m_PlayerDefense) / 100;
+	float totalDmg = DamageAmount * (100 - m_PlayerDefense) / 100;
 	m_PlayerHealth -= totalDmg;
 	if (m_PlayerHealth <= 0) m_PlayerHealth = 0;
 	//UE_LOG(LogTemp, Warning, TEXT("Player was hit"))
@@ -517,31 +523,31 @@ void APlayerCharacter::ResetStatsToDefault()
 	m_PlayerAttackSpeed = m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_BaseAttackSpeed;
 }
 
-void APlayerCharacter::ChangeMovementSpeed(int32 a_Value)
+void APlayerCharacter::ChangeMovementSpeed(float a_Value)
 {
 	m_PlayerMovementSpeed += a_Value;
 	if (m_PlayerMovementSpeed <= 0) m_PlayerMovementSpeed = 0;
 }
 
-void APlayerCharacter::ChangeLuck(int32 a_Value)
+void APlayerCharacter::ChangeLuck(float a_Value)
 {
 	m_PlayerLuck += a_Value;
 	if (m_PlayerLuck <= 0) m_PlayerLuck = 0;
 }
 
-void APlayerCharacter::ChangeDefense(int32 a_Value)
+void APlayerCharacter::ChangeDefense(float a_Value)
 {
 	m_PlayerDefense += a_Value;
 	m_PlayerDefense = FMath::Clamp(m_PlayerDefense, 0, 100); // defense must be between 0 and 100 as it  decreases incoming damageby that percentage.
 }
 
-void APlayerCharacter::ChangeAttackSpeed(int32 a_Value)
+void APlayerCharacter::ChangeAttackSpeed(float a_Value)
 {
 	m_PlayerAttackSpeed += a_Value;
 	if (m_PlayerAttackSpeed <= 0) m_PlayerAttackSpeed = 0;
 }
 
-void APlayerCharacter::ChangeAttackDamage(int32 a_Value)
+void APlayerCharacter::ChangeAttackDamage(float a_Value)
 {
 	m_AttackDamage += a_Value;
 }

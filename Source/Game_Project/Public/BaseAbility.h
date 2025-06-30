@@ -32,6 +32,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Ability")
 	void EquipAbility(AActor* a_AbilityUser);
 
+	UFUNCTION(BlueprintCallable, Category = "Ability")
+	float GetCooldownTime(UWorld* a_World);
+
 private:
 	bool m_IsOnCooldown = false;
 
@@ -43,4 +46,6 @@ private:
 
 	UPROPERTY(EditAnywhere, Instanced, Category = "Ability", meta = (DisplayName = "Enemy Abilities"))
 	TArray<UBaseAbilityAction*> m_AbilityActions;
+
+	FTimerHandle m_CooldownTimerHandle;
 };
