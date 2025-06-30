@@ -40,6 +40,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
 	void RemoveAllAbilities();
 
+	UFUNCTION(BlueprintCallable, Category = "Abilities")
+	float GetRemainingCooldownFromAbility(int32 a_Index);
+
 private:
 	UPROPERTY(EditAnywhere)
 	TArray<UBaseAbility*> m_Abilities;

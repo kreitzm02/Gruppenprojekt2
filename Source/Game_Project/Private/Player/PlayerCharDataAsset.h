@@ -23,22 +23,22 @@ public:
 	FString m_DisplayName;
 
 	UPROPERTY(EditAnywhere, Category = "Character Stats", meta = (DisplayName = "Base Health Points"))
-	int32 m_BaseHealthPoints;
+	float m_BaseHealthPoints;
 
 	UPROPERTY(EditAnywhere, Category = "Character Stats", meta = (DisplayName = "Base Attack Damage"))
-	int32 m_BaseAttackPoints;
+	float m_BaseAttackPoints;
 
 	UPROPERTY(EditAnywhere, Category = "Character Stats", meta = (DisplayName = "Base Attack Speed"))
-	int32 m_BaseAttackSpeed;
+	float m_BaseAttackSpeed;
 
 	UPROPERTY(EditAnywhere, Category = "Character Stats", meta = (DisplayName = "Base Movement Speed"))
-	int32 m_BaseMoveSpeed;
+	float m_BaseMoveSpeed;
 
 	UPROPERTY(EditAnywhere, Category = "Character Stats", meta = (DisplayName = "Base Luck"))
-	int32 m_BaseLuck;
+	float m_BaseLuck;
 
 	UPROPERTY(EditAnywhere, Category = "Character Stats", meta = (DisplayName = "Base Defense"))
-	int32 m_BaseDefense;
+	float m_BaseDefense;
 
 	UPROPERTY(EditAnywhere, Category = "Placeholders", meta = (DisplayName = "Starting Ability"))
 	TSubclassOf<UBaseAbility> m_StartingAbility;

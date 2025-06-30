@@ -1,10 +1,6 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "BaseAbility.h"
 #include "TimerManager.h"
 #include <Player/PlayerCharacter.h>
-
 
 void UBaseAbility::UseAbility(AActor* a_AbilityUser)
 {
@@ -37,6 +33,13 @@ void UBaseAbility::EquipAbility(AActor* a_AbilityUser)
 	}
 }
 
+float UBaseAbility::GetCooldownTime(UWorld* a_World)
+{
+	float elapsedTime = a_World->GetTimerManager().GetTimerElapsed(m_CooldownTimerHandle);
+	UE_LOG(LogTemp, Warning, TEXT("Cooldown Time: %f"), elapsedTime);
+	return a_World->GetTimerManager().GetTimerElapsed(m_CooldownTimerHandle);
+}
+
 void UBaseAbility::StartCooldown(UWorld* a_World)
 {
 	if (!a_World || m_CooldownTime <= 0.0f) return;
@@ -45,6 +48,5 @@ void UBaseAbility::StartCooldown(UWorld* a_World)
 
 	FTimerDelegate resetDel = FTimerDelegate::CreateLambda([this]() { m_IsOnCooldown = false; });
 
-	FTimerHandle timerHandle;
-	a_World->GetTimerManager().SetTimer(timerHandle, resetDel, m_CooldownTime, false);
+	a_World->GetTimerManager().SetTimer(m_CooldownTimerHandle, resetDel, m_CooldownTime, false);
 }
