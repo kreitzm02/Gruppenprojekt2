@@ -5,6 +5,7 @@
 
 #include "OverworldTileData.h"
 #include "CoreMinimal.h"
+#include "DungeonEntrancePortal.h"
 #include "GameFramework/Actor.h"
 #include "NavMesh/NavMeshBoundsVolume.h"
 #include "OverworldGeneration.generated.h"
@@ -92,6 +93,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Overworld settings", meta = (ClampMin = "0", ClampMax = "100", UIMin = "0", UIMax = "100"))
 	int m_roadSpreadPossability = 0;
 
+	UPROPERTY(EditAnywhere, Category = "Overworld settings")
+	int m_noSpreadFromWorldBorder = 2;
+
 	UPROPERTY(EditAnywhere, Category = "Overworld settings", meta = (ClampMin = "0", ClampMax = "100", UIMin = "0", UIMax = "100"))
 	int m_roadStraightness = 0;
 
@@ -110,18 +114,21 @@ private:
 	UPROPERTY(EditAnywhere, Category = "AIMap")
 	ANavMeshBoundsVolume* m_navMesh;
 
-	//UPROPERTY(EditAnywhere, Category = "Overworld settings")
-	//TArray<ADungeonEntrance*> dungeonEntrance = {};
+	UPROPERTY(EditAnywhere, Category = "Overworld settings")
+	TSubclassOf<ADungeonEntrancePortal> m_dungeonEntrance = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Overworld settings")
+	float m_dungeonEntranceHeightOffset = 0;
 
 	//UPROPERTY(EditAnywhere, Category = "Overworld settings")
-	//TArray<AEnemySpawn*> dungeonEntrance = {};
+	//TArray<AEnemySpawn*> m_dungeonEntrance = {};
 
 	FRandomStream m_randomNumber;
 
 	TArray<PositionAndEdgeData> m_lastGeneratedTiles = {};
 	TArray<PositionAndEdgeData> m_currentGeneratedTiles = {};
 
-
+	
 	TArray<FVector>* m_endTiles = new TArray<FVector>;
 	TArray<FVector>* m_emptyTiles = new TArray<FVector>;
 
