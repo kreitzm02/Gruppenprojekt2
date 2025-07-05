@@ -25,14 +25,14 @@ AEnemyCharacter::AEnemyCharacter()
 	m_characterHitbox->SetupAttachment(m_skeletalMesh);
 	m_characterHitbox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	m_characterHitbox->SetCollisionObjectType(ECC_WorldDynamic);
-	m_characterHitbox->SetCollisionResponseToAllChannels(ECR_Block);
+	m_characterHitbox->SetCollisionResponseToAllChannels(ECR_Ignore);
 	m_characterHitbox->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Overlap);
 
 	m_weaponHitbox = CreateDefaultSubobject<UBoxComponent>(TEXT("AxeHitbox"));
 	m_weaponHitbox->SetupAttachment(m_weaponMesh);
 	m_weaponHitbox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	m_weaponHitbox->SetCollisionObjectType(ECC_WorldDynamic);
-	m_weaponHitbox->SetCollisionResponseToAllChannels(ECR_Block);
+	m_weaponHitbox->SetCollisionResponseToAllChannels(ECR_Ignore);
 	m_weaponHitbox->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Overlap);
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
