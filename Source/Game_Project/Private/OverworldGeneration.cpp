@@ -148,19 +148,26 @@ void AOverworldGeneration::BeginPlay()
                     maxRoadCount = minRoadCount;
                 }
 
-                //possibility of road spreading
+                //possibility of road spreading //change to not spreading closely at world end
                 if (minRoadCount <= 2 && maxRoadCount >= 2 && i < m_worldSize - 1)
                 {
-                    int roadSpreadRandom = m_randomNumber.RandRange(1, 100);
-                    if (roadSpreadRandom >= m_roadSpreadPossability)
+                    if (i < m_worldSize - m_noSpreadFromWorldBorder)
                     {
-                        minRoadCount = 2;
-                        maxRoadCount = 3;
+                        int roadSpreadRandom = m_randomNumber.RandRange(1, 100);
+                        if (roadSpreadRandom >= m_roadSpreadPossability)
+                        {
+                            minRoadCount = 2;
+                            maxRoadCount = 3;
+                        }
+                        else
+                        {
+                            minRoadCount = 3;
+                            //maxRoadCount = 6;
+                        }
                     }
                     else
                     {
-                        minRoadCount = 3;
-                        //maxRoadCount = 6;
+                        maxRoadCount = minRoadCount;
                     }
                 }
 
@@ -314,6 +321,16 @@ void AOverworldGeneration::BeginPlay()
             m_emptyTiles->RemoveAt(i);
         }
     }
+
+    //dungeon portals spawn
+	for (int i = m_endTiles->Num() - 1; i >= 0; i--)
+	{
+		FVector position = (*m_endTiles)[i];
+        ADungeonEntrancePortal* portalActor = nullptr;
+		portalActor = GetWorld()->SpawnActor<ADungeonEntrancePortal>(m_dungeonEntrance, TilePosition(position.X, position.Y) + FVector(0, 0, m_dungeonEntranceHeightOffset), FRotator::ZeroRotator);
+	}
+
+
     if (!m_navMesh)
     {
         UE_LOG(LogTemp, Error, TEXT("NavMesh not Found"));
