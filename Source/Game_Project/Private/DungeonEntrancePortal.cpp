@@ -3,6 +3,8 @@
 
 #include "DungeonEntrancePortal.h"
 
+#include "Kismet/GameplayStatics.h"
+
 // Sets default values
 ADungeonEntrancePortal::ADungeonEntrancePortal()
 {
@@ -35,6 +37,7 @@ void ADungeonEntrancePortal::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	//enemies spawn logic
+	UE_LOG(LogTemp, Warning, TEXT("Portal is Loaded"))
 }
 
 void ADungeonEntrancePortal::OnPortalEnter(UPrimitiveComponent* a_overlappedComponent, AActor* a_otherActor, UPrimitiveComponent* a_otherComp, int32 a_otherBodyIndex, bool a_bFromSweep, const FHitResult& a_sweepResult)
