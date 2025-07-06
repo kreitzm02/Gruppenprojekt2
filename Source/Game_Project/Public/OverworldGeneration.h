@@ -74,6 +74,8 @@ private:
 		}
 	};
 
+	UPROPERTY(EditAnywhere, Category = "Overworld settings")
+	FVector m_worldOffsetVector = FVector::ZeroVector;
 
 	UPROPERTY(EditAnywhere, Category = "Overworld settings")
 	int m_tileSize = 100;
