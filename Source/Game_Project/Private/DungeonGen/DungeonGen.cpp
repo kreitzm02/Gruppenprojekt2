@@ -10,6 +10,7 @@
 #include "EngineUtils.h"
 #include <Kismet/GameplayStatics.h>
 #include <Player/PlayerCharacter.h>
+#include <Engine/LevelStreamingDynamic.h>
 
 // Sets default values
 ADungeonGen::ADungeonGen()
@@ -153,9 +154,10 @@ void ADungeonGen::GenerateDungeon()
 		}
 	}
 
-	m_Builder = NewObject<UDungeonBuilder>(this);
+	m_Builder = NewObject<UDungeonBuilder>(this);7
 	m_Builder->Init(m_UnitSize, m_DungeonTheme, &m_Data, GetWorld(), m_WallOffset);
-	m_Builder->BuildFloor();
+	m_CurrentLevel = GetCurrentLevel();
+	m_Builder->BuildFloor(m_CurrentLevel);
 	m_Builder->BuildWall();
 	m_Builder->BuildDebugObjects();
 	m_Builder->BuildDecorationObjects();
@@ -168,5 +170,25 @@ void ADungeonGen::BuildNavMeshForDungeon()
 {
 	UNavigationSystemV1* navSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
 	navSystem->Build();
+}
+
+ULevel* ADungeonGen::GetCurrentLevel()
+{
+	UWorld* World = GetWorld();
+	if (!World) return nullptr;
+
+	ULevel* MyLevel = GetLevel();  // das ULevel, in dem dieser Generator-Actor jetzt lebt
+
+	for (ULevelStreaming* Streaming : World->GetStreamingLevels())
+	{
+		if (ULevelStreamingDynamic* Dyn = Cast<ULevelStreamingDynamic>(Streaming))
+		{
+			if (Dyn->GetLoadedLevel() == MyLevel)
+			{
+				return Dyn->GetLoadedLevel();
+			}
+		}
+	}
+	return nullptr;
 }
 

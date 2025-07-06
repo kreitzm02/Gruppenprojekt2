@@ -35,6 +35,9 @@ public:
 	UStaticMeshComponent* m_DevCube;
 
 private:
+
+	ULevel* m_CurrentLevel;
+
 	const FString DEFAULT_CUBE_PATH = FString(TEXT("/Engine/BasicShapes/Cube.Cube"));
 	
 	UPROPERTY(EditAnywhere, Category = "General Settings", meta = (DisplayName = "Grid Length", ToolTip = "Amount of grid cells on the X axis."))
@@ -82,4 +85,5 @@ private:
 	void GenerateCorridors();
 	void GenerateDungeon();
 	void BuildNavMeshForDungeon();
+	ULevel* GetCurrentLevel();
 };
