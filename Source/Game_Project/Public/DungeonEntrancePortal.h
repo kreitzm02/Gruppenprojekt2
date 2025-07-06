@@ -42,6 +42,5 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	UBoxComponent* m_portalTrigger = nullptr;
-
 	bool m_dungeonCleared = false;
 };

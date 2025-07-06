@@ -7,6 +7,7 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 #include "NavigationSystem.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AOverworldGeneration::AOverworldGeneration()
@@ -42,9 +43,10 @@ void AOverworldGeneration::BeginPlay()
             int roadCountIndex = m_randomNumber.RandRange(m_startRoadCountMin, m_startRoadCountMax);
             int tileIndex = m_randomNumber.RandRange(0, (*m_possibleTilesMap)[roadCountIndex].Num() - 1);
             int tileRotationIndex = m_randomNumber.RandRange(0, (*m_possibleTilesMap)[roadCountIndex][tileIndex].Num() - 1);
-            tileActor = GetWorld()->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), FVector::ZeroVector, (*m_possibleTilesMap)[roadCountIndex][tileIndex][tileRotationIndex].m_rotation);
+            tileActor = GetWorld()->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), FVector::ZeroVector + m_worldOffsetVector, (*m_possibleTilesMap)[roadCountIndex][tileIndex][tileRotationIndex].m_rotation);
             if (tileActor)
             {
+                tileActor->SetMobility(EComponentMobility::Movable);
                 tileActor->GetStaticMeshComponent()->SetStaticMesh((*m_possibleTilesMap)[roadCountIndex][tileIndex][tileRotationIndex].m_tileMesh);
                 tileActor->SetMobility(EComponentMobility::Static);
             }
@@ -265,9 +267,10 @@ void AOverworldGeneration::BeginPlay()
                 }
 
                 //select a random tile out of the possible ones and spawns it
-                tileActor = GetWorld()->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), TilePosition(a_pos.X, a_pos.Y), possibleTiles[selectedTile].m_rotation);
+                tileActor = GetWorld()->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), TilePosition(a_pos.X, a_pos.Y) + m_worldOffsetVector, possibleTiles[selectedTile].m_rotation);
                 if (tileActor)
                 {
+                    tileActor->SetMobility(EComponentMobility::Movable);
                     tileActor->GetStaticMeshComponent()->SetStaticMesh(possibleTiles[selectedTile].m_tileMesh);
                     tileActor->SetMobility(EComponentMobility::Static);
                 }
@@ -285,15 +288,17 @@ void AOverworldGeneration::BeginPlay()
             for (FVector a_pos : worldPositions)
             {
                 
-            	tileActor = GetWorld()->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), TilePosition(a_pos.X, a_pos.Y), FRotator::ZeroRotator);
+            	tileActor = GetWorld()->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), TilePosition(a_pos.X, a_pos.Y) + m_worldOffsetVector, FRotator::ZeroRotator);
                 if (tileActor)
                 {
+                    tileActor->SetMobility(EComponentMobility::Movable);
                     tileActor->GetStaticMeshComponent()->SetStaticMesh((*m_possibleTilesMap)[0][0][0].m_tileMesh);
                     tileActor->SetMobility(EComponentMobility::Static);
                 }
-                tileActor = GetWorld()->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), TilePosition(a_pos.X, a_pos.Y), FRotator::ZeroRotator);
+                tileActor = GetWorld()->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), TilePosition(a_pos.X, a_pos.Y) + m_worldOffsetVector, FRotator::ZeroRotator);
                 if (tileActor)
                 {
+                    tileActor->SetMobility(EComponentMobility::Movable);
                     tileActor->GetStaticMeshComponent()->SetStaticMesh(m_worldBorder[m_randomNumber.RandRange(0, m_worldBorder.Num() - 1)]);
                     tileActor->SetMobility(EComponentMobility::Static);
                 }
@@ -312,9 +317,10 @@ void AOverworldGeneration::BeginPlay()
         FVector position = (*m_emptyTiles)[i];
         if (natureDensityRandom <= m_natureDensity)
         {
-            tileActor = GetWorld()->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), TilePosition(position.X, position.Y), FRotator::ZeroRotator);
+            tileActor = GetWorld()->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), TilePosition(position.X, position.Y) + m_worldOffsetVector, FRotator::ZeroRotator);
             if (tileActor)
             {
+                tileActor->SetMobility(EComponentMobility::Movable);
                 tileActor->GetStaticMeshComponent()->SetStaticMesh(m_natureDecorations[m_randomNumber.RandRange(0, m_natureDecorations.Num() - 1)]);
                 tileActor->SetMobility(EComponentMobility::Static);
             }
@@ -327,7 +333,7 @@ void AOverworldGeneration::BeginPlay()
 	{
 		FVector position = (*m_endTiles)[i];
         ADungeonEntrancePortal* portalActor = nullptr;
-		portalActor = GetWorld()->SpawnActor<ADungeonEntrancePortal>(m_dungeonEntrance, TilePosition(position.X, position.Y) + FVector(0, 0, m_dungeonEntranceHeightOffset), FRotator::ZeroRotator);
+		portalActor = GetWorld()->SpawnActor<ADungeonEntrancePortal>(m_dungeonEntrance, TilePosition(position.X, position.Y) + FVector(0, 0, m_dungeonEntranceHeightOffset) + m_worldOffsetVector, FRotator::ZeroRotator);
 	}
 
 
@@ -337,7 +343,7 @@ void AOverworldGeneration::BeginPlay()
     }
     else
     {
-	    m_navMesh->SetActorLocation(FVector(0,0,0));
+	    m_navMesh->SetActorLocation(FVector(0,0,0) + m_worldOffsetVector);
 		m_navMesh->SetActorScale3D(FVector(m_worldSize * 2, m_worldSize * 2,0.2));
         if (UNavigationSystemV1* navSys = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld()))
         {
