@@ -34,12 +34,6 @@ void UDungeonLevelStreamer::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 void UDungeonLevelStreamer::LoadDungeon()
 {
-    if (!m_DungeonLevelInstance.IsValid())
-    {
-        UE_LOG(LogTemp, Warning, TEXT("DungeonLevelAsset is not set!"));
-        return;
-    }
-
     FTransform transform;
     transform.SetLocation(GetOwner()->GetActorLocation() + m_LevelOffset);
     transform.SetRotation(FQuat::Identity);
