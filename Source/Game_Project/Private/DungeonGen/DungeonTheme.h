@@ -6,13 +6,18 @@
 #include "Engine/DataAsset.h"
 #include "DungeonMeshEntry.h"
 #include "EnemyCharacter.h"
+#include <DungeonMesh.h>
 #include "DungeonTheme.generated.h"
+
 
 UCLASS()
 class GAME_PROJECT_API UDungeonTheme : public UDataAsset
 {
 	GENERATED_BODY()
 public:
+	UPROPERTY(EditAnywhere, Category = "Meshes", meta = (DisplayName = "Test Mesh"))
+	TSubclassOf<ADungeonMesh> m_Test;
+
 	UPROPERTY(EditAnywhere, Category = "Meshes", meta = (DisplayName = "Floor Meshes"))
 	TArray <FDungeonMeshEntry> m_FloorMeshes;
 

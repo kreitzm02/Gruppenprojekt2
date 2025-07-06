@@ -1,6 +1,7 @@
+#include "DungeonEntrancePortal.h"
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
+#include "DungeonLevelStreamer.h"
 #include "DungeonEntrancePortal.h"
 
 // Sets default values
@@ -12,6 +13,7 @@ ADungeonEntrancePortal::ADungeonEntrancePortal()
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
 	m_portalTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("Portal Trigger"));
 	m_portalVFX = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Portal VFX"));
+	m_DungeonLevelStreamer = CreateDefaultSubobject<UDungeonLevelStreamer>(TEXT("Dungeon Level Streaming Component"));
 
 	m_portalVFX->SetupAttachment(RootComponent);
 	m_portalTrigger->SetupAttachment(m_portalVFX);
@@ -35,11 +37,13 @@ void ADungeonEntrancePortal::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	//enemies spawn logic
+	UE_LOG(LogTemp, Warning, TEXT("Portal is Loaded"));
 }
 
 void ADungeonEntrancePortal::OnPortalEnter(UPrimitiveComponent* a_overlappedComponent, AActor* a_otherActor, UPrimitiveComponent* a_otherComp, int32 a_otherBodyIndex, bool a_bFromSweep, const FHitResult& a_sweepResult)
 {
-	UE_LOG(LogTemp,Warning,TEXT("Entered Portal"))
+	UE_LOG(LogTemp, Warning, TEXT("Entered Portal"));
+	m_DungeonLevelStreamer->LoadDungeon();
 }
 
 void ADungeonEntrancePortal::SetDungeonAsCleared()

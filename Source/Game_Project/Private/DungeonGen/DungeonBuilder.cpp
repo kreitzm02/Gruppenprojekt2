@@ -3,6 +3,7 @@
 
 #include "DungeonGen/DungeonBuilder.h"
 #include "Engine/StaticMeshActor.h"
+#include "DungeonMesh.h"
 #include "DungeonGenUtils.h"
 
 void UDungeonBuilder::Init(float a_UnitSize, UDungeonTheme* a_Theme, FDungeonData* a_Data, UWorld* a_World, float a_WallOffset)
@@ -14,7 +15,7 @@ void UDungeonBuilder::Init(float a_UnitSize, UDungeonTheme* a_Theme, FDungeonDat
 	m_WallOffset = a_WallOffset;
 }
 
-void UDungeonBuilder::BuildFloor()
+void UDungeonBuilder::BuildFloor(ULevel* m_Level)
 {
 	for (int x = 0; x < m_Data->m_DungeonGrid.Num(); x++)
 	{
@@ -258,12 +259,22 @@ void UDungeonBuilder::BuildFloor()
 				pos.X += (float)posOffset.X;
 				pos.Y += (float)posOffset.Y;
 				pos.Z += (float)posOffset.Z;
-				AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, FRotator::ZeroRotator); // testing!
+				FActorSpawnParameters params;
+				params.OverrideLevel = m_Level;
+				AStaticMeshActor* meshActor = GetWorld()->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, FRotator::ZeroRotator, params); // testing!
 				if (meshActor)
 				{
+					meshActor->SetMobility(EComponentMobility::Movable);
 					meshActor->GetStaticMeshComponent()->SetStaticMesh(m_DungeonTheme->m_FloorMeshes[0].m_Mesh);
 					meshActor->SetMobility(EComponentMobility::Static);
 				}
+
+				//TSubclassOf<ADungeonMesh> enemyToSpawn = m_DungeonTheme->m_Test;
+				//
+				//if (enemyToSpawn)
+				//{
+				//	GetWorld()->SpawnActor<ADungeonMesh>(enemyToSpawn, pos, { 0, 0, 0 });
+				//}
 			}
 		}
 	}
@@ -289,6 +300,7 @@ void UDungeonBuilder::BuildWall()
 					AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0, 0, 0 }); // testing!
 					if (meshActor)
 					{
+						meshActor->SetMobility(EComponentMobility::Movable);
 						meshActor->GetStaticMeshComponent()->SetStaticMesh(m_DungeonTheme->m_WallOCornerMesh);
 						meshActor->SetMobility(EComponentMobility::Static);
 					}
@@ -308,6 +320,7 @@ void UDungeonBuilder::BuildWall()
 					AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0, 180, 0 }); // testing!
 					if (meshActor)
 					{
+						meshActor->SetMobility(EComponentMobility::Movable);
 						meshActor->GetStaticMeshComponent()->SetStaticMesh(m_DungeonTheme->m_WallUCornerMesh);
 						meshActor->SetMobility(EComponentMobility::Static);
 					}
@@ -325,6 +338,7 @@ void UDungeonBuilder::BuildWall()
 					AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0, 0, 0 }); // testing!
 					if (meshActor)
 					{
+						meshActor->SetMobility(EComponentMobility::Movable);
 						meshActor->GetStaticMeshComponent()->SetStaticMesh(m_DungeonTheme->m_WallUCornerMesh);
 						meshActor->SetMobility(EComponentMobility::Static);
 					}
@@ -342,6 +356,7 @@ void UDungeonBuilder::BuildWall()
 					AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0, -90, 0 }); // testing!
 					if (meshActor)
 					{
+						meshActor->SetMobility(EComponentMobility::Movable);
 						meshActor->GetStaticMeshComponent()->SetStaticMesh(m_DungeonTheme->m_WallUCornerMesh);
 						meshActor->SetMobility(EComponentMobility::Static);
 					}
@@ -359,6 +374,7 @@ void UDungeonBuilder::BuildWall()
 					AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0, 90, 0 }); // testing!
 					if (meshActor)
 					{
+						meshActor->SetMobility(EComponentMobility::Movable);
 						meshActor->GetStaticMeshComponent()->SetStaticMesh(m_DungeonTheme->m_WallUCornerMesh);
 						meshActor->SetMobility(EComponentMobility::Static);
 					}
@@ -386,6 +402,7 @@ void UDungeonBuilder::BuildWall()
 				AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0 + (float)rotOffset.X, 0 + (float)rotOffset.Y, 0 + (float)rotOffset.Z }); // testing!
 				if (meshActor)
 				{
+					meshActor->SetMobility(EComponentMobility::Movable);
 					meshActor->GetStaticMeshComponent()->SetStaticMesh(m_DungeonTheme->m_WallOuterCornerMesh);
 					meshActor->SetMobility(EComponentMobility::Static);
 				}
@@ -402,6 +419,7 @@ void UDungeonBuilder::BuildWall()
 				AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0 + (float)rotOffset.X, -90 + (float)rotOffset.Y, 0 + (float)rotOffset.Z }); // testing!
 				if (meshActor)
 				{
+					meshActor->SetMobility(EComponentMobility::Movable);
 					meshActor->GetStaticMeshComponent()->SetStaticMesh(m_DungeonTheme->m_WallOuterCornerMesh);
 					meshActor->SetMobility(EComponentMobility::Static);
 				}
@@ -418,6 +436,7 @@ void UDungeonBuilder::BuildWall()
 				AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0 + (float)rotOffset.X, 180 + (float)rotOffset.Y, 0 + (float)rotOffset.Z }); // testing!
 				if (meshActor)
 				{
+					meshActor->SetMobility(EComponentMobility::Movable);
 					meshActor->GetStaticMeshComponent()->SetStaticMesh(m_DungeonTheme->m_WallOuterCornerMesh);
 					meshActor->SetMobility(EComponentMobility::Static);
 				}
@@ -434,6 +453,7 @@ void UDungeonBuilder::BuildWall()
 				AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0 + (float)rotOffset.X, 90 + (float)rotOffset.Y, 0 + (float)rotOffset.Z }); // testing!
 				if (meshActor)
 				{
+					meshActor->SetMobility(EComponentMobility::Movable);
 					meshActor->GetStaticMeshComponent()->SetStaticMesh(m_DungeonTheme->m_WallOuterCornerMesh);
 					meshActor->SetMobility(EComponentMobility::Static);
 				}
@@ -463,6 +483,7 @@ void UDungeonBuilder::BuildWall()
 				AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0 + (float)rotOffset.X, 0 + (float)rotOffset.Y, 0 + (float)rotOffset.Z }); // testing!
 				if (meshActor)
 				{
+					meshActor->SetMobility(EComponentMobility::Movable);
 					meshActor->GetStaticMeshComponent()->SetStaticMesh(m_DungeonTheme->m_WallCornerMesh);
 					meshActor->SetMobility(EComponentMobility::Static);
 				}
@@ -475,6 +496,7 @@ void UDungeonBuilder::BuildWall()
 				AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0 + (float)rotOffset.X, 90 + (float)rotOffset.Y, 0 + (float)rotOffset.Z }); // testing!
 				if (meshActor)
 				{
+					meshActor->SetMobility(EComponentMobility::Movable);
 					meshActor->GetStaticMeshComponent()->SetStaticMesh(m_DungeonTheme->m_WallCornerMesh);
 					meshActor->SetMobility(EComponentMobility::Static);
 				}
@@ -487,6 +509,7 @@ void UDungeonBuilder::BuildWall()
 				AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0 + (float)rotOffset.X, 180 + (float)rotOffset.Y, 0 + (float)rotOffset.Z }); // testing!
 				if (meshActor)
 				{
+					meshActor->SetMobility(EComponentMobility::Movable);
 					meshActor->GetStaticMeshComponent()->SetStaticMesh(m_DungeonTheme->m_WallCornerMesh);
 					meshActor->SetMobility(EComponentMobility::Static);
 				}
@@ -499,6 +522,7 @@ void UDungeonBuilder::BuildWall()
 				AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0 + (float)rotOffset.X, -90 + (float)rotOffset.Y, 0 + (float)rotOffset.Z }); // testing!
 				if (meshActor)
 				{
+					meshActor->SetMobility(EComponentMobility::Movable);
 					meshActor->GetStaticMeshComponent()->SetStaticMesh(m_DungeonTheme->m_WallCornerMesh);
 					meshActor->SetMobility(EComponentMobility::Static);
 				}
@@ -550,6 +574,7 @@ void UDungeonBuilder::BuildDebugObjects()
 			AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), position, { 0, 0, 0 }); // testing!
 			if (meshActor)
 			{
+				meshActor->SetMobility(EComponentMobility::Movable);
 				meshActor->GetStaticMeshComponent()->SetStaticMesh(m_DungeonTheme->m_StartCubeMesh);
 				meshActor->SetMobility(EComponentMobility::Static);
 			}
@@ -561,6 +586,7 @@ void UDungeonBuilder::BuildDebugObjects()
 			AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), position, { 0, 0, 0 }); // testing!
 			if (meshActor)
 			{
+				meshActor->SetMobility(EComponentMobility::Movable);
 				meshActor->GetStaticMeshComponent()->SetStaticMesh(m_DungeonTheme->m_ExitCubeMesh);
 				meshActor->SetMobility(EComponentMobility::Static);
 			}
@@ -619,6 +645,7 @@ void UDungeonBuilder::BuildBossRoom()
 					AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, FRotator::ZeroRotator); // testing!
 					if (meshActor)
 					{
+						meshActor->SetMobility(EComponentMobility::Movable);
 						meshActor->GetStaticMeshComponent()->SetStaticMesh(m_DungeonTheme->m_BossFloorMesh);
 						meshActor->SetMobility(EComponentMobility::Static);
 					}
@@ -666,6 +693,7 @@ void UDungeonBuilder::TryPlaceWall(int32 a_GridX, int32 a_GridY, const FVector& 
 	AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), a_Position, rotation); // testing!
 	if (meshActor)
 	{
+		meshActor->SetMobility(EComponentMobility::Movable);
 		meshActor->GetStaticMeshComponent()->SetStaticMesh(m_DungeonTheme->m_WallMeshes[a_WallIndex].m_Mesh);
 		meshActor->SetMobility(EComponentMobility::Static);
 	}
@@ -689,6 +717,7 @@ bool UDungeonBuilder::TryPlacePrefabCornerFacingCenter(TArray<TArray<ECellType>>
 		AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), targetPosition, targetRotation); // testing!
 		if (meshActor)
 		{
+			meshActor->SetMobility(EComponentMobility::Movable);
 			meshActor->GetStaticMeshComponent()->SetStaticMesh(a_Mesh);
 			meshActor->SetMobility(EComponentMobility::Static);
 		}
@@ -708,6 +737,7 @@ bool UDungeonBuilder::TryPlacePrefabCornerOrthoRotation(TArray<TArray<ECellType>
 		AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), targetPosition, targetRotation); // testing!
 		if (meshActor)
 		{
+			meshActor->SetMobility(EComponentMobility::Movable);
 			meshActor->GetStaticMeshComponent()->SetStaticMesh(a_Mesh);
 			meshActor->SetMobility(EComponentMobility::Static);
 		}
