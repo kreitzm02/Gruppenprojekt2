@@ -5,6 +5,8 @@
 #include "Engine/StaticMeshActor.h"
 #include "DungeonMesh.h"
 #include "DungeonGenUtils.h"
+#include "CustomChunkSystem/CustomChunkManager.h"
+#include <Kismet/GameplayStatics.h>
 
 void UDungeonBuilder::Init(float a_UnitSize, UDungeonTheme* a_Theme, FDungeonData* a_Data, UWorld* a_World, float a_WallOffset)
 {
@@ -261,7 +263,9 @@ void UDungeonBuilder::BuildFloor(ULevel* m_Level)
 				pos.Z += (float)posOffset.Z;
 				FActorSpawnParameters params;
 				params.OverrideLevel = m_Level;
-				AStaticMeshActor* meshActor = GetWorld()->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, FRotator::ZeroRotator, params); // testing!
+				ACustomChunkManager* chunkManager = Cast<ACustomChunkManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACustomChunkManager::StaticClass()));
+				AStaticMeshActor* meshActor = Cast<AStaticMeshActor>(chunkManager->SpawnActorInChunk(AStaticMeshActor::StaticClass(), pos, FRotator::ZeroRotator, params));
+				//AStaticMeshActor* meshActor = GetWorld()->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, FRotator::ZeroRotator, params); // testing!
 				if (meshActor)
 				{
 					meshActor->SetMobility(EComponentMobility::Movable);
