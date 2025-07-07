@@ -262,7 +262,6 @@ void UDungeonBuilder::BuildFloor(ULevel* m_Level)
 				pos.Y += (float)posOffset.Y;
 				pos.Z += (float)posOffset.Z;
 				FActorSpawnParameters params;
-				params.OverrideLevel = m_Level;
 				ACustomChunkManager* chunkManager = Cast<ACustomChunkManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACustomChunkManager::StaticClass()));
 				AStaticMeshActor* meshActor = Cast<AStaticMeshActor>(chunkManager->SpawnActorInChunk(AStaticMeshActor::StaticClass(), pos, FRotator::ZeroRotator, params));
 				//AStaticMeshActor* meshActor = GetWorld()->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, FRotator::ZeroRotator, params); // testing!
@@ -301,7 +300,10 @@ void UDungeonBuilder::BuildWall()
 					m_Data->m_DungeonGrid[x - 1][y] = ECellType::WALLO;
 					FInt32Vector posOffset = m_DungeonTheme->m_WallOPosOffset;
 					FVector pos = { ((x - 1) * m_UnitSize) - posOffset.X, (y * m_UnitSize) + posOffset.Y, 0 };
-					AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0, 0, 0 }); // testing!
+					FActorSpawnParameters params;
+					ACustomChunkManager* chunkManager = Cast<ACustomChunkManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACustomChunkManager::StaticClass()));
+					AStaticMeshActor* meshActor = Cast<AStaticMeshActor>(chunkManager->SpawnActorInChunk(AStaticMeshActor::StaticClass(), pos, FRotator::ZeroRotator, params));
+					//AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0, 0, 0 }); // testing!
 					if (meshActor)
 					{
 						meshActor->SetMobility(EComponentMobility::Movable);
@@ -321,7 +323,10 @@ void UDungeonBuilder::BuildWall()
 					m_Data->m_DungeonGrid[x][y - 1] = ECellType::WALLU;
 					FInt32Vector posOffset = m_DungeonTheme->m_WallOPosOffset;
 					FVector pos = { (x * m_UnitSize) + posOffset.X, ((y - 1) * m_UnitSize) - posOffset.Y, 0 };
-					AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0, 180, 0 }); // testing!
+					FActorSpawnParameters params;
+					ACustomChunkManager* chunkManager = Cast<ACustomChunkManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACustomChunkManager::StaticClass()));
+					AStaticMeshActor* meshActor = Cast<AStaticMeshActor>(chunkManager->SpawnActorInChunk(AStaticMeshActor::StaticClass(), pos, { 0, 180, 0 }, params));
+					//AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0, 180, 0 }); // testing!
 					if (meshActor)
 					{
 						meshActor->SetMobility(EComponentMobility::Movable);
@@ -339,7 +344,10 @@ void UDungeonBuilder::BuildWall()
 					m_Data->m_DungeonGrid[x][y + 1] = ECellType::WALLU;
 					FInt32Vector posOffset = m_DungeonTheme->m_WallOPosOffset;
 					FVector pos = { (x * m_UnitSize) - posOffset.X, ((y + 1) * m_UnitSize) + posOffset.Y, 0 };
-					AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0, 0, 0 }); // testing!
+					FActorSpawnParameters params;
+					ACustomChunkManager* chunkManager = Cast<ACustomChunkManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACustomChunkManager::StaticClass()));
+					AStaticMeshActor* meshActor = Cast<AStaticMeshActor>(chunkManager->SpawnActorInChunk(AStaticMeshActor::StaticClass(), pos, FRotator::ZeroRotator, params));
+					//AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0, 0, 0 }); // testing!
 					if (meshActor)
 					{
 						meshActor->SetMobility(EComponentMobility::Movable);
@@ -357,7 +365,10 @@ void UDungeonBuilder::BuildWall()
 					m_Data->m_DungeonGrid[x + 1][y] = ECellType::WALLU;
 					FInt32Vector posOffset = m_DungeonTheme->m_WallOPosOffset;
 					FVector pos = { ((x + 1) * m_UnitSize) + posOffset.X, (y * m_UnitSize) + posOffset.Y, 0 };
-					AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0, -90, 0 }); // testing!
+					FActorSpawnParameters params;
+					ACustomChunkManager* chunkManager = Cast<ACustomChunkManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACustomChunkManager::StaticClass()));
+					AStaticMeshActor* meshActor = Cast<AStaticMeshActor>(chunkManager->SpawnActorInChunk(AStaticMeshActor::StaticClass(), pos, { 0, -90, 0 }, params));
+					//AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0, -90, 0 }); // testing!
 					if (meshActor)
 					{
 						meshActor->SetMobility(EComponentMobility::Movable);
@@ -375,7 +386,10 @@ void UDungeonBuilder::BuildWall()
 					m_Data->m_DungeonGrid[x - 1][y] = ECellType::WALLU;
 					FInt32Vector posOffset = m_DungeonTheme->m_WallOPosOffset;
 					FVector pos = { ((x - 1) * m_UnitSize) - posOffset.X, (y * m_UnitSize) - posOffset.Y, 0 };
-					AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0, 90, 0 }); // testing!
+					FActorSpawnParameters params;
+					ACustomChunkManager* chunkManager = Cast<ACustomChunkManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACustomChunkManager::StaticClass()));
+					AStaticMeshActor* meshActor = Cast<AStaticMeshActor>(chunkManager->SpawnActorInChunk(AStaticMeshActor::StaticClass(), pos, { 0, 90, 0 }, params));
+					//AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0, 90, 0 }); // testing!
 					if (meshActor)
 					{
 						meshActor->SetMobility(EComponentMobility::Movable);
@@ -403,7 +417,10 @@ void UDungeonBuilder::BuildWall()
 				FInt32Vector posOffset = m_DungeonTheme->m_WallCornerOPosOffset;
 				FVector pos = { ((x - 1) * m_UnitSize) + posOffset.X, ((y - 1) * m_UnitSize) + posOffset.Y, 0 };
 				FInt32Vector rotOffset = m_DungeonTheme->m_WallCornerORotOffset;
-				AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0 + (float)rotOffset.X, 0 + (float)rotOffset.Y, 0 + (float)rotOffset.Z }); // testing!
+				FActorSpawnParameters params;
+				ACustomChunkManager* chunkManager = Cast<ACustomChunkManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACustomChunkManager::StaticClass()));
+				AStaticMeshActor* meshActor = Cast<AStaticMeshActor>(chunkManager->SpawnActorInChunk(AStaticMeshActor::StaticClass(), pos, { 0 + (float)rotOffset.X, 0 + (float)rotOffset.Y, 0 + (float)rotOffset.Z }, params));
+				//AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0 + (float)rotOffset.X, 0 + (float)rotOffset.Y, 0 + (float)rotOffset.Z }); // testing!
 				if (meshActor)
 				{
 					meshActor->SetMobility(EComponentMobility::Movable);
@@ -420,7 +437,10 @@ void UDungeonBuilder::BuildWall()
 				FInt32Vector posOffset = m_DungeonTheme->m_WallCornerOPosOffset;
 				FVector pos = { ((x - 1) * m_UnitSize) + posOffset.X, ((y + 1) * m_UnitSize) - posOffset.Y, 0 };
 				FInt32Vector rotOffset = m_DungeonTheme->m_WallCornerORotOffset;
-				AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0 + (float)rotOffset.X, -90 + (float)rotOffset.Y, 0 + (float)rotOffset.Z }); // testing!
+				FActorSpawnParameters params;
+				ACustomChunkManager* chunkManager = Cast<ACustomChunkManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACustomChunkManager::StaticClass()));
+				AStaticMeshActor* meshActor = Cast<AStaticMeshActor>(chunkManager->SpawnActorInChunk(AStaticMeshActor::StaticClass(), pos, { 0 + (float)rotOffset.X, -90 + (float)rotOffset.Y, 0 + (float)rotOffset.Z }, params));
+				//AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0 + (float)rotOffset.X, -90 + (float)rotOffset.Y, 0 + (float)rotOffset.Z }); // testing!
 				if (meshActor)
 				{
 					meshActor->SetMobility(EComponentMobility::Movable);
@@ -437,7 +457,10 @@ void UDungeonBuilder::BuildWall()
 				FInt32Vector posOffset = m_DungeonTheme->m_WallCornerOPosOffset;
 				FVector pos = { ((x + 1) * m_UnitSize) - posOffset.X, ((y + 1) * m_UnitSize) - posOffset.Y, 0 };
 				FInt32Vector rotOffset = m_DungeonTheme->m_WallCornerORotOffset;
-				AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0 + (float)rotOffset.X, 180 + (float)rotOffset.Y, 0 + (float)rotOffset.Z }); // testing!
+				FActorSpawnParameters params;
+				ACustomChunkManager* chunkManager = Cast<ACustomChunkManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACustomChunkManager::StaticClass()));
+				AStaticMeshActor* meshActor = Cast<AStaticMeshActor>(chunkManager->SpawnActorInChunk(AStaticMeshActor::StaticClass(), pos, { 0 + (float)rotOffset.X, 180 + (float)rotOffset.Y, 0 + (float)rotOffset.Z }, params));
+				//AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0 + (float)rotOffset.X, 180 + (float)rotOffset.Y, 0 + (float)rotOffset.Z }); // testing!
 				if (meshActor)
 				{
 					meshActor->SetMobility(EComponentMobility::Movable);
@@ -454,7 +477,10 @@ void UDungeonBuilder::BuildWall()
 				FInt32Vector posOffset = m_DungeonTheme->m_WallCornerOPosOffset;
 				FVector pos = { ((x + 1) * m_UnitSize) - posOffset.X, ((y - 1) * m_UnitSize) + posOffset.Y, 0 };
 				FInt32Vector rotOffset = m_DungeonTheme->m_WallCornerORotOffset;
-				AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0 + (float)rotOffset.X, 90 + (float)rotOffset.Y, 0 + (float)rotOffset.Z }); // testing!
+				FActorSpawnParameters params;
+				ACustomChunkManager* chunkManager = Cast<ACustomChunkManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACustomChunkManager::StaticClass()));
+				AStaticMeshActor* meshActor = Cast<AStaticMeshActor>(chunkManager->SpawnActorInChunk(AStaticMeshActor::StaticClass(), pos, { 0 + (float)rotOffset.X, 90 + (float)rotOffset.Y, 0 + (float)rotOffset.Z }, params));
+				//AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0 + (float)rotOffset.X, 90 + (float)rotOffset.Y, 0 + (float)rotOffset.Z }); // testing!
 				if (meshActor)
 				{
 					meshActor->SetMobility(EComponentMobility::Movable);
@@ -484,7 +510,10 @@ void UDungeonBuilder::BuildWall()
 				m_Data->m_DungeonGrid[x + 1][y - 1] = ECellType::WALLCONCAVE;
 				FVector pos = { ((x + 1) * m_UnitSize) - m_WallOffset, ((y - 1) * m_UnitSize) + m_WallOffset, 0 };
 				FInt32Vector rotOffset = m_DungeonTheme->m_WallCornerRotOffset;
-				AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0 + (float)rotOffset.X, 0 + (float)rotOffset.Y, 0 + (float)rotOffset.Z }); // testing!
+				FActorSpawnParameters params;
+				ACustomChunkManager* chunkManager = Cast<ACustomChunkManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACustomChunkManager::StaticClass()));
+				AStaticMeshActor* meshActor = Cast<AStaticMeshActor>(chunkManager->SpawnActorInChunk(AStaticMeshActor::StaticClass(), pos, { 0 + (float)rotOffset.X, 0 + (float)rotOffset.Y, 0 + (float)rotOffset.Z }, params));
+				//AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0 + (float)rotOffset.X, 0 + (float)rotOffset.Y, 0 + (float)rotOffset.Z }); // testing!
 				if (meshActor)
 				{
 					meshActor->SetMobility(EComponentMobility::Movable);
@@ -497,7 +526,10 @@ void UDungeonBuilder::BuildWall()
 				m_Data->m_DungeonGrid[x + 1][y + 1] = ECellType::WALLCONCAVE;
 				FVector pos = { ((x + 1) * m_UnitSize) - m_WallOffset, ((y + 1) * m_UnitSize) - m_WallOffset, 0 };
 				FInt32Vector rotOffset = m_DungeonTheme->m_WallCornerRotOffset;
-				AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0 + (float)rotOffset.X, 90 + (float)rotOffset.Y, 0 + (float)rotOffset.Z }); // testing!
+				FActorSpawnParameters params;
+				ACustomChunkManager* chunkManager = Cast<ACustomChunkManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACustomChunkManager::StaticClass()));
+				AStaticMeshActor* meshActor = Cast<AStaticMeshActor>(chunkManager->SpawnActorInChunk(AStaticMeshActor::StaticClass(), pos, { 0 + (float)rotOffset.X, 90 + (float)rotOffset.Y, 0 + (float)rotOffset.Z }, params));
+				//AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0 + (float)rotOffset.X, 90 + (float)rotOffset.Y, 0 + (float)rotOffset.Z }); // testing!
 				if (meshActor)
 				{
 					meshActor->SetMobility(EComponentMobility::Movable);
@@ -510,7 +542,10 @@ void UDungeonBuilder::BuildWall()
 				m_Data->m_DungeonGrid[x - 1][y + 1] = ECellType::WALLCONCAVE;
 				FVector pos = { ((x - 1) * m_UnitSize) + m_WallOffset, ((y + 1) * m_UnitSize) - m_WallOffset, 0 };
 				FInt32Vector rotOffset = m_DungeonTheme->m_WallCornerRotOffset;
-				AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0 + (float)rotOffset.X, 180 + (float)rotOffset.Y, 0 + (float)rotOffset.Z }); // testing!
+				FActorSpawnParameters params;
+				ACustomChunkManager* chunkManager = Cast<ACustomChunkManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACustomChunkManager::StaticClass()));
+				AStaticMeshActor* meshActor = Cast<AStaticMeshActor>(chunkManager->SpawnActorInChunk(AStaticMeshActor::StaticClass(), pos, { 0 + (float)rotOffset.X, 180 + (float)rotOffset.Y, 0 + (float)rotOffset.Z }, params));
+				//AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0 + (float)rotOffset.X, 180 + (float)rotOffset.Y, 0 + (float)rotOffset.Z }); // testing!
 				if (meshActor)
 				{
 					meshActor->SetMobility(EComponentMobility::Movable);
@@ -523,7 +558,10 @@ void UDungeonBuilder::BuildWall()
 				m_Data->m_DungeonGrid[x - 1][y - 1] = ECellType::WALLCONCAVE;
 				FVector pos = { ((x - 1) * m_UnitSize) + m_WallOffset, ((y - 1) * m_UnitSize) + m_WallOffset, 0 };
 				FInt32Vector rotOffset = m_DungeonTheme->m_WallCornerRotOffset;
-				AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0 + (float)rotOffset.X, -90 + (float)rotOffset.Y, 0 + (float)rotOffset.Z }); // testing!
+				FActorSpawnParameters params;
+				ACustomChunkManager* chunkManager = Cast<ACustomChunkManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACustomChunkManager::StaticClass()));
+				AStaticMeshActor* meshActor = Cast<AStaticMeshActor>(chunkManager->SpawnActorInChunk(AStaticMeshActor::StaticClass(), pos, { 0 + (float)rotOffset.X, -90 + (float)rotOffset.Y, 0 + (float)rotOffset.Z }, params));
+				//AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, { 0 + (float)rotOffset.X, -90 + (float)rotOffset.Y, 0 + (float)rotOffset.Z }); // testing!
 				if (meshActor)
 				{
 					meshActor->SetMobility(EComponentMobility::Movable);
@@ -575,7 +613,10 @@ void UDungeonBuilder::BuildDebugObjects()
 		{
 			FInt32Vector2 intPos = m_Data->m_AllRooms[i].GetRoomCenter();
 			FVector position = { (float)intPos.X * m_UnitSize, (float)intPos.Y * m_UnitSize, 0 };
-			AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), position, { 0, 0, 0 }); // testing!
+			FActorSpawnParameters params;
+			ACustomChunkManager* chunkManager = Cast<ACustomChunkManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACustomChunkManager::StaticClass()));
+			AStaticMeshActor* meshActor = Cast<AStaticMeshActor>(chunkManager->SpawnActorInChunk(AStaticMeshActor::StaticClass(), position, FRotator::ZeroRotator, params));
+			//AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), position, { 0, 0, 0 }); // testing!
 			if (meshActor)
 			{
 				meshActor->SetMobility(EComponentMobility::Movable);
@@ -587,7 +628,10 @@ void UDungeonBuilder::BuildDebugObjects()
 		{
 			FInt32Vector2 intPos = m_Data->m_AllRooms[i].GetRoomCenter();
 			FVector position = { (float)intPos.X * m_UnitSize, (float)intPos.Y * m_UnitSize, 0 };
-			AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), position, { 0, 0, 0 }); // testing!
+			FActorSpawnParameters params;
+			ACustomChunkManager* chunkManager = Cast<ACustomChunkManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACustomChunkManager::StaticClass()));
+			AStaticMeshActor* meshActor = Cast<AStaticMeshActor>(chunkManager->SpawnActorInChunk(AStaticMeshActor::StaticClass(), position, FRotator::ZeroRotator, params));
+			//AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), position, { 0, 0, 0 }); // testing!
 			if (meshActor)
 			{
 				meshActor->SetMobility(EComponentMobility::Movable);
@@ -646,7 +690,10 @@ void UDungeonBuilder::BuildBossRoom()
 					pos.X += (float)posOffset.X;
 					pos.Y += (float)posOffset.Y;
 					pos.Z += (float)posOffset.Z + m_DungeonTheme->m_BossFloorZOffset;
-					AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, FRotator::ZeroRotator); // testing!
+					FActorSpawnParameters params;
+					ACustomChunkManager* chunkManager = Cast<ACustomChunkManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACustomChunkManager::StaticClass()));
+					AStaticMeshActor* meshActor = Cast<AStaticMeshActor>(chunkManager->SpawnActorInChunk(AStaticMeshActor::StaticClass(), pos, FRotator::ZeroRotator, params));
+					//AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), pos, FRotator::ZeroRotator); // testing!
 					if (meshActor)
 					{
 						meshActor->SetMobility(EComponentMobility::Movable);
@@ -680,7 +727,10 @@ void UDungeonBuilder::GenerateEnemies()
 
 		if (enemyToSpawn)
 		{
-			GetWorld()->SpawnActor<AEnemyCharacter>(enemyToSpawn, position, {0, 0, 0});
+			//GetWorld()->SpawnActor<AEnemyCharacter>(enemyToSpawn, position, {0, 0, 0});
+			FActorSpawnParameters params;
+			ACustomChunkManager* chunkManager = Cast<ACustomChunkManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACustomChunkManager::StaticClass()));
+			chunkManager->SpawnActorInChunk(enemyToSpawn, position, FRotator::ZeroRotator, params);
 		}
 	}
 }
@@ -694,7 +744,10 @@ void UDungeonBuilder::TryPlaceWall(int32 a_GridX, int32 a_GridY, const FVector& 
 	m_Data->m_DungeonGrid[a_GridX][a_GridY] = ECellType::WALL;
 	FInt32Vector rotOffset = m_DungeonTheme->m_WallRotOffset;
 	FRotator rotation = { a_Rotation.Pitch + (float)rotOffset.X, a_Rotation.Yaw + (float)rotOffset.Y, a_Rotation.Roll + (float)rotOffset.Z };
-	AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), a_Position, rotation); // testing!
+	FActorSpawnParameters params;
+	ACustomChunkManager* chunkManager = Cast<ACustomChunkManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACustomChunkManager::StaticClass()));
+	AStaticMeshActor* meshActor = Cast<AStaticMeshActor>(chunkManager->SpawnActorInChunk(AStaticMeshActor::StaticClass(), a_Position, rotation, params));
+	//AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), a_Position, rotation); // testing!
 	if (meshActor)
 	{
 		meshActor->SetMobility(EComponentMobility::Movable);
@@ -718,7 +771,10 @@ bool UDungeonBuilder::TryPlacePrefabCornerFacingCenter(TArray<TArray<ECellType>>
 		FVector direction = FVector(roomCenter.X, roomCenter.Y, 0) * m_UnitSize - targetPosition;
 		direction.Z = 0;
 		FRotator targetRotation = FRotationMatrix::MakeFromX(direction).Rotator();
-		AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), targetPosition, targetRotation); // testing!
+		FActorSpawnParameters params;
+		ACustomChunkManager* chunkManager = Cast<ACustomChunkManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACustomChunkManager::StaticClass()));
+		AStaticMeshActor* meshActor = Cast<AStaticMeshActor>(chunkManager->SpawnActorInChunk(AStaticMeshActor::StaticClass(), targetPosition, targetRotation, params));
+		//AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), targetPosition, targetRotation); // testing!
 		if (meshActor)
 		{
 			meshActor->SetMobility(EComponentMobility::Movable);
@@ -738,7 +794,10 @@ bool UDungeonBuilder::TryPlacePrefabCornerOrthoRotation(TArray<TArray<ECellType>
 		FInt32Vector2 roomCenter = a_Room.GetRoomCenter();
 		int32 rotationY = UDungeonGenUtils::GetOrthogonalRotationBasedOnCenter(targetPosition, FVector(roomCenter.X, roomCenter.Y, 0) * m_UnitSize);
 		FRotator targetRotation = FRotator(0, (float)rotationY, 0);
-		AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), targetPosition, targetRotation); // testing!
+		FActorSpawnParameters params;
+		ACustomChunkManager* chunkManager = Cast<ACustomChunkManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACustomChunkManager::StaticClass()));
+		AStaticMeshActor* meshActor = Cast<AStaticMeshActor>(chunkManager->SpawnActorInChunk(AStaticMeshActor::StaticClass(), targetPosition, targetRotation, params));
+		//AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), targetPosition, targetRotation); // testing!
 		if (meshActor)
 		{
 			meshActor->SetMobility(EComponentMobility::Movable);

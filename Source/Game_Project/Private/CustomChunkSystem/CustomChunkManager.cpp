@@ -75,7 +75,7 @@ void ACustomChunkManager::SetChunkActive(const FIntPoint& a_Position, bool a_Act
 		{
 			actor->SetActorTickEnabled(a_Active);
 			actor->SetActorHiddenInGame(!a_Active);
-			actor->SetActorEnableCollision(a_Active);
+			//actor->SetActorEnableCollision(a_Active);
 			
 			TArray<UPrimitiveComponent*> comps;
 			actor->GetComponents<UPrimitiveComponent>(comps);
