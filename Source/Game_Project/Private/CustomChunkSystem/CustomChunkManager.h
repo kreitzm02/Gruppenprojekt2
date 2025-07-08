@@ -39,4 +39,5 @@ private:
 	FIntPoint GetChunkPosFromWorldPos(const FVector& a_WorldPos) const;
 	void UpdateChunkActivation();
 	void SetChunkActive(const FIntPoint& a_Position, bool a_Active);
+	void UpdateChunkForMovableActors();
 };

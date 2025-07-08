@@ -2,6 +2,7 @@
 
 
 #include "CustomChunkSystem/CustomChunkManager.h"
+#include "Engine/StaticMeshActor.h"
 #include <Kismet/GameplayStatics.h>
 
 // Sets default values
@@ -39,6 +40,7 @@ void ACustomChunkManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	UpdateChunkActivation();
+	UpdateChunkForMovableActors();
 }
 
 FIntPoint ACustomChunkManager::GetChunkPosFromWorldPos(const FVector& a_WorldPos) const
@@ -91,6 +93,42 @@ void ACustomChunkManager::SetChunkActive(const FIntPoint& a_Position, bool a_Act
 					
 			}
 		}
+	}
+}
+
+void ACustomChunkManager::UpdateChunkForMovableActors()
+{
+	struct FActorMoveData
+	{
+		TWeakObjectPtr<AActor> actor;
+		FIntPoint newChunkPos;
+	};
+	TArray<FActorMoveData> datas;
+
+	// removing actors from wrong chunk during runtime
+	for (auto& pair : m_AllChunks)
+	{
+		for (int i = pair.Value.m_AllActorsInThisChunk.Num() - 1; i >= 0; i--)
+		{
+			AActor* actor = pair.Value.m_AllActorsInThisChunk[i].Get();
+			if (!actor)
+			{
+				pair.Value.m_AllActorsInThisChunk.RemoveAt(i);
+				continue;
+			}
+			if (actor->IsA(AStaticMeshActor::StaticClass())) continue;
+			FIntPoint newChunkPos = GetChunkPosFromWorldPos(actor->GetActorLocation());
+			if (newChunkPos == pair.Key) continue;
+			datas.Add({ actor, newChunkPos });
+			pair.Value.m_AllActorsInThisChunk.RemoveAt(i);
+		}
+	}
+
+	//adding vectors to new chunk during runtime
+	for (auto& data : datas)
+	{
+		if (!m_AllChunks.Contains(data.newChunkPos)) m_AllChunks.Add(data.newChunkPos, FCustomChunk(data.newChunkPos.X, data.newChunkPos.Y));
+		m_AllChunks[data.newChunkPos].m_AllActorsInThisChunk.Add(data.actor);
 	}
 }
 
