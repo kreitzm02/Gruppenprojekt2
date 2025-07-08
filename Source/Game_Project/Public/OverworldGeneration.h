@@ -7,6 +7,8 @@
 #include "CoreMinimal.h"
 #include "DungeonEntrancePortal.h"
 #include "GameFramework/Actor.h"
+#include "CustomChunkSystem/CustomChunkManager.h"
+#include "Kismet/GameplayStatics.h"
 #include "NavMesh/NavMeshBoundsVolume.h"
 #include "OverworldGeneration.generated.h"
 
@@ -73,6 +75,9 @@ private:
 			m_edgeHasRoad = a_edgeHasRoad;
 		}
 	};
+
+	UPROPERTY(VisibleAnywhere)
+	ACustomChunkManager* m_chunkManager = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "Overworld settings")
 	FVector m_worldOffsetVector = FVector::ZeroVector;
