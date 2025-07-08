@@ -17,7 +17,7 @@ void UDungeonBuilder::Init(float a_UnitSize, UDungeonTheme* a_Theme, FDungeonDat
 	m_WallOffset = a_WallOffset;
 }
 
-void UDungeonBuilder::BuildFloor(ULevel* m_Level)
+void UDungeonBuilder::BuildFloor()
 {
 	for (int x = 0; x < m_Data->m_DungeonGrid.Num(); x++)
 	{
