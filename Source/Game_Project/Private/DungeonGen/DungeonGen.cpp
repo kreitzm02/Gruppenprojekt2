@@ -154,7 +154,7 @@ void ADungeonGen::GenerateDungeon()
 		}
 	}
 
-	m_Builder = NewObject<UDungeonBuilder>(this);7
+	m_Builder = NewObject<UDungeonBuilder>(this);
 	m_Builder->Init(m_UnitSize, m_DungeonTheme, &m_Data, GetWorld(), m_WallOffset);
 	m_CurrentLevel = GetCurrentLevel();
 	m_Builder->BuildFloor(m_CurrentLevel);
