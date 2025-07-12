@@ -3,11 +3,21 @@
 
 #include "BossEnemy_Warrior.h"
 
+void ABossEnemy_Warrior::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+
+	m_weaponMesh->SetRelativeScale3D(m_weaponScale);
+}
+
 void ABossEnemy_Warrior::PreInitializeComponents()
 {
 	Super::PreInitializeComponents();
 
-	m_attackDuration = m_attackAnimation->GetPlayLength();
+	if (m_attackAnimation)
+	{
+		m_attackDuration = m_attackAnimation->GetPlayLength();
+	}
 }
 
 void ABossEnemy_Warrior::BeginPlay()
@@ -16,7 +26,7 @@ void ABossEnemy_Warrior::BeginPlay()
 
 	m_maxMultiplierAtHPPercent = 1 - m_maxMultiplierAtHPPercent;
 
-	if (m_maxMultiplierAtHPPercent == 0.0f)
+	if (m_maxMultiplierAtHPPercent <= 0.0f)
 	{
 		m_maxMultiplierAtHPPercent = 0.01f;
 	}
@@ -27,13 +37,24 @@ void ABossEnemy_Warrior::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (!m_chargeReady && m_passedCooldownTime <= m_chargeCooldown)
+	if (!m_chargeReady && !m_spinReady && m_passedCooldownTime <= m_abilityCooldown)
 	{
-		m_passedCooldownTime += DeltaTime;
+		m_passedCooldownTime += DeltaTime * m_currentDoStuffMultiplier;
 
-		if (m_passedCooldownTime >= m_chargeCooldown)
+		if (m_passedCooldownTime >= m_abilityCooldown)
 		{
-			m_chargeReady = true;
+			//int abilityNumber = FMath::RandRange(0, 1);
+			switch (FMath::RandRange(0, 1))
+			{
+			case 0:
+				m_chargeReady = true;
+				break;
+			case 1:
+				m_spinReady = true;
+				break;
+			default:
+				break;
+			}
 			m_passedCooldownTime = 0.0f;
 		}
 	}

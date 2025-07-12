@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameFramework/Character.h"
 #include "UObject/NoExportTypes.h"
 #include "FSM_BaseEnemyState.generated.h"
 
@@ -26,16 +27,16 @@ public:
 
 	//void SetOwnerPawn(APawn* a_pawn)
 	//{
-	//	m_ownerPawn = a_pawn;
+	//	m_ownerCharacter = a_pawn;
 	//}
 
 	//APawn* GetOwnerPawn()
 	//{
-	//	return m_ownerPawn;
+	//	return m_ownerCharacter;
 	//}
 protected:
 	UPROPERTY()
-	APawn* m_ownerPawn;
+	ACharacter* m_ownerCharacter;
 	UPROPERTY()
 	USkeletalMeshComponent* m_ownerSkeletalMesh;
 

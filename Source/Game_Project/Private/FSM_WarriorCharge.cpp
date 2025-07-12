@@ -12,7 +12,7 @@
 void UFSM_WarriorCharge::Initialize()
 {
 	Super::Initialize();
-	AEnemy_Warrior* enemy = Cast<AEnemy_Warrior>(m_ownerPawn);
+	AEnemy_Warrior* enemy = Cast<AEnemy_Warrior>(m_ownerCharacter);
 	m_chargeAnimation = enemy->GetChargeAnimation();
 	m_chargeSpeed = enemy->GetChargeSpeed();
 	m_chaseRange = enemy->GetPlayerChaseRadius();
@@ -24,7 +24,7 @@ void UFSM_WarriorCharge::OnEnter()
 
 	m_ownerSkeletalMesh->PlayAnimation(m_chargeAnimation, true);
 
-	if (m_ownerPawn == nullptr)
+	if (m_ownerCharacter == nullptr)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Charge has no Owner Pawn!"))
 	}
@@ -32,14 +32,14 @@ void UFSM_WarriorCharge::OnEnter()
 	{
 		TArray<FOverlapResult> overlaps;
 		FCollisionQueryParams queryParams;
-		queryParams.AddIgnoredActor(m_ownerPawn);
+		queryParams.AddIgnoredActor(m_ownerCharacter);
 
 		FCollisionObjectQueryParams objectQueryParams;
 		objectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel1);
 
-		bool test = m_ownerPawn->GetWorld()->OverlapMultiByObjectType(
+		bool test = m_ownerCharacter->GetWorld()->OverlapMultiByObjectType(
 			overlaps,
-			m_ownerPawn->GetActorLocation(),
+			m_ownerCharacter->GetActorLocation(),
 			FQuat::Identity,
 			objectQueryParams,
 			FCollisionShape::MakeSphere(m_chaseRange),
@@ -53,7 +53,7 @@ void UFSM_WarriorCharge::OnEnter()
 				m_player = Cast<ACharacter>(actor);
 			}
 		}
-		ACharacter* character = Cast<ACharacter>(m_ownerPawn);
+		ACharacter* character = Cast<ACharacter>(m_ownerCharacter);
 		character->GetCharacterMovement()->MaxWalkSpeed = m_chargeSpeed;
 	}
 }
@@ -62,10 +62,10 @@ void UFSM_WarriorCharge::OnUpdate(float a_deltatime)
 {
 	Super::OnUpdate(a_deltatime);
 
-	AAIController* aiController = Cast<AAIController>(m_ownerPawn->GetController());
+	AAIController* aiController = Cast<AAIController>(m_ownerCharacter->GetController());
 	if (aiController)
 	{
-		UNavigationSystemV1* navSystem = UNavigationSystemV1::GetCurrent(m_ownerPawn->GetWorld());
+		UNavigationSystemV1* navSystem = UNavigationSystemV1::GetCurrent(m_ownerCharacter->GetWorld());
 		if (navSystem)
 		{
 			FNavLocation navLocation;
@@ -81,7 +81,7 @@ void UFSM_WarriorCharge::OnExit()
 {
 	Super::OnExit();
 
-	AEnemy_Warrior* enemy = Cast<AEnemy_Warrior>(m_ownerPawn);
+	AEnemy_Warrior* enemy = Cast<AEnemy_Warrior>(m_ownerCharacter);
 	enemy->SetChargeReady(false);
 
 }

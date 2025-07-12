@@ -15,7 +15,7 @@
 void UFSM_ChasePlayer::Initialize()
 {
 	Super::Initialize();
-	AEnemyCharacter* enemy = Cast<AEnemyCharacter>(m_ownerPawn);
+	AEnemyCharacter* enemy = Cast<AEnemyCharacter>(m_ownerCharacter);
 	m_chaseAnimation = enemy->GetChaseAnimation();
 	m_chaseRange = enemy->GetPlayerChaseRadius(); 
 	m_walkSpeed = enemy->GetChaseWalkSpeed();
@@ -27,14 +27,14 @@ void UFSM_ChasePlayer::OnEnter()
 
 	m_ownerSkeletalMesh->PlayAnimation(m_chaseAnimation, true);
 
-	ACharacter* character = Cast<ACharacter>(m_ownerPawn);
+	ACharacter* character = Cast<ACharacter>(m_ownerCharacter);
 	character->GetCharacterMovement()->MaxWalkSpeed = m_walkSpeed;
 }
 
 void UFSM_ChasePlayer::OnUpdate(float a_deltaTime)
 {
     Super::OnUpdate(a_deltaTime);
-	if (m_ownerPawn == nullptr)
+	if (m_ownerCharacter == nullptr)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Player Chase has no Owner Pawn!"))
 	}
@@ -42,14 +42,14 @@ void UFSM_ChasePlayer::OnUpdate(float a_deltaTime)
 	{
 		TArray<FOverlapResult> overlaps;
 		FCollisionQueryParams queryParams;
-		queryParams.AddIgnoredActor(m_ownerPawn);
+		queryParams.AddIgnoredActor(m_ownerCharacter);
 
 		FCollisionObjectQueryParams objectQueryParams;
 		objectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel1);
 
-		bool hasOverlap = m_ownerPawn->GetWorld()->OverlapMultiByObjectType(
+		bool hasOverlap = m_ownerCharacter->GetWorld()->OverlapMultiByObjectType(
 			overlaps,
-			m_ownerPawn->GetActorLocation(),
+			m_ownerCharacter->GetActorLocation(),
 			FQuat::Identity,
 			objectQueryParams,
 			FCollisionShape::MakeSphere(m_chaseRange),
@@ -63,10 +63,10 @@ void UFSM_ChasePlayer::OnUpdate(float a_deltaTime)
 				ACharacter* player = Cast<ACharacter>(actor);
 				if (player)
 				{
-					AAIController* aiController = Cast<AAIController>(m_ownerPawn->GetController());
+					AAIController* aiController = Cast<AAIController>(m_ownerCharacter->GetController());
 					if (aiController)
 					{
-						UNavigationSystemV1* navSystem = UNavigationSystemV1::GetCurrent(m_ownerPawn->GetWorld());
+						UNavigationSystemV1* navSystem = UNavigationSystemV1::GetCurrent(m_ownerCharacter->GetWorld());
 						if (navSystem)
 						{
 							FNavLocation navLocation;

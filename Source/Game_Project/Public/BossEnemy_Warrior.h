@@ -15,6 +15,8 @@ class GAME_PROJECT_API ABossEnemy_Warrior : public AEnemyCharacter
 	GENERATED_BODY()
 
 protected:
+	virtual void OnConstruction(const FTransform& Transform) override;
+
 	virtual void PreInitializeComponents() override;
 
 	virtual void BeginPlay() override;
@@ -24,19 +26,42 @@ public:
 
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
-	float GetChargeDuration() { return m_chargeDuration; }
+	float GetMultiplier() { return m_currentDoStuffMultiplier; }
 
-	float GetChargeSpeed() { return m_baseChargeSpeed * m_currentDoStuffMultiplier; }
+	float GetChargeOnPointDuration() { return m_chargeOnPointDuration; }
+
+	int GetMaxChargesPerAbility() { return m_chargesPerChargeAbility; }
+
+	void AddUsedCharge() { m_currentCharges += 1; }
+
+	void ResetUsedCharges() { m_currentCharges = 0; }
+
+	int GetCurrentCharges() { return m_currentCharges; }
+
+	float GetSpinDuration() { return m_spinDuration; }
+
+	float GetChargeSpeed() { return m_baseChargeSpeed; }
+
+	float GetSpinSpeed() { return m_baseSpinSpeed; }
 
 	bool GetChargeReady() { return m_chargeReady; }
 
+	bool GetSpinReady() { return m_spinReady; }
+
 	void SetChargeReady(bool a_chargeReady) { m_chargeReady = a_chargeReady; }
 
+	void SetSpinReady(bool a_spinReady) { m_spinReady = a_spinReady; }
+
 	UAnimSequence* GetChargeAnimation() { return m_chargeAnimation; }
+
+	UAnimSequence* GetSpinAnimation() { return m_spinAnimation; }
 
 	UAnimSequence* GetAttackAnimation() { return m_attackAnimation; }
 
 private:
+	UPROPERTY(EditAnywhere, Category = "Weapon Scale")
+	FVector m_weaponScale = FVector::OneVector;
+
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
 	UAnimSequence* m_chargeAnimation = nullptr;
 
@@ -47,15 +72,26 @@ private:
 	UAnimSequence* m_attackAnimation = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
-	float m_chargeDuration = 4.0f;
+	float m_chargeOnPointDuration = 2.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
-	float m_chargeCooldown = 20.0f;
+	int m_chargesPerChargeAbility = 5;
+
+	int m_currentCharges = 0;
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
+	float m_spinDuration = 10.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
+	float m_abilityCooldown = 20.0f;
 
 	float m_passedCooldownTime = 0.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
-	float m_baseChargeSpeed = 400.0f;
+	float m_baseChargeSpeed = 600.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
+	float m_baseSpinSpeed = 500.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
 	float m_maxMultiplierAtHPPercent = 0.2f;
@@ -65,5 +101,7 @@ private:
 
 	float m_currentDoStuffMultiplier = 1.0f;
 
-	bool m_chargeReady = true;
+	bool m_chargeReady = false;
+
+	bool m_spinReady = false;
 };

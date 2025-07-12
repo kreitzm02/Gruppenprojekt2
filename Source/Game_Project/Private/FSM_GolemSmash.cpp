@@ -7,7 +7,7 @@ void UFSM_GolemSmash::Initialize()
 {
 	Super::Initialize();
 
-	m_thisEnemy = Cast<AEnemy_Golem>(m_ownerPawn);
+	m_thisEnemy = Cast<AEnemy_Golem>(m_ownerCharacter);
 	m_smashAnimation = m_thisEnemy->GetSmashAnimation();
 	m_thisEnemy->SetSmashDuration(m_smashAnimation->GetPlayLength());
 }

@@ -23,6 +23,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Debug")
 	bool m_enableDebug = true;
 
+	UPROPERTY(EditAnywhere, Category = "Settings")
+	bool m_isDungeonEnemy = false;
+
 	UPROPERTY()
 	AActor* m_owner = nullptr;
 

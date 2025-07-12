@@ -9,13 +9,13 @@
 void UFSM_Attack::Initialize()
 {
 	Super::Initialize();
-	m_thisEnemy = Cast<AEnemy_Warrior>(m_ownerPawn);
+	m_thisEnemy = Cast<AEnemy_Warrior>(m_ownerCharacter);
 	m_attackAnimation = m_thisEnemy->GetAttackAnimation();
 }
 
 void UFSM_Attack::OnEnter()
 {
-	if (ACharacter* character = Cast<ACharacter>(m_ownerPawn))
+	if (ACharacter* character = Cast<ACharacter>(m_ownerCharacter))
 	{
 		character->GetCharacterMovement()->StopMovementImmediately();
 	}

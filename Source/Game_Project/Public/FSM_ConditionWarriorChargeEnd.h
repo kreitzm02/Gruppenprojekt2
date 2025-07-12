@@ -15,8 +15,12 @@ class GAME_PROJECT_API UFSM_ConditionWarriorChargeEnd : public UFSM_BaseStateTra
 {
 	GENERATED_BODY()
 
-private:
+public:
+	void Initialize() override;
+	void ResetCondition() override;
+	bool IsConditionMet(float a_deltaTime) override;
 
+private:
 	UPROPERTY()
 	AEnemy_Warrior* m_thisWarrior = nullptr;
 
@@ -29,8 +33,4 @@ private:
 
 	float m_chargeCurrentDuration;
 
-public:
-	void Initialize() override;
-	void ResetCondition() override;
-	bool IsConditionMet(float a_deltaTime) override;
 };

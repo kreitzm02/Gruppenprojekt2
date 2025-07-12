@@ -66,14 +66,18 @@ bool UFSM_ConditionPlayerInRange::IsConditionMet(float a_deltaTime)
 	if (m_checkForInRange)
 	{
 		if (!hasOverlap) return false;
-		else return true;
+		else
+		{
+			return true;
+		}
 	}
 	else
 	{
 		if (!hasOverlap) return true;
-		else return false;
+		else
+		{
+			return false;
+		}
 	}
-
-	
 }
 
