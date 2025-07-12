@@ -9,7 +9,7 @@
 void UFSM_RiseFromGround::Initialize()
 {
 	Super::Initialize();
-	m_thisEnemy = Cast<AEnemy_NecroSummon>(m_ownerPawn);
+	m_thisEnemy = Cast<AEnemy_NecroSummon>(m_ownerCharacter);
 	m_riseAnimation = m_thisEnemy->GetRiseAnimation();
 	m_duration = m_riseAnimation->GetPlayLength();
 	m_duration = m_duration/2;
@@ -39,7 +39,7 @@ void UFSM_RiseFromGround::OnExit()
 {
 	Super::OnExit();
 
-	AEnemy_NecroSummon* enemy = Cast<AEnemy_NecroSummon>(m_ownerPawn);
+	AEnemy_NecroSummon* enemy = Cast<AEnemy_NecroSummon>(m_ownerCharacter);
 	enemy->GetCharacterMovement()->GravityScale = 1.0f;
 	enemy->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	enemy->GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);

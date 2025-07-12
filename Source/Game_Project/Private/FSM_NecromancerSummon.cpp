@@ -10,7 +10,7 @@ void UFSM_NecromancerSummon::Initialize()
 {
 	Super::Initialize();
 
-	m_thisEnemy = Cast<AEnemy_Necromancer>(m_ownerPawn);
+	m_thisEnemy = Cast<AEnemy_Necromancer>(m_ownerCharacter);
 	m_summonAnimation = m_thisEnemy->GetSummonAnimation();
 }
 

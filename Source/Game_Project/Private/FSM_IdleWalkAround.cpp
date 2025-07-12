@@ -13,7 +13,7 @@
 void UFSM_IdleWalkAround::Initialize()
 {
     Super::Initialize();
-    AEnemyCharacter* enemy = Cast<AEnemyCharacter>(m_ownerPawn);
+    AEnemyCharacter* enemy = Cast<AEnemyCharacter>(m_ownerCharacter);
     m_walkAnimation = enemy->GetWalkAnimation();
 	m_walkSpeed = enemy->GetIdleWalkSpeed();
 }
@@ -24,17 +24,17 @@ void UFSM_IdleWalkAround::OnEnter()
 
     //m_ownerSkeletalMesh->PlayAnimation(m_walkAnimation, true);
 
-    //UE_LOG(LogTemp, Warning, TEXT("owner of state: %s\n"), *m_ownerPawn->GetOwner()->GetName());
-    ACharacter* character = Cast<ACharacter>(m_ownerPawn);
+    //UE_LOG(LogTemp, Warning, TEXT("owner of state: %s\n"), *m_ownerCharacter->GetOwner()->GetName());
+    ACharacter* character = Cast<ACharacter>(m_ownerCharacter);
     character->GetCharacterMovement()->MaxWalkSpeed = m_walkSpeed;
     
 
     //UE_LOG(LogTemp, Warning, TEXT("walk on enter\n"));
-    if (m_ownerPawn != nullptr)
+    if (m_ownerCharacter != nullptr)
     {
-        ChooseRandomNavLocation(m_ownerPawn);
+        ChooseRandomNavLocation(m_ownerCharacter);
         //UE_LOG(LogTemp, Warning, TEXT("aactor owner found\n"));
-        if (AAIController* AIController = Cast<AAIController>(m_ownerPawn->GetController()))
+        if (AAIController* AIController = Cast<AAIController>(m_ownerCharacter->GetController()))
         {
             AIController->MoveToLocation(m_targetLocation);
             //UE_LOG(LogTemp, Warning, TEXT("aaicontroller found\n"));
@@ -54,7 +54,7 @@ void UFSM_IdleWalkAround::OnExit()
 {
 	Super::OnExit();
 
-    if (ACharacter* character = Cast<ACharacter>(m_ownerPawn))
+    if (ACharacter* character = Cast<ACharacter>(m_ownerCharacter))
     {
         character->GetCharacterMovement()->StopMovementImmediately();
     }

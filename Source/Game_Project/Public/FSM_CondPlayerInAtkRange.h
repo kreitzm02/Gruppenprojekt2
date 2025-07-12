@@ -27,7 +27,7 @@ private:
 	AActor* m_owner = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "Settings")
-	bool m_checkForInRange = true;
+	bool m_isDungeonEnemy = false;
 
 	UPROPERTY()
 	float m_attackRange;

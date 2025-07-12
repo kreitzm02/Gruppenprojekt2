@@ -9,7 +9,7 @@
 void UFSM_IdleStand::Initialize()
 {
 	Super::Initialize();
-	AEnemyCharacter* enemy = Cast<AEnemyCharacter>(m_ownerPawn);
+	AEnemyCharacter* enemy = Cast<AEnemyCharacter>(m_ownerCharacter);
 	m_idleAnimation = enemy->GetIdleAnimation();
 }
 
@@ -19,7 +19,7 @@ void UFSM_IdleStand::OnEnter()
 
 	m_ownerSkeletalMesh->PlayAnimation(m_idleAnimation, true);
 
-	if (ACharacter* character = Cast<ACharacter>(m_ownerPawn))
+	if (ACharacter* character = Cast<ACharacter>(m_ownerCharacter))
 	{
 		character->GetCharacterMovement()->StopMovementImmediately();
 	}

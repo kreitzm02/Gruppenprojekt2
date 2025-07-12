@@ -11,7 +11,7 @@ void UFSM_MageAttack::Initialize()
 {
 	Super::Initialize();
 
-	m_thisEnemy = Cast<AEnemy_Mage>(m_ownerPawn);
+	m_thisEnemy = Cast<AEnemy_Mage>(m_ownerCharacter);
 	m_attackAnimation = m_thisEnemy->GetAttackAnimation();
 
 	m_animDuration = m_attackAnimation->GetPlayLength();
@@ -21,7 +21,7 @@ void UFSM_MageAttack::OnEnter()
 {
 	Super::OnEnter();
 
-	if (ACharacter* character = Cast<ACharacter>(m_ownerPawn))
+	if (ACharacter* character = Cast<ACharacter>(m_ownerCharacter))
 	{
 		character->GetCharacterMovement()->StopMovementImmediately();
 	}
@@ -29,7 +29,7 @@ void UFSM_MageAttack::OnEnter()
 	m_passedTime = 0.0f;
 	m_animDuration = 0.0f;
 
-	if (m_ownerPawn == nullptr)
+	if (m_ownerCharacter == nullptr)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Charge has no Owner Pawn!"))
 	}
@@ -37,14 +37,14 @@ void UFSM_MageAttack::OnEnter()
 	{
 		TArray<FOverlapResult> overlaps;
 		FCollisionQueryParams queryParams;
-		queryParams.AddIgnoredActor(m_ownerPawn);
+		queryParams.AddIgnoredActor(m_ownerCharacter);
 
 		FCollisionObjectQueryParams objectQueryParams;
 		objectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel1);
 
-		bool test = m_ownerPawn->GetWorld()->OverlapMultiByObjectType(
+		bool test = m_ownerCharacter->GetWorld()->OverlapMultiByObjectType(
 			overlaps,
-			m_ownerPawn->GetActorLocation(),
+			m_ownerCharacter->GetActorLocation(),
 			FQuat::Identity,
 			objectQueryParams,
 			FCollisionShape::MakeSphere(m_thisEnemy->GetAttackRange()),
@@ -64,9 +64,9 @@ void UFSM_MageAttack::OnUpdate(float a_deltaTime)
 
 	if (m_player)
 	{
-		FVector playerDirection = m_player->GetActorLocation() - m_ownerPawn->GetActorLocation();
+		FVector playerDirection = m_player->GetActorLocation() - m_ownerCharacter->GetActorLocation();
 		playerDirection.Z = 0.0f;
-		m_ownerPawn->SetActorRotation(playerDirection.Rotation());
+		m_ownerCharacter->SetActorRotation(playerDirection.Rotation());
 	}
 
 

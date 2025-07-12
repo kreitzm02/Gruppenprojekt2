@@ -38,16 +38,8 @@ bool UFSM_ConditionWarriorChargeEnd::IsConditionMet(float a_deltaTime)
 		FCollisionShape::MakeSphere(m_attackRange),
 		queryParams
 	);
-	for (FOverlapResult& overlap : overlaps)
-	{
-		AActor* actor = overlap.GetActor();
-		if (actor && actor->IsA(ACharacter::StaticClass()))
-		{
-			m_player = Cast<ACharacter>(actor);
-		}
-	}
 
-	if (hasOverlap || m_chargeCurrentDuration >= m_chargeDuration) return true;
+	if (!hasOverlap || m_chargeCurrentDuration >= m_chargeDuration) return true;
 	else return false;
 
 }
