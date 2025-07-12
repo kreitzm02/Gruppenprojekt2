@@ -56,14 +56,106 @@ bool UFSM_CondPlayerInAtkRange::IsConditionMet(float a_deltaTime)
 		1.0f
 	);
 	
-	if (m_checkForInRange)
-	{
-		if (!hasOverlap) return false;
-		else return true;
-	}
+	if (!hasOverlap) return false;
 	else
 	{
-		if (!hasOverlap) return true;
-		else return false;
+		if (!m_isDungeonEnemy)
+		{
+			return true;
+		}
+		else
+		{
+			for (const FOverlapResult& result : overlaps)
+			{
+				AActor* otherActor = result.GetActor();
+				if (otherActor && otherActor->IsA<ACharacter>())
+				{
+					FHitResult hitResult;
+					FVector start = m_owner->GetActorLocation();
+					FVector end = otherActor->GetActorLocation();
+
+					FCollisionQueryParams traceParams;
+					traceParams.AddIgnoredActor(m_owner);
+					traceParams.AddIgnoredActor(otherActor);
+
+					bool hit = m_owner->GetWorld()->LineTraceSingleByChannel(
+						hitResult,
+						start,
+						end,
+						ECC_Visibility,
+						traceParams
+					);
+
+					if (m_enableDebug)
+					{
+						DrawDebugLine(
+							m_owner->GetWorld(),
+							start,
+							end,
+							hit ? FColor::Red : FColor::Green,
+							false,
+							0.1f,
+							0,
+							1.0f
+						);
+					}
+					if (hit) return false;
+				}
+			}
+			return true;
+		}
 	}
+	
+	/*else
+	{
+		if (!hasOverlap) return true;
+		else
+		{
+			if (!m_isDungeonEnemy)
+			{
+				return false;
+			}
+			else
+			{
+				for (const FOverlapResult& result : overlaps)
+				{
+					AActor* otherActor = result.GetActor();
+					if (otherActor && otherActor->IsA<ACharacter>())
+					{
+						FHitResult hitResult;
+						FVector start = m_owner->GetActorLocation();
+						FVector end = otherActor->GetActorLocation();
+
+						FCollisionQueryParams traceParams;
+						traceParams.AddIgnoredActor(m_owner);
+						traceParams.AddIgnoredActor(otherActor);
+
+						bool hit = m_owner->GetWorld()->LineTraceSingleByChannel(
+							hitResult,
+							start,
+							end,
+							ECC_Visibility,
+							traceParams
+						);
+
+						if (m_enableDebug)
+						{
+							DrawDebugLine(
+								m_owner->GetWorld(),
+								start,
+								end,
+								hit ? FColor::Red : FColor::Green,
+								false,
+								0.1f,
+								0,
+								1.0f
+							);
+						}
+						if (hit) return true;
+					}
+				}
+				return false;
+			}
+		}
+	}*/
 }

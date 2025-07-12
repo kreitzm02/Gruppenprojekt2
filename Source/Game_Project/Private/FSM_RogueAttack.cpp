@@ -11,7 +11,7 @@
 void UFSM_RogueAttack::Initialize()
 {
 	Super::Initialize();
-	m_thisEnemy = Cast<AEnemy_Rogue>(m_ownerPawn);
+	m_thisEnemy = Cast<AEnemy_Rogue>(m_ownerCharacter);
 	m_attackAnimation = m_thisEnemy->GetAttackAnimation();
 	m_reloadAnimation = m_thisEnemy->GetReloadAnimation();
 }
@@ -20,7 +20,7 @@ void UFSM_RogueAttack::OnEnter()
 {
 	Super::OnEnter();
 
-	if (ACharacter* character = Cast<ACharacter>(m_ownerPawn))
+	if (ACharacter* character = Cast<ACharacter>(m_ownerCharacter))
 	{
 		character->GetCharacterMovement()->StopMovementImmediately();
 	}
@@ -28,24 +28,24 @@ void UFSM_RogueAttack::OnEnter()
 	m_passedTime = 0.0f;
 	m_animDuration = 0.0f;
 
-	if (m_ownerPawn == nullptr)
+	if (m_ownerCharacter == nullptr)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Charge has no Owner Pawn!"))
 	}
 	else
 	{
-		AEnemy_Rogue* thisEnemy = Cast<AEnemy_Rogue>(m_ownerPawn);
+		AEnemy_Rogue* thisEnemy = Cast<AEnemy_Rogue>(m_ownerCharacter);
 
 		TArray<FOverlapResult> overlaps;
 		FCollisionQueryParams queryParams;
-		queryParams.AddIgnoredActor(m_ownerPawn);
+		queryParams.AddIgnoredActor(m_ownerCharacter);
 
 		FCollisionObjectQueryParams objectQueryParams;
 		objectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel1);
 
-		bool test = m_ownerPawn->GetWorld()->OverlapMultiByObjectType(
+		bool test = m_ownerCharacter->GetWorld()->OverlapMultiByObjectType(
 			overlaps,
-			m_ownerPawn->GetActorLocation(),
+			m_ownerCharacter->GetActorLocation(),
 			FQuat::Identity,
 			objectQueryParams,
 			FCollisionShape::MakeSphere(thisEnemy->GetAttackRange()),
@@ -63,9 +63,9 @@ void UFSM_RogueAttack::OnUpdate(float a_deltaTime)
 {
 	Super::OnUpdate(a_deltaTime);
 
-	FVector playerDirection = m_player->GetActorLocation() - m_ownerPawn->GetActorLocation();
+	FVector playerDirection = m_player->GetActorLocation() - m_ownerCharacter->GetActorLocation();
 	playerDirection.Z = 0.0f;
-	m_ownerPawn->SetActorRotation(playerDirection.Rotation());
+	m_ownerCharacter->SetActorRotation(playerDirection.Rotation());
 
 	m_passedTime += a_deltaTime;
 

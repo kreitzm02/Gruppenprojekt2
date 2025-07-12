@@ -10,7 +10,7 @@
 void UFSM_MageFireball::Initialize()
 {
 	Super::Initialize();
-	m_thisEnemy = Cast<AEnemy_Mage>(m_ownerPawn);
+	m_thisEnemy = Cast<AEnemy_Mage>(m_ownerCharacter);
 	m_castShootAnimation = m_thisEnemy->GetCastShootAnimation();
 	m_castAnimation = m_thisEnemy->GetCastingAnimation();
 	m_thisEnemy->SetFireballCastTime(m_castAnimation->GetPlayLength() * m_castingLoopsUntilFireball + m_castShootAnimation->GetPlayLength());
@@ -22,7 +22,7 @@ void UFSM_MageFireball::OnEnter()
 {
 	Super::OnEnter();
 
-	if (ACharacter* character = Cast<ACharacter>(m_ownerPawn))
+	if (ACharacter* character = Cast<ACharacter>(m_ownerCharacter))
 	{
 		character->GetCharacterMovement()->StopMovementImmediately();
 	}
@@ -33,24 +33,24 @@ void UFSM_MageFireball::OnEnter()
 
 	m_fireballFired = false;
 
-	if (m_ownerPawn == nullptr)
+	if (m_ownerCharacter == nullptr)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Fireball has no Owner Pawn!"))
 	}
 	else
 	{
-		AEnemy_Mage* thisEnemy = Cast<AEnemy_Mage>(m_ownerPawn);
+		AEnemy_Mage* thisEnemy = Cast<AEnemy_Mage>(m_ownerCharacter);
 
 		TArray<FOverlapResult> overlaps;
 		FCollisionQueryParams queryParams;
-		queryParams.AddIgnoredActor(m_ownerPawn);
+		queryParams.AddIgnoredActor(m_ownerCharacter);
 
 		FCollisionObjectQueryParams objectQueryParams;
 		objectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel1);
 
-		bool test = m_ownerPawn->GetWorld()->OverlapMultiByObjectType(
+		bool test = m_ownerCharacter->GetWorld()->OverlapMultiByObjectType(
 			overlaps,
-			m_ownerPawn->GetActorLocation(),
+			m_ownerCharacter->GetActorLocation(),
 			FQuat::Identity,
 			objectQueryParams,
 			FCollisionShape::MakeSphere(thisEnemy->GetPlayerChaseRadius()),
@@ -70,9 +70,9 @@ void UFSM_MageFireball::OnUpdate(float a_deltaTime)
 {
 	Super::OnUpdate(a_deltaTime);
 
-	FVector playerDirection = m_player->GetActorLocation() - m_ownerPawn->GetActorLocation();
+	FVector playerDirection = m_player->GetActorLocation() - m_ownerCharacter->GetActorLocation();
 	playerDirection.Z = 0.0f;
-	m_ownerPawn->SetActorRotation(playerDirection.Rotation());
+	m_ownerCharacter->SetActorRotation(playerDirection.Rotation());
 
 	m_passedTime += a_deltaTime;
 

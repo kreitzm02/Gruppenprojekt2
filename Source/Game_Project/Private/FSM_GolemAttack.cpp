@@ -10,7 +10,7 @@ void UFSM_GolemAttack::Initialize()
 {
 	Super::Initialize();
 
-	m_thisEnemy = Cast<AEnemy_Golem>(m_ownerPawn);
+	m_thisEnemy = Cast<AEnemy_Golem>(m_ownerCharacter);
 	m_attackAnimation = m_thisEnemy->GetAttackAnimation();
 }
 
@@ -18,29 +18,29 @@ void UFSM_GolemAttack::OnEnter()
 {
 	Super::OnEnter();
 
-	if (ACharacter* character = Cast<ACharacter>(m_ownerPawn))
+	if (ACharacter* character = Cast<ACharacter>(m_ownerCharacter))
 	{
 		character->GetCharacterMovement()->StopMovementImmediately();
 	}
 
-	if (m_ownerPawn == nullptr)
+	if (m_ownerCharacter == nullptr)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Charge has no Owner Pawn!"))
 	}
 	else
 	{
-		AEnemy_Golem* thisEnemy = Cast<AEnemy_Golem>(m_ownerPawn);
+		AEnemy_Golem* thisEnemy = Cast<AEnemy_Golem>(m_ownerCharacter);
 
 		TArray<FOverlapResult> overlaps;
 		FCollisionQueryParams queryParams;
-		queryParams.AddIgnoredActor(m_ownerPawn);
+		queryParams.AddIgnoredActor(m_ownerCharacter);
 
 		FCollisionObjectQueryParams objectQueryParams;
 		objectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel1);
 
-		bool test = m_ownerPawn->GetWorld()->OverlapMultiByObjectType(
+		bool test = m_ownerCharacter->GetWorld()->OverlapMultiByObjectType(
 			overlaps,
-			m_ownerPawn->GetActorLocation(),
+			m_ownerCharacter->GetActorLocation(),
 			FQuat::Identity,
 			objectQueryParams,
 			FCollisionShape::MakeSphere(thisEnemy->GetAttackRange()),
@@ -62,9 +62,9 @@ void UFSM_GolemAttack::OnUpdate(float a_deltaTime)
 
 	if (m_player)
 	{
-		FVector playerDirection = m_player->GetActorLocation() - m_ownerPawn->GetActorLocation();
+		FVector playerDirection = m_player->GetActorLocation() - m_ownerCharacter->GetActorLocation();
 		playerDirection.Z = 0.0f;
-		m_ownerPawn->SetActorRotation(playerDirection.Rotation());
+		m_ownerCharacter->SetActorRotation(playerDirection.Rotation());
 	}
 }
 

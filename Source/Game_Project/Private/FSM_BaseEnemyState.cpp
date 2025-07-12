@@ -6,8 +6,8 @@
 
 void UFSM_BaseEnemyState::Initialize()
 {
-	m_ownerPawn = Cast<APawn>(GetOuter()->GetOuter());
-	m_ownerSkeletalMesh = m_ownerPawn->FindComponentByClass<USkeletalMeshComponent>();
+	m_ownerCharacter = Cast<ACharacter>(GetOuter()->GetOuter());
+	m_ownerSkeletalMesh = m_ownerCharacter->FindComponentByClass<USkeletalMeshComponent>();
 }
 
 void UFSM_BaseEnemyState::OnEnter()
