@@ -55,6 +55,8 @@ void UFSM_BossWarriorSpin::OnEnter()
 		}
 
 		m_owner->GetCharacterMovement()->MaxWalkSpeed = m_spinSpeed * m_owner->GetMultiplier();
+		m_owner->GetCharacterMovement()->MaxAcceleration = 10000;
+		m_owner->GetCharacterMovement()->BrakingDecelerationWalking = 10000;
 	}
 
 	m_spinDirectionNormal = (m_player->GetActorLocation() - m_ownerCharacter->GetActorLocation()).GetSafeNormal();
@@ -99,11 +101,21 @@ void UFSM_BossWarriorSpin::OnUpdate(float a_deltatime)
 
 	if (hit)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("boss collided with wall"));
-		UE_LOG(LogTemp, Warning, TEXT("normal vector x:%f y:%f z:%f"), m_spinDirectionNormal.X, m_spinDirectionNormal.Y, m_spinDirectionNormal.Z);
-		m_spinDirectionNormal = FVector::VectorPlaneProject(m_spinDirectionNormal, hitResult.Normal).GetSafeNormal();
-		//m_spinDirectionNormal.MirrorByPlane(FPlane(hitResult.ImpactPoint, hitResult.Normal));
-		UE_LOG(LogTemp, Warning, TEXT("normal vector x:%f y:%f z:%f"), m_spinDirectionNormal.X, m_spinDirectionNormal.Y, m_spinDirectionNormal.Z);
+		FVector newDirection;
+
+		for (int i = 0; i <= 10; i++)
+		{
+			newDirection = FMath::VRandCone(hitResult.Normal, FMath::DegreesToRadians(m_maxBounceFromWallDeg));
+
+			if (FMath::RadiansToDegrees(acosf(FVector::DotProduct(hitResult.Normal, newDirection))) < m_minBounceFromWallDeg)
+			{
+				UE_LOG(LogTemp,Warning,TEXT("found fitting vector"))
+				break;
+			}
+		}
+		newDirection.Z = 0;
+
+		m_spinDirectionNormal = newDirection.GetSafeNormal();
 	}
 	
 }

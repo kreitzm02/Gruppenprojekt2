@@ -3,6 +3,13 @@
 
 #include "BossEnemy_Warrior.h"
 
+void ABossEnemy_Warrior::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+
+	m_weaponMesh->SetRelativeScale3D(m_weaponScale);
+}
+
 void ABossEnemy_Warrior::PreInitializeComponents()
 {
 	Super::PreInitializeComponents();
@@ -37,7 +44,7 @@ void ABossEnemy_Warrior::Tick(float DeltaTime)
 		if (m_passedCooldownTime >= m_abilityCooldown)
 		{
 			//int abilityNumber = FMath::RandRange(0, 1);
-			switch (FMath::RandRange(1, 1))
+			switch (FMath::RandRange(0, 1))
 			{
 			case 0:
 				m_chargeReady = true;

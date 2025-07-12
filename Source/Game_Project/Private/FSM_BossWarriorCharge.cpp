@@ -55,6 +55,8 @@ void UFSM_BossWarriorCharge::OnEnter()
 		}
 		
 		m_owner->GetCharacterMovement()->MaxWalkSpeed = m_chargeSpeed * m_owner->GetMultiplier();
+		m_owner->GetCharacterMovement()->MaxAcceleration = 10000;
+		m_owner->GetCharacterMovement()->BrakingDecelerationWalking = 10000;
 	}
 
 	m_resetChargeDirection = true;

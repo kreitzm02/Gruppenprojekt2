@@ -15,6 +15,8 @@ class GAME_PROJECT_API ABossEnemy_Warrior : public AEnemyCharacter
 	GENERATED_BODY()
 
 protected:
+	virtual void OnConstruction(const FTransform& Transform) override;
+
 	virtual void PreInitializeComponents() override;
 
 	virtual void BeginPlay() override;
@@ -57,6 +59,9 @@ public:
 	UAnimSequence* GetAttackAnimation() { return m_attackAnimation; }
 
 private:
+	UPROPERTY(EditAnywhere, Category = "Weapon Scale")
+	FVector m_weaponScale = FVector::OneVector;
+
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
 	UAnimSequence* m_chargeAnimation = nullptr;
 
@@ -83,7 +88,7 @@ private:
 	float m_passedCooldownTime = 0.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
-	float m_baseChargeSpeed = 500.0f;
+	float m_baseChargeSpeed = 600.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
 	float m_baseSpinSpeed = 500.0f;

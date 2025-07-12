@@ -40,6 +40,12 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Settings")
 	float m_changeDirBeforeWallMultiplier = 1.0f;
 
+	UPROPERTY(EditAnywhere, Category = "Settings")
+	float m_minBounceFromWallDeg = 80.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Settings")
+	float m_maxBounceFromWallDeg = 70.0f;
+
 	float m_spinSpeed = 0.0f;
 
 	float m_detectionRange = 0.0f;
