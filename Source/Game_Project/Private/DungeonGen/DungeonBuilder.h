@@ -24,12 +24,13 @@ class UDungeonBuilder : public UObject
 
 public:
 	void Init(float a_UnitSize, UDungeonTheme* a_Theme, FDungeonData* a_Data, UWorld* a_World, float a_WallOffset);
-	void BuildFloor(ULevel* m_Level);
+	void BuildFloor();
 	void BuildWall();
 	void BuildDebugObjects();
 	void BuildDecorationObjects();
 	void BuildBossRoom();
 	void GenerateEnemies();
+	void SpawnBossEnemyRandom();
 
 private:
 	void TryPlaceWall(int32 a_GridX, int32 a_GridY, const FVector& a_Position, const FRotator& a_Rotation, int32 a_WallIndex) const;

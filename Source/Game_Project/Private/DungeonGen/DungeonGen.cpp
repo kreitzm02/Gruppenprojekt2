@@ -37,7 +37,7 @@ void ADungeonGen::BeginPlay()
 		APlayerCharacter* PC = *It;
 		if (PC)
 		{
-			FInt32Vector2 startPos = m_Data.m_StartRoom.GetRoomCenter();
+			FInt32Vector2 startPos = m_Data.m_EndRoom.GetRoomCenter();
 			PC->SetActorLocation(FVector((float)startPos.X * m_UnitSize, (float)startPos.Y * m_UnitSize, 100.0f));
 			PC->SetActorRotation(FRotator::ZeroRotator);
 			UE_LOG(LogTemp, Log, TEXT("PlayerCharacter (Iterator) auf Startraum gesetzt."));
@@ -156,13 +156,13 @@ void ADungeonGen::GenerateDungeon()
 
 	m_Builder = NewObject<UDungeonBuilder>(this);
 	m_Builder->Init(m_UnitSize, m_DungeonTheme, &m_Data, GetWorld(), m_WallOffset);
-	m_CurrentLevel = GetCurrentLevel();
-	m_Builder->BuildFloor(m_CurrentLevel);
+	m_Builder->BuildFloor();
 	m_Builder->BuildWall();
 	m_Builder->BuildDebugObjects();
 	m_Builder->BuildDecorationObjects();
 	m_Builder->BuildBossRoom();
 	m_Builder->GenerateEnemies();
+	m_Builder->SpawnBossEnemyRandom();
 	BuildNavMeshForDungeon();
 }
 
@@ -170,25 +170,5 @@ void ADungeonGen::BuildNavMeshForDungeon()
 {
 	UNavigationSystemV1* navSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
 	navSystem->Build();
-}
-
-ULevel* ADungeonGen::GetCurrentLevel()
-{
-	UWorld* World = GetWorld();
-	if (!World) return nullptr;
-
-	ULevel* MyLevel = GetLevel();  // das ULevel, in dem dieser Generator-Actor jetzt lebt
-
-	for (ULevelStreaming* Streaming : World->GetStreamingLevels())
-	{
-		if (ULevelStreamingDynamic* Dyn = Cast<ULevelStreamingDynamic>(Streaming))
-		{
-			if (Dyn->GetLoadedLevel() == MyLevel)
-			{
-				return Dyn->GetLoadedLevel();
-			}
-		}
-	}
-	return nullptr;
 }
 

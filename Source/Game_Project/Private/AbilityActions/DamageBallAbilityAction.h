@@ -3,8 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include <NiagaraSystem.h>
+#include "NiagaraComponent.h"
 #include "AbilityActions/BaseAbilityAction.h"
 #include "DamageBallAbilityAction.generated.h"
+
 
 UENUM(BlueprintType)
 enum class EDamageBallWeaponNames : uint8
@@ -36,6 +39,7 @@ struct FDamageBallInstance
 	int32 m_HitCount = 0;
 	TSet<AActor*> m_AlreadyHitActors;
 	float m_CircleAngle;
+	UNiagaraComponent* m_VFXComp = nullptr;
 };
 
 UCLASS(Blueprintable, EditInlineNew)
@@ -43,6 +47,8 @@ class UDamageBallAbilityAction : public UBaseAbilityAction
 {
 	GENERATED_BODY()
 public:
+	UPROPERTY(EditAnywhere, Category = "Niagara VFX", meta = (DisplayName = "Projectile"))
+	UNiagaraSystem* m_VFX;
 
 	UPROPERTY(EditAnywhere, Category = "Damage Ball Action Settings", meta = (DisplayName = "Damage"))
 	int32 m_Damage;
@@ -74,9 +80,6 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Damage Ball Action Settings", meta = (DisplayName = "Ball Size"))
 	float m_BallSize;
-
-	UPROPERTY(EditAnywhere, Category = "Damage Ball Action Settings", meta = (DisplayName = "Ball Color"))
-	FColor m_Color;
 
 	UPROPERTY(EditAnywhere, Category = "Damage Ball Action Settings", meta = (DisplayName = "Color Glow Strength"))
 	float m_ColorGlowStrength;

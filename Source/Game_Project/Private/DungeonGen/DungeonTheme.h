@@ -83,4 +83,7 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Enemies", meta = (DisplayName = "Default Spawnable Enemies"))
 	TArray<TSubclassOf<class AEnemyCharacter>> m_EnemyCharacters;
+
+	UPROPERTY(EditAnywhere, Category = "Enemies", meta = (DisplayName = "Spawnable Boss Enemies"))
+	TArray<TSubclassOf<class AEnemyCharacter>> m_BossCharacters;
 };
