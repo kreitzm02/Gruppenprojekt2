@@ -30,6 +30,7 @@ public:
 	void BuildDecorationObjects();
 	void BuildBossRoom();
 	void GenerateEnemies();
+	void SpawnBossEnemyRandom();
 
 private:
 	void TryPlaceWall(int32 a_GridX, int32 a_GridY, const FVector& a_Position, const FRotator& a_Rotation, int32 a_WallIndex) const;
