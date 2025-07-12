@@ -95,6 +95,7 @@ public:
 	float GetPlayerMovementSpeed() { return m_PlayerMovementSpeed; }
 	float GetPlayerAttackSpeed() { return m_PlayerAttackSpeed; }
 	float GetPlayerAttackDamage() { return m_AttackDamage; }
+	void TryAddPlayerHealth(float a_Amount);
 	TArray<float> GetPlayerAbilityCooldownTimes() { return m_AbilityCooldownTimes; }
 
 	// 

@@ -31,7 +31,7 @@ void APlayerCharacter::BeginPlay()
 	SetupPlayer();
 
 	m_AnimInstance = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
-
+	   
 	m_PreviousLocation = GetActorLocation();
 
 	SetupWeapons();
@@ -169,6 +169,8 @@ void APlayerCharacter::Tick(float DeltaTime)
 	{
 		m_AbilityCooldownTimes[i] = m_PlayerAbilities->GetRemainingCooldownFromAbility(i);
 	}
+
+	UE_LOG(LogTemp, Log, TEXT("PLAYER HEALTH: %f"), m_PlayerHealth);
 }
 
 // Called to bind functionality to input
@@ -497,6 +499,13 @@ void APlayerCharacter::SetupChangedPlayerClass()
 	// setup the player stats with the default values from the given data asset
 	ResetStatsToDefault();
 	ChangeToAbilitySlot0();
+}
+
+void APlayerCharacter::TryAddPlayerHealth(float a_Amount)
+{
+	if (m_PlayerHealth + a_Amount >= m_PlayerMaxHealth) m_PlayerHealth = m_PlayerMaxHealth;
+	else m_PlayerHealth += a_Amount;
+	UpdateHealthBar();
 }
 
 void APlayerCharacter::ChangeToPlayerClassA()
