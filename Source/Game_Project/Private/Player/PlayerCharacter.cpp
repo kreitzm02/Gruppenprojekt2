@@ -70,12 +70,12 @@ void APlayerCharacter::MoveRight(float a_Value)
 
 void APlayerCharacter::StartSprint()
 {
-	GetCharacterMovement()->MaxWalkSpeed = m_PlayerMovementSpeed * m_RunMultiplier;
+	m_PlayerShouldSprint = true;
 }
 
 void APlayerCharacter::StopSprint()
 {
-	GetCharacterMovement()->MaxWalkSpeed = m_PlayerMovementSpeed;
+	m_PlayerShouldSprint = false;
 }
 
 void APlayerCharacter::UseAbility()
@@ -145,8 +145,8 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 	if (m_AnimInstance)
 	{
-		m_AnimInstance->m_IsRunning = speed > m_PlayerMovementSpeed + movementThreshold ;
-		m_AnimInstance->m_IsWalking = speed > movementThreshold && speed <= m_PlayerMovementSpeed + movementThreshold;
+		m_AnimInstance->m_IsRunning = m_PlayerShouldSprint && m_PlayerStamina > 2.0f;
+		m_AnimInstance->m_IsWalking = (m_PlayerShouldSprint && m_PlayerStamina <= 1.0f) || (!m_PlayerShouldSprint && speed > 0.1f);
 		// to avoid t posing when no montage is playing in upper body slot
 		float targetWeight = m_AnimInstance->Montage_IsPlaying(nullptr) ? 1.0f : 0.0f;
 		m_AnimInstance->m_BlendWeight = FMath::FInterpTo(m_AnimInstance->m_BlendWeight, targetWeight, DeltaTime, 9.5f);
@@ -170,7 +170,8 @@ void APlayerCharacter::Tick(float DeltaTime)
 		m_AbilityCooldownTimes[i] = m_PlayerAbilities->GetRemainingCooldownFromAbility(i);
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("PLAYER HEALTH: %f"), m_PlayerHealth);
+	UpdatePlayerStamina(DeltaTime, speed, movementThreshold);
+	UpdatePlayerSpeed();
 }
 
 // Called to bind functionality to input
@@ -283,6 +284,8 @@ void APlayerCharacter::SetupWeapons()
 		else continue;
 
 		UStaticMeshComponent* meshComponent = AttachWeaponComponentToBone(boneName, meshAsset);
+		meshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		meshComponent->SetCanEverAffectNavigation(false);
 		//if (meshComponent)
 		//{
 		//	meshComponent->SetVisibility(false, true);
@@ -457,6 +460,36 @@ void APlayerCharacter::UpdateHealthBar()
 	m_playerUIInstance->SetHealthPercent(healthPercentage);
 }
 
+void APlayerCharacter::UpdateStaminabar()
+{
+	float staminaPercentage = m_PlayerStamina / m_PlayerMaxStamina;
+	m_playerUIInstance->SetStaminaPercent(staminaPercentage);
+}
+
+void APlayerCharacter::UpdatePlayerSpeed()
+{
+	if (m_PlayerStamina > 0 && m_PlayerShouldSprint)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = m_PlayerMovementSpeed * m_RunMultiplier;
+	}
+	else
+	{
+		GetCharacterMovement()->MaxWalkSpeed = m_PlayerMovementSpeed;
+	}
+}
+
+void APlayerCharacter::UpdatePlayerStamina(float a_DeltaTime, float a_Speed, float a_MovementThreshold)
+{
+	if (a_Speed > m_PlayerMovementSpeed + a_MovementThreshold)
+	{
+		ChangePlayerStamina(-10.0f * a_DeltaTime);
+	}
+	else
+	{
+		ChangePlayerStamina(5.0f * a_DeltaTime);
+	}
+}
+
 
 void APlayerCharacter::HandleKnockback(FVector a_knockbackDirection, float a_knockbackStrength)
 {
@@ -542,12 +575,15 @@ bool APlayerCharacter::CheckIfCurrentPlayerClassIsValid()
 
 void APlayerCharacter::ResetStatsToDefault()
 {
-	m_PlayerHealth = m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_BaseHealthPoints;
-	m_PlayerMaxHealth = m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_BaseHealthPoints;
-	m_PlayerMovementSpeed = m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_BaseMoveSpeed;
-	m_PlayerDefense = m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_BaseDefense;
-	m_PlayerLuck = m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_BaseLuck;
-	m_PlayerAttackSpeed = m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_BaseAttackSpeed;
+	UPlayerCharDataAsset* currentPlayerDA = m_PlayerCharDataAssets[m_CurrentPlayerClass];
+	m_PlayerHealth = currentPlayerDA->m_BaseHealthPoints;
+	m_PlayerMaxHealth = currentPlayerDA->m_BaseHealthPoints;
+	m_PlayerMovementSpeed = currentPlayerDA->m_BaseMoveSpeed;
+	m_PlayerDefense = currentPlayerDA->m_BaseDefense;
+	m_PlayerLuck = currentPlayerDA->m_BaseLuck;
+	m_PlayerAttackSpeed = currentPlayerDA->m_BaseAttackSpeed;
+	m_PlayerStamina = currentPlayerDA->m_BaseStamina;
+	m_PlayerMaxStamina = currentPlayerDA->m_BaseStamina;
 }
 
 void APlayerCharacter::ChangeMovementSpeed(float a_Value)
@@ -577,5 +613,15 @@ void APlayerCharacter::ChangeAttackSpeed(float a_Value)
 void APlayerCharacter::ChangeAttackDamage(float a_Value)
 {
 	m_AttackDamage += a_Value;
+}
+
+void APlayerCharacter::ChangePlayerStamina(float a_Value)
+{
+	m_PlayerStamina += a_Value;
+	if (m_PlayerStamina > m_PlayerMaxStamina)
+	{
+		m_PlayerStamina = m_PlayerMaxStamina;
+	}
+	UpdateStaminabar();
 }
 

@@ -15,8 +15,6 @@ class GAME_PROJECT_API UDungeonTheme : public UDataAsset
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(EditAnywhere, Category = "Meshes", meta = (DisplayName = "Test Mesh"))
-	TSubclassOf<ADungeonMesh> m_Test;
 
 	UPROPERTY(EditAnywhere, Category = "Meshes", meta = (DisplayName = "Floor Meshes"))
 	TArray <FDungeonMeshEntry> m_FloorMeshes;
@@ -33,8 +31,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Meshes", meta = (DisplayName = "Wall Outer Corner Mesh"))
 	UStaticMesh* m_WallOuterCornerMesh;
 
-	UPROPERTY(EditAnywhere, Category = "Meshes", meta = (DisplayName = "Door Mesh"))
-	UStaticMesh* m_DoorMesh;
+	UPROPERTY(EditAnywhere, Category = "Meshes", meta = (DisplayName = "Torch Mesh"))
+	TSubclassOf<AStaticMeshActor> m_TorchMesh;
 
 	UPROPERTY(EditAnywhere, Category = "Meshes", meta = (DisplayName = "Boss Floor Mesh"))
 	UStaticMesh* m_BossFloorMesh;
