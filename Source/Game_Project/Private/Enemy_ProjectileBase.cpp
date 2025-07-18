@@ -22,6 +22,7 @@ void AEnemy_ProjectileBase::OnConstruction(const FTransform& Transform)
 
 	m_projectileMesh->SetRelativeRotation(m_arrowRotation);
 	m_projectileHitbox->SetRelativeScale3D(m_hitboxSize);
+	m_projectileMesh->SetRelativeScale3D(m_arrowSize);
 }
 
 // Called when the game starts or when spawned
@@ -32,9 +33,13 @@ void AEnemy_ProjectileBase::BeginPlay()
 
 	SetLifeSpan(m_lifeSpan);
 	m_projectileHitbox->OnComponentBeginOverlap.AddDynamic(this, &AEnemy_ProjectileBase::OnHit);
-
-	m_targetDirection = m_target->GetActorLocation() - this->GetActorLocation();
+	if(m_target != nullptr)
+	{
+		m_targetDirection = m_target->GetActorLocation() - this->GetActorLocation();
+	}
+	m_targetDirection.Z = 0;
 	m_targetDirection.Normalize();
+
 	this->SetActorRotation(m_targetDirection.Rotation());
 }
 
@@ -58,7 +63,7 @@ void AEnemy_ProjectileBase::OnHit(UPrimitiveComponent* a_overlappedComponent, AA
 		if (a_otherComp->GetCollisionObjectType() == ECC_GameTraceChannel1)
 		{
 			UE_LOG(LogTemp,Warning,TEXT("projectile hit player"));
-			UGameplayStatics::ApplyDamage(a_otherActor, m_enemyCharacter->GetAttackDamage(), m_enemyCharacter->GetController(), m_enemyCharacter, nullptr);
+			UGameplayStatics::ApplyDamage(a_otherActor, m_enemyCharacter->GetAttackDamage(), m_enemyCharacter->GetController(), this, nullptr);
 			this->Destroy();
 		}
 		else
