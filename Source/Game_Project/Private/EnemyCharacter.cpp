@@ -60,39 +60,11 @@ void AEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
-	//GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
-	//m_characterHitbox->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
-	//m_weaponHitbox->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
-	//m_skeletalMesh->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
-	//m_skeletalMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
-	//m_weaponMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
-	//m_weaponMesh->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
-
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Ignore);
 	m_skeletalMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
 	m_weaponMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
-
-	//GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Ignore);
-	//m_characterHitbox->SetCollisionResponseToAllChannels(ECR_Ignore);
-	//m_weaponHitbox->SetCollisionResponseToAllChannels(ECR_Ignore);
-	//m_skeletalMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
-	//m_weaponMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
-	//
-	//GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
-	//m_characterHitbox->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
-	//m_weaponHitbox->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
-	//m_skeletalMesh->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
-	//m_weaponMesh->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
-
-
-	//GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Ignore);
-	//m_characterHitbox->SetCollisionResponseToAllChannels(ECR_Ignore);
-	//m_weaponHitbox->SetCollisionResponseToAllChannels(ECR_Ignore);
-	//m_skeletalMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
-
 
 	m_characterHitbox->OnComponentBeginOverlap.AddDynamic(this, &AEnemyCharacter::OnHit);
 	m_weaponHitbox->OnComponentBeginOverlap.AddDynamic(this, &AEnemyCharacter::OnHit);
