@@ -73,7 +73,7 @@ void AEnemy_GolemShockwave::OnHit(UPrimitiveComponent* a_overlappedComponent, AA
 		if (a_otherComp->GetCollisionObjectType() == ECC_GameTraceChannel1)
 		{
 			UE_LOG(LogTemp,Warning,TEXT("projectile hit player"));
-			UGameplayStatics::ApplyDamage(a_otherActor, m_enemyCharacter->GetAttackDamage(), m_enemyCharacter->GetController(), m_enemyCharacter, nullptr);
+			UGameplayStatics::ApplyDamage(a_otherActor, m_enemyCharacter->GetAttackDamage(), m_enemyCharacter->GetController(), this, nullptr);
 			
 		}
 	}

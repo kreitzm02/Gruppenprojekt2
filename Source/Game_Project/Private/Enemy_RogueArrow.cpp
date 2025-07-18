@@ -15,9 +15,12 @@ AEnemy_RogueArrow::AEnemy_RogueArrow()
 	m_projectileHitbox->SetCollisionResponseToAllChannels(ECR_Block);
 	m_projectileHitbox->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Overlap);
 
-	RootComponent = m_projectileHitbox;
+	//RootComponent = m_projectileHitbox;
 
 	m_projectileMesh->SetupAttachment(RootComponent);
+	m_projectileHitbox->SetupAttachment(m_projectileMesh);
+	
+	//m_projectileMesh->SetupAttachment(RootComponent);
 
 	
 }

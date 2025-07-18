@@ -33,7 +33,6 @@ void UFSM_RogueSpray::OnEnter()
 	}
 	else
 	{
-		AEnemy_Rogue* thisEnemy = Cast<AEnemy_Rogue>(m_ownerCharacter);
 
 		TArray<FOverlapResult> overlaps;
 		FCollisionQueryParams queryParams;
@@ -47,7 +46,7 @@ void UFSM_RogueSpray::OnEnter()
 			m_ownerCharacter->GetActorLocation(),
 			FQuat::Identity,
 			objectQueryParams,
-			FCollisionShape::MakeSphere(thisEnemy->GetPlayerChaseRadius()),
+			FCollisionShape::MakeSphere(m_thisEnemy->GetPlayerChaseRadius()),
 			queryParams
 		);
 		for (FOverlapResult& overlap : overlaps)

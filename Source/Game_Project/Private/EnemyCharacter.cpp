@@ -4,6 +4,7 @@
 #include "EnemyCharacter.h"
 #include "FSM_EnemyStateMachineComponent.h"
 #include "Components/BoxComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -59,8 +60,45 @@ void AEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
+	//GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+	//m_characterHitbox->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
+	//m_weaponHitbox->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
+	//m_skeletalMesh->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
+	//m_skeletalMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+	//m_weaponMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+	//m_weaponMesh->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
+
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Ignore);
+	m_skeletalMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
+	m_weaponMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
+
+	//GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Ignore);
+	//m_characterHitbox->SetCollisionResponseToAllChannels(ECR_Ignore);
+	//m_weaponHitbox->SetCollisionResponseToAllChannels(ECR_Ignore);
+	//m_skeletalMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
+	//m_weaponMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
+	//
+	//GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+	//m_characterHitbox->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+	//m_weaponHitbox->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+	//m_skeletalMesh->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+	//m_weaponMesh->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+
+
+	//GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Ignore);
+	//m_characterHitbox->SetCollisionResponseToAllChannels(ECR_Ignore);
+	//m_weaponHitbox->SetCollisionResponseToAllChannels(ECR_Ignore);
+	//m_skeletalMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
+
+
 	m_characterHitbox->OnComponentBeginOverlap.AddDynamic(this, &AEnemyCharacter::OnHit);
 	m_weaponHitbox->OnComponentBeginOverlap.AddDynamic(this, &AEnemyCharacter::OnHit);
+
+	m_characterHitbox->UpdateOverlaps();
+	m_weaponHitbox->UpdateOverlaps();
 
 	m_currentHealth = m_maxHealth;
 
@@ -74,7 +112,6 @@ void AEnemyCharacter::BeginPlay()
 void AEnemyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 // Called to bind functionality to input
@@ -103,6 +140,7 @@ float AEnemyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 		HandleKnockback(knockbackDirection,600.0f /*get knockback strengh from damage causer*/);
 		//ACharacter* damagingUnit = Cast<ACharacter>(DamageCauser);
 		//damagingUnit->GetKnockback();
+
 	}
 
 	UpdateHealthBar();

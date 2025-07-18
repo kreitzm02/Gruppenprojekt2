@@ -30,6 +30,8 @@ public:
 
 	void SetTarget(AActor* a_target){ m_target = a_target; }
 
+	void SetTargetDirection(const FVector &a_target) { m_targetDirection = a_target; }
+
 	void SetProjectileSpeed(float a_projectileSpeed){ m_projectileSpeed = a_projectileSpeed; }
 
 	void SetProjectileLifeSpan(float a_lifeSpan) { m_lifeSpan = a_lifeSpan; }
@@ -52,13 +54,16 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Projectile Settings")
 	FVector m_hitboxSize = FVector::OneVector;
 
+	UPROPERTY(EditAnywhere, Category = "Projectile Settings")
+	FVector m_arrowSize = FVector::OneVector;
+
 	UPROPERTY()
 	AActor* m_target = nullptr;
 
 	UPROPERTY()
 	AEnemyCharacter* m_enemyCharacter = nullptr;
 
-	FVector m_targetDirection = FVector::ZeroVector;
+	FVector m_targetDirection = FVector::ForwardVector;
 
 	float m_projectileSpeed = 1000.0f;
 
