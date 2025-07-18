@@ -2,6 +2,7 @@
 
 
 #include "DungeonLevelStreamer.h"
+#include "LoadingScreenManager.h"
 
 // Sets default values for this component's properties
 UDungeonLevelStreamer::UDungeonLevelStreamer()

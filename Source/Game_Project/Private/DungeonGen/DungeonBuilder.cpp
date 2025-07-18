@@ -672,6 +672,63 @@ void UDungeonBuilder::BuildDecorationObjects()
 	}
 }
 
+void UDungeonBuilder::BuildTorches()
+{
+	for (int i = 0; i < m_Data->m_AllRooms.Num(); i++)
+	{
+		for (int x = m_Data->m_AllRooms[i].m_RoomOrigin.X; x <= m_Data->m_AllRooms[i].m_RoomOrigin.X + m_Data->m_AllRooms[i].m_RoomCellLength; x++)
+		{
+			for (int y = m_Data->m_AllRooms[i].m_RoomOrigin.Y; y <= m_Data->m_AllRooms[i].m_RoomOrigin.Y + m_Data->m_AllRooms[i].m_RoomCellWidth; y++)
+			{
+				if (m_Data->m_DungeonGrid[x + 1][y + 1] == ECellType::WALLCONCAVE)
+				{
+					if (m_Data->m_DungeonGrid[x - 1][y + 1] == ECellType::WALL)
+					{
+						PlaceTorchAt(x - 1, y, FVector(0.0f, 215.0f, 0.0f), FRotator(0, 180, 0));
+					}
+					if (m_Data->m_DungeonGrid[x + 1][y - 1] == ECellType::WALL)
+					{
+						PlaceTorchAt(x, y - 1, FVector(215.0f, 0.0f, 0.0f), FRotator(0, 90, 0));
+					}
+				}
+				else if (m_Data->m_DungeonGrid[x - 1][y + 1] == ECellType::WALLCONCAVE)
+				{
+					if (m_Data->m_DungeonGrid[x - 1][y - 1] == ECellType::WALL)
+					{
+						PlaceTorchAt(x, y - 1, FVector(-215.0f, 0.0f, 0.0f), FRotator(0, 270, 0));
+					}
+					if (m_Data->m_DungeonGrid[x + 1][y + 1] == ECellType::WALL)
+					{
+						PlaceTorchAt(x + 1, y, FVector(0.0f, 215.0f, 0.0f), FRotator(0, 180, 0));
+					}
+				}
+				else if (m_Data->m_DungeonGrid[x + 1][y - 1] == ECellType::WALLCONCAVE)
+				{
+					if (m_Data->m_DungeonGrid[x - 1][y - 1] == ECellType::WALL)
+					{
+						PlaceTorchAt(x - 1, y, FVector(0.0f, -215.0f, 0.0f), FRotator(0, 0, 0));
+					}
+					if (m_Data->m_DungeonGrid[x + 1][y + 1] == ECellType::WALL)
+					{
+						PlaceTorchAt(x, y + 1, FVector(215.0f, 0.0f, 0.0f), FRotator(0, 90, 0));
+					}
+				}
+				else if (m_Data->m_DungeonGrid[x - 1][y - 1] == ECellType::WALLCONCAVE)
+				{
+					if (m_Data->m_DungeonGrid[x - 1][y + 1] == ECellType::WALL)
+					{
+						PlaceTorchAt(x, y + 1, FVector(-215.0f, 0.0f, 0.0f), FRotator(0, -90, 0));
+					}
+					if (m_Data->m_DungeonGrid[x + 1][y - 1] == ECellType::WALL)
+					{
+						PlaceTorchAt(x + 1, y, FVector(0.0f, -215.0f, 0.0f), FRotator(0, 0, 0));
+					}
+				}
+			}
+		}
+	}
+}
+
 void UDungeonBuilder::BuildBossRoom()
 {
 	for (int i = 0; i < m_Data->m_AllRooms.Num(); i++)
@@ -835,4 +892,17 @@ bool UDungeonBuilder::TryPlacePrefabCornerOrthoRotation(TArray<TArray<ECellType>
 		}
 	}
 	return false;
+}
+
+void UDungeonBuilder::PlaceTorchAt(int32 a_X, int32 a_Y, const FVector& a_PositionOffset, const FRotator& a_RotationOffset)
+{
+	FVector pos = FVector(a_X * m_UnitSize, a_Y * m_UnitSize, 150.0f);
+	pos += a_PositionOffset;
+
+	FRotator rot = FRotator::ZeroRotator;
+	rot += a_RotationOffset;
+
+	FActorSpawnParameters params;
+	ACustomChunkManager* chunkManager = Cast<ACustomChunkManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACustomChunkManager::StaticClass()));
+	chunkManager->SpawnActorInChunk(m_DungeonTheme->m_TorchMesh, pos, rot, params);
 }
