@@ -150,6 +150,7 @@ void UDamageBallAbilityAction::PlayDamageBall(AActor* a_AbilityUser)
 					ballInstance->m_Direction.Z = 0.0f;
 					ballInstance->m_CurrPosition = hit.Location + ballInstance->m_Direction * 2.0f;
 					ballInstance->m_HitCount++;
+					ballInstance->m_AlreadyHitActors.Empty();
 					return;
 				}
 			}
