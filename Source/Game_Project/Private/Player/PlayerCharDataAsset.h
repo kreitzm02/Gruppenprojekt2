@@ -40,6 +40,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Character Stats", meta = (DisplayName = "Base Defense"))
 	float m_BaseDefense;
 
+	UPROPERTY(EditAnywhere, Category = "Character Stats", meta = (DisplayName = "Base Stamina"))
+	float m_BaseStamina;
+
 	UPROPERTY(EditAnywhere, Category = "Placeholders", meta = (DisplayName = "Starting Ability"))
 	TSubclassOf<UBaseAbility> m_StartingAbility;
 

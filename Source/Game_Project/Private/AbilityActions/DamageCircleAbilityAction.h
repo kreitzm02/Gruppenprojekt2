@@ -35,6 +35,8 @@ class UDamageCircleAbilityAction : public UBaseAbilityAction
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(EditAnywhere, Category = "Damage Circle Action Settings", meta = (DisplayName = "Circle mesh"))
+	UStaticMesh* m_DCMesh;
 
 	UPROPERTY(EditAnywhere, Category = "Damage Circle Action Settings", meta = (DisplayName = "Damage Per Hit"))
 	int32 m_DamagePerHit;
@@ -54,9 +56,6 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Damage Circle Action Settings", meta = (DisplayName = "Circle Color"))
 	FColor m_Color;
 
-	UPROPERTY(EditAnywhere, Category = "Damage Circle Action Settings", meta = (DisplayName = "Color Glow Strength"))
-	float m_ColorGlowStrength;
-
 	UPROPERTY(EditAnywhere, Category = "Damage Circle Action Settings", meta = (DisplayName = "Circle Follows The User"))
 	bool m_CircleFollowsUser;
 
@@ -72,15 +71,18 @@ public:
 	FName GetWeaponMeshName() const;
 	void EndAbilityAction();
 	void DrawDebug(AActor* a_AbilityUser);
+	void MoveCircle(AActor* a_AbilityUser);
 
 	virtual void PrepareAbilityAction(AActor* a_AbilityUser) override;
 	virtual void PlayAbilityAction(AActor* a_AbilityUser) override;
 
 private:
 
+	AStaticMeshActor* m_DCMeshActor = nullptr;
 	UAnimMontage* m_AttackMontage;
 	FTimerHandle m_DamageTickTimerHandle;
 	FTimerHandle m_DebugDrawTimerHandle;
+	FTimerHandle m_CircleMoveTimerHandle;
 	FTimerHandle m_EndTimerHandle;
 	FTimerHandle m_StartTimerHandle;
 	FVector m_StaticCircleLocation;

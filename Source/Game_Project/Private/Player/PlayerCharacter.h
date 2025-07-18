@@ -85,6 +85,7 @@ public:
 	void ChangeDefense(float a_Value);
 	void ChangeAttackSpeed(float a_Value);
 	void ChangeAttackDamage(float a_Value);
+	void ChangePlayerStamina(float a_Value);
 
 	void CheckForDeath(); // no functionality yet
 
@@ -95,6 +96,8 @@ public:
 	float GetPlayerMovementSpeed() { return m_PlayerMovementSpeed; }
 	float GetPlayerAttackSpeed() { return m_PlayerAttackSpeed; }
 	float GetPlayerAttackDamage() { return m_AttackDamage; }
+	float GetPlayerStamina() { return m_PlayerStamina; }
+	void TryAddPlayerHealth(float a_Amount);
 	TArray<float> GetPlayerAbilityCooldownTimes() { return m_AbilityCooldownTimes; }
 
 	// 
@@ -107,6 +110,9 @@ public:
 private:
 
 	void UpdateHealthBar();
+	void UpdateStaminabar();
+	void UpdatePlayerSpeed();
+	void UpdatePlayerStamina(float a_DeltaTime, float a_Speed, float a_MovementThreshold);
 
 	TSet<AActor*> m_AlreadyHitActors;
 
@@ -129,10 +135,15 @@ private:
 
 	bool m_IsPlayerAlive = true;
 
+	bool m_PlayerShouldSprint = false;
+
 	// player stats
 
 	UPROPERTY(VisibleAnywhere)
 	float m_PlayerMaxHealth;
+
+	UPROPERTY(VisibleAnywhere)
+	float m_PlayerMaxStamina;
 
 	UPROPERTY(VisibleAnywhere)
 	float m_PlayerHealth;
@@ -151,6 +162,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	float m_AttackDamage;
+
+	UPROPERTY(VisibleAnywhere)
+	float m_PlayerStamina;
 
 	//
 

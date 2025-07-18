@@ -28,6 +28,7 @@ public:
 	void BuildWall();
 	void BuildDebugObjects();
 	void BuildDecorationObjects();
+	void BuildTorches();
 	void BuildBossRoom();
 	void GenerateEnemies();
 	void SpawnBossEnemyRandom();
@@ -37,4 +38,5 @@ private:
 	bool IsWithinBounds(int32 a_GridX, int32 a_GridY) const;
 	bool TryPlacePrefabCornerFacingCenter(TArray<TArray<ECellType>> a_Grid, int32 a_GridX, int32 a_GridY, FDungeonRoom a_Room, UStaticMesh* a_Mesh, int32 a_Probabilty);
 	bool TryPlacePrefabCornerOrthoRotation(TArray<TArray<ECellType>> a_Grid, int32 a_GridX, int32 a_GridY, FDungeonRoom a_Room, UStaticMesh* a_Mesh, int32 a_Probabilty);
+	void PlaceTorchAt(int32 a_X, int32 a_Y, const FVector& a_PositionOffset, const FRotator& a_RotationOffset);
 };

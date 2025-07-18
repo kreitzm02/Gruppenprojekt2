@@ -3,6 +3,7 @@
 #include "AbilityActions/DamageCircleAbilityAction.h"         
 #include "Kismet/GameplayStatics.h"
 #include "Engine/OverlapResult.h"
+#include "Engine/StaticMeshActor.h"
 #include <Player/PlayerCharacter.h>
 
 void UDamageCircleAbilityAction::PrepareAbilityAction(AActor* a_AbilityUser)
@@ -71,8 +72,10 @@ void UDamageCircleAbilityAction::EndAbilityAction()
 	{
 		World->GetTimerManager().ClearTimer(m_DamageTickTimerHandle);
 		World->GetTimerManager().ClearTimer(m_DebugDrawTimerHandle);
+		World->GetTimerManager().ClearTimer(m_CircleMoveTimerHandle);
 		World->GetTimerManager().ClearTimer(m_EndTimerHandle);
 		World->GetTimerManager().ClearTimer(m_StartTimerHandle);
+		m_DCMeshActor->Destroy();
 		UE_LOG(LogTemp, Warning, TEXT("Damage Circle Ability Action Ended"));
 	}
 }
@@ -81,6 +84,13 @@ void UDamageCircleAbilityAction::DrawDebug(AActor* a_AbilityUser)
 {
 	FVector location = m_CircleFollowsUser ? a_AbilityUser->GetActorLocation() : m_StaticCircleLocation;
 	DrawDebugSphere(a_AbilityUser->GetWorld(), location, m_CircleSize, 32, m_Color, false, 0.06f, 0, 1.0f);
+}
+
+void UDamageCircleAbilityAction::MoveCircle(AActor* a_AbilityUser)
+{
+	FVector location = m_CircleFollowsUser ? a_AbilityUser->GetActorLocation() : m_StaticCircleLocation;
+	location.Z -= 80.0f;
+	m_DCMeshActor->SetActorLocation(location);
 }
 
 void UDamageCircleAbilityAction::PerformDamageTick(AActor* a_AbilityUser)
@@ -120,7 +130,25 @@ void UDamageCircleAbilityAction::PlayDamageCircle(AActor* a_AbilityUser)
 		// sound
 		m_StaticCircleLocation = a_AbilityUser->GetActorLocation();
 
-		a_AbilityUser->GetWorld()->GetTimerManager().SetTimer(m_DebugDrawTimerHandle, FTimerDelegate::CreateUObject(this, &UDamageCircleAbilityAction::DrawDebug, a_AbilityUser), 0.05f, true);
+		if (m_DCMesh)
+		{
+			FVector location = a_AbilityUser->GetActorLocation();
+			location.Z -= 80.0f;
+			m_DCMeshActor = a_AbilityUser->GetWorld()->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), location, FRotator::ZeroRotator);
+			if (m_DCMeshActor)
+			{
+				UStaticMeshComponent* meshComp = m_DCMeshActor->GetStaticMeshComponent();
+				m_DCMeshActor->SetMobility(EComponentMobility::Movable);
+				meshComp->SetStaticMesh(m_DCMesh);
+				m_DCMeshActor->SetActorEnableCollision(false);
+				m_DCMeshActor->SetActorScale3D(m_DCMeshActor->GetActorScale3D() * FVector(m_CircleSize * 0.005, m_CircleSize * 0.005, 1));
+				UMaterialInstanceDynamic* dynMat = meshComp->CreateAndSetMaterialInstanceDynamic(0);
+				dynMat->SetVectorParameterValue(FName("color"), m_Color.ReinterpretAsLinear());
+			}
+		}
+
+		//a_AbilityUser->GetWorld()->GetTimerManager().SetTimer(m_DebugDrawTimerHandle, FTimerDelegate::CreateUObject(this, &UDamageCircleAbilityAction::DrawDebug, a_AbilityUser), 0.05f, true);
+		a_AbilityUser->GetWorld()->GetTimerManager().SetTimer(m_CircleMoveTimerHandle, FTimerDelegate::CreateUObject(this, &UDamageCircleAbilityAction::MoveCircle, a_AbilityUser), 0.01f, true);
 		a_AbilityUser->GetWorld()->GetTimerManager().SetTimer(m_DamageTickTimerHandle, FTimerDelegate::CreateUObject(this, &UDamageCircleAbilityAction::PerformDamageTick, a_AbilityUser), m_TimeBetweenHits, true);
 		a_AbilityUser->GetWorld()->GetTimerManager().SetTimer(m_EndTimerHandle, this, &UDamageCircleAbilityAction::EndAbilityAction, m_Duration, false);
 

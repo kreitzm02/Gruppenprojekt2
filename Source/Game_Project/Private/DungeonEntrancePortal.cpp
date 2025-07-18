@@ -2,6 +2,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "DungeonLevelStreamer.h"
+#include "LoadingScreenManager.h"
 #include "DungeonEntrancePortal.h"
 
 // Sets default values
@@ -43,6 +44,7 @@ void ADungeonEntrancePortal::Tick(float DeltaTime)
 void ADungeonEntrancePortal::OnPortalEnter(UPrimitiveComponent* a_overlappedComponent, AActor* a_otherActor, UPrimitiveComponent* a_otherComp, int32 a_otherBodyIndex, bool a_bFromSweep, const FHitResult& a_sweepResult)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Entered Portal"));
+	ULoadingScreenManager::Get(GetWorld())->StartLoading(GetWorld());
 	m_DungeonLevelStreamer->LoadDungeon();
 }
 

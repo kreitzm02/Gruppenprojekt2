@@ -3,6 +3,7 @@
 
 #include "DungeonGen/DungeonGen.h"
 #include "Components/StaticMeshComponent.h"
+#include "LoadingScreenManager.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "UObject/ConstructorHelpers.h"
 #include "NavigationSystem.h"
@@ -163,7 +164,9 @@ void ADungeonGen::GenerateDungeon()
 	m_Builder->BuildBossRoom();
 	m_Builder->GenerateEnemies();
 	m_Builder->SpawnBossEnemyRandom();
+	m_Builder->BuildTorches();
 	BuildNavMeshForDungeon();
+	ULoadingScreenManager::Get(GetWorld())->EndLoading();
 }
 
 void ADungeonGen::BuildNavMeshForDungeon()
