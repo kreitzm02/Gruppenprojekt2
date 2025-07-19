@@ -7,23 +7,24 @@
 
 ULoadingScreenManager* ULoadingScreenManager::Get(UWorld* World)
 {
+    UPROPERTY()
     static ULoadingScreenManager* instance = nullptr;
-
+    
     if (!instance)
     {
         instance = NewObject<ULoadingScreenManager>();
-        instance->m_World = World;
+        instance->SetFlags(RF_Transient);
         instance->AddToRoot();
-        instance->m_LoadingWidgetClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(TEXT("/Game/LoadingScreen/WBP_Loading.WBP_Loading_C")));
-        UE_LOG(LogTemp, Warning, TEXT("Loading screen not found!!!!"));
     }
-
+    instance->m_World = World;
+    instance->m_LoadingWidgetClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(TEXT("/Game/LoadingScreen/WBP_Loading.WBP_Loading_C")));
+    
     return instance;
 }
 
 void ULoadingScreenManager::StartLoading(UWorld* a_World)
 {
-    if (!m_LoadingWidget)
+    if (!m_LoadingWidget && m_LoadingWidgetClass != nullptr)
     {
         UClass* WidgetClass = m_LoadingWidgetClass.LoadSynchronous();
         if (WidgetClass)
