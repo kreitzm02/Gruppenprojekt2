@@ -3,8 +3,10 @@
 
 #include "BossEnemy_Mage.h"
 
+#include "Enemy_BurnGroundProjectile.h"
 #include "Enemy_MageFireballProjectile.h"
 #include "Enemy_MageProjectile.h"
+#include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 ABossEnemy_Mage::ABossEnemy_Mage()
@@ -53,7 +55,7 @@ void ABossEnemy_Mage::Tick(float DeltaTime)
 
 		if (m_passedCooldownTime >= m_abilityCooldown)
 		{
-			switch (FMath::RandRange(0, 1))
+			switch (FMath::RandRange(1, 1))
 			{
 			case 0:
 				m_burnGroundReady = true;
@@ -110,7 +112,7 @@ void ABossEnemy_Mage::FireProjectile(AActor* a_target)
 
 void ABossEnemy_Mage::FireFireball(AActor* a_target)
 {
-	FTransform transform = FTransform(FRotator(0.0f, 0.0f, 0.0f), m_projectileSpawnPoint->GetComponentLocation(), FVector(1.0f, 1.0f, 1.0f));
+	FTransform transform = FTransform(FRotator(0.0f, 0.0f, 0.0f), m_projectileSpawnPoint->GetComponentLocation(), FVector(1.0f, 1.0f, 1.0f) * m_currentDoStuffMultiplier);
 
 	AEnemy_MageFireballProjectile* fireball = GetWorld()->SpawnActorDeferred<AEnemy_MageFireballProjectile>(m_fireballBP, transform);
 	fireball->SetOwnerEnemy(this);
@@ -118,11 +120,19 @@ void ABossEnemy_Mage::FireFireball(AActor* a_target)
 	fireball->SetProjectileLifeSpan(m_fireballLifetime);
 	fireball->SetTarget(a_target);
 	UGameplayStatics::FinishSpawningActor(fireball, transform);
-
-	//change scale with multiplier
 }
 
-void ABossEnemy_Mage::FireBurnGround(AActor* a_target)
+void ABossEnemy_Mage::FireBurnGround(ACharacter* a_target)
 {
-	
+	FTransform transform = FTransform(FRotator(0.0f, 0.0f, 0.0f), m_projectileSpawnPoint->GetComponentLocation(), FVector(1.0f, 1.0f, 1.0f));
+
+	FVector targetPos = a_target->GetActorLocation();
+	targetPos.Z -= a_target->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+
+	AEnemy_BurnGroundProjectile* burnGround = GetWorld()->SpawnActorDeferred<AEnemy_BurnGroundProjectile>(m_fireballBP, transform);
+	burnGround->SetOwner(this);
+	burnGround->SetTargetPos(targetPos);
+	burnGround->SetFlightTime(m_burnGroundFlightTime);
+	burnGround->SetLifetime(m_burnGroundLifetime * m_currentDoStuffMultiplier);
+	UGameplayStatics::FinishSpawningActor(burnGround, transform);
 }

@@ -33,7 +33,7 @@ public:
 
 	void FireFireball(AActor* a_target);
 
-	void FireBurnGround(AActor* a_target);
+	void FireBurnGround(ACharacter* a_target);
 
 	float GetMultiplier() { return m_currentDoStuffMultiplier; }
 
@@ -103,6 +103,15 @@ private:
 	int m_burnGroundsPerAbility = 5;
 
 	int m_currentBurnGround = 0;
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
+	float m_burnGroundLifetime = 5;
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
+	float m_burnGroundFlightTime = 3.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
+	UClass* m_burnGroundBP = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
 	float m_abilityCooldown = 20.0f;

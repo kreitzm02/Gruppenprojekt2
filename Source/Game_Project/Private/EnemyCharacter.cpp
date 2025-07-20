@@ -61,7 +61,7 @@ void AEnemyCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
-	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Ignore);
 	m_skeletalMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
 	m_weaponMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
