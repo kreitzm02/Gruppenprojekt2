@@ -45,6 +45,7 @@ void ADungeonEntrancePortal::OnPortalEnter(UPrimitiveComponent* a_overlappedComp
 {
 	UE_LOG(LogTemp, Warning, TEXT("Entered Portal"));
 	ULoadingScreenManager::Get(GetWorld())->StartLoading(GetWorld());
+	SetDungeonAsCleared();
 	m_DungeonLevelStreamer->LoadDungeon();
 }
 

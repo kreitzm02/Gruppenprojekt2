@@ -23,7 +23,7 @@ ULoadingScreenManager* ULoadingScreenManager::Get(UWorld* World)
 
 void ULoadingScreenManager::StartLoading(UWorld* a_World)
 {
-    if (!m_LoadingWidget)
+    if (!m_LoadingWidget && m_LoadingWidgetClass)
     {
         UClass* WidgetClass = m_LoadingWidgetClass.LoadSynchronous();
         if (WidgetClass)
@@ -50,5 +50,6 @@ void ULoadingScreenManager::EndLoadingDelegate()
 {
     m_LoadingWidget->RemoveFromParent();
     m_LoadingWidget = nullptr;
+    m_LoadingWidgetClass = nullptr;
     m_World->GetTimerManager().ClearTimer(m_EndLoadingDelayTimer);
 }
