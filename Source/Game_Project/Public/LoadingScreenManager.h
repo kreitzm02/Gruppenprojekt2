@@ -16,6 +16,7 @@ class GAME_PROJECT_API ULoadingScreenManager : public UObject
 	
 public:
 	static ULoadingScreenManager* Get(UWorld* a_World);
+
 	void StartLoading(UWorld* a_World);
 	void EndLoading();
 
@@ -23,7 +24,7 @@ private:
 	UPROPERTY()
 	UUserWidget* m_LoadingWidget;
 
-	TSoftClassPtr<UUserWidget> m_LoadingWidgetClass;
+	TSoftClassPtr<UUserWidget> m_LoadingWidgetClass = nullptr;
 
 	FTimerHandle m_EndLoadingDelayTimer;
 
