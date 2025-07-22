@@ -35,13 +35,22 @@ public:
 	void EquipAbility(int32 a_Index);
 
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
-	void TryAddAbility(TSubclassOf<UBaseAbility> a_AbilityClass);
+	bool TryAddAbility(TSubclassOf<UBaseAbility> a_AbilityClass);
 
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
 	void RemoveAllAbilities();
 
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
+	void RemoveAbility(TSubclassOf<UBaseAbility> a_AbilityClass);
+
+	UFUNCTION(BlueprintCallable, Category = "Abilities")
 	float GetRemainingCooldownFromAbility(int32 a_Index);
+
+	UFUNCTION(BlueprintCallable, Category = "Abilities")
+	FText GetAbilityName(int32 a_Index);
+
+	UFUNCTION(BlueprintCallable, Category = "Abilities")
+	UTexture2D* GetAbilityIcon(int32 a_Index);
 
 private:
 	UPROPERTY(EditAnywhere)

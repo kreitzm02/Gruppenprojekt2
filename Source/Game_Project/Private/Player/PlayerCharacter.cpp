@@ -8,6 +8,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/InputComponent.h"
 #include "Engine/SkeletalMeshSocket.h"
+#include "MainAbilityContainer.h"
 #include "GameFramework/Controller.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Animation/AnimInstance.h"
@@ -28,6 +29,7 @@ APlayerCharacter::APlayerCharacter()
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	FillAbilityLevelMap();
 	SetupPlayer();
 
 	m_AnimInstance = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
@@ -39,7 +41,9 @@ void APlayerCharacter::BeginPlay()
 	HideAllWeapons();
 	ChangeToAbilitySlot0(); // the char equips his default ability
 	SetupMovement();
-	m_AbilityCooldownTimes.Init(0.0f, m_AbilityNum);
+	m_AbilityCooldownTimes.Init(0.0f, m_AbilityMax);
+	m_AbilityIcons.Init(nullptr, m_AbilityMax);
+	m_AbilityNames.Init(FText::FromString(TEXT("Empty")), m_AbilityMax);
 
 	if (m_playerUI)
 	{
@@ -90,16 +94,19 @@ void APlayerCharacter::ChangeToAbilitySlot0()
 
 void APlayerCharacter::ChangeToAbilitySlot1()
 {
+	if (m_AbilityNum < 2) return;
 	ChangeToAbilitySlot(1);
 }
 
 void APlayerCharacter::ChangeToAbilitySlot2()
 {
+	if (m_AbilityNum < 3) return;
 	ChangeToAbilitySlot(2);
 }
 
 void APlayerCharacter::ChangeToAbilitySlot3()
 {
+	if (m_AbilityNum < 4) return;
 	ChangeToAbilitySlot(3);
 }
 
@@ -112,16 +119,16 @@ void APlayerCharacter::ChangeToAbilitySlot(int32 a_Index)
 
 void APlayerCharacter::AbilitySlotIncrease()
 {
-	if (m_CurrentAbilitySlot == m_AbilityNum - 1) m_CurrentAbilitySlot = 0;
-	else if (m_CurrentAbilitySlot >= m_AbilityNum || m_CurrentAbilitySlot <= -1) m_CurrentAbilitySlot = 0;
+	if (m_CurrentAbilitySlot == m_AbilityMax - 1) m_CurrentAbilitySlot = 0;
+	else if (m_CurrentAbilitySlot >= m_AbilityMax || m_CurrentAbilitySlot <= -1) m_CurrentAbilitySlot = 0;
 	else m_CurrentAbilitySlot++;
 	m_PlayerAbilities->EquipAbility(m_CurrentAbilitySlot);
 }
 
 void APlayerCharacter::AbilitySlotDecrease()
 {
-	if (m_CurrentAbilitySlot == 0) m_CurrentAbilitySlot = m_AbilityNum - 1;
-	else if (m_CurrentAbilitySlot >= m_AbilityNum || m_CurrentAbilitySlot <= -1) m_CurrentAbilitySlot = 0;
+	if (m_CurrentAbilitySlot == 0) m_CurrentAbilitySlot = m_AbilityMax - 1;
+	else if (m_CurrentAbilitySlot >= m_AbilityMax || m_CurrentAbilitySlot <= -1) m_CurrentAbilitySlot = 0;
 	else m_CurrentAbilitySlot--;
 	m_PlayerAbilities->EquipAbility(m_CurrentAbilitySlot);
 }
@@ -165,9 +172,11 @@ void APlayerCharacter::Tick(float DeltaTime)
 		}
 	}
 
-	for (int i = 0; i < m_AbilityNum; i++)
+	for (int i = 0; i < m_AbilityMax; i++)
 	{
 		m_AbilityCooldownTimes[i] = m_PlayerAbilities->GetRemainingCooldownFromAbility(i);
+		m_AbilityIcons[i] = m_PlayerAbilities->GetAbilityIcon(i);
+		m_AbilityNames[i] = m_PlayerAbilities->GetAbilityName(i);
 	}
 
 	UpdatePlayerStamina(DeltaTime, speed, movementThreshold);
@@ -234,12 +243,12 @@ void APlayerCharacter::SetupPlayer()
 {
 	GetMesh()->SetSkeletalMesh(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_Mesh);
 	GetMesh()->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
-	m_PlayerAbilities->TryAddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility);
+	AddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility);
 
 	// only for debug purposes. the player would normally start with just 1 ability ( the m_StartingAbility)
-	m_PlayerAbilities->TryAddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility1Debug);
-	m_PlayerAbilities->TryAddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility2Debug);
-	m_PlayerAbilities->TryAddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility3Debug);
+	//AddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility1Debug);
+	//AddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility2Debug);
+	//AddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility3Debug);
 
 	// setup the player stats with the default values from the given data asset
 	ResetStatsToDefault();
@@ -435,21 +444,18 @@ void APlayerCharacter::ClearAlreadyHitActors()
 float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	float totalDmg = DamageAmount * (100 - m_PlayerDefense) / 100;
-	UE_LOG(LogTemp, Warning, TEXT("player got damage: %f"),totalDmg)
-	UE_LOG(LogTemp, Warning, TEXT("Player health: %f"),m_PlayerHealth)
-	m_PlayerHealth -= totalDmg;
-	if (m_PlayerHealth <= 0) m_PlayerHealth = 0;
-	UpdateHealthBar();
-	//UE_LOG(LogTemp, Warning, TEXT("Player was hit"))
-		if (DamageCauser)
-		{
-			FVector knockbackDirection = GetActorLocation() - DamageCauser->GetActorLocation();
-			knockbackDirection.Z = 0;
-			knockbackDirection.Normalize();
-			HandleKnockback(knockbackDirection, 0.0f /*get knockback strengh from damage causer*/);
-			//ACharacter* damagingUnit = Cast<ACharacter>(DamageCauser);
-			//damagingUnit->GetKnockback();
-		}
+	UE_LOG(LogTemp, Warning, TEXT("player got damage: %f"), totalDmg)
+	UE_LOG(LogTemp, Warning, TEXT("Player health: %f"), m_PlayerHealth)
+	TryAddPlayerHealth(totalDmg * -1); // "adds" negative health 
+	if (DamageCauser)
+	{
+		FVector knockbackDirection = GetActorLocation() - DamageCauser->GetActorLocation();
+		knockbackDirection.Z = 0;
+		knockbackDirection.Normalize();
+		HandleKnockback(knockbackDirection, 0.0f /*get knockback strengh from damage causer*/);
+		//ACharacter* damagingUnit = Cast<ACharacter>(DamageCauser);
+		//damagingUnit->GetKnockback();
+	}
 
 	return totalDmg;
 }
@@ -522,16 +528,60 @@ void APlayerCharacter::SetupChangedPlayerClass()
 	GetMesh()->SetSkeletalMesh(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_Mesh);
 	GetMesh()->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
 	m_PlayerAbilities->RemoveAllAbilities();
-	m_PlayerAbilities->TryAddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility);
+	AddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility);
 
 	// only for debug purposes. the player would normally start with just 1 ability ( the m_StartingAbility)
-	m_PlayerAbilities->TryAddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility1Debug);
-	m_PlayerAbilities->TryAddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility2Debug);
-	m_PlayerAbilities->TryAddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility3Debug);
+	//AddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility1Debug);
+	//AddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility2Debug);
+	//AddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility3Debug);
 
 	// setup the player stats with the default values from the given data asset
 	ResetStatsToDefault();
 	ChangeToAbilitySlot0();
+}
+
+void APlayerCharacter::FillAbilityLevelMap()
+{
+	if (!m_AbilityLevels.IsEmpty()) return; // if we have a savegame, we can sync the map with the save file before calling this method.
+	for (int i = 0; i < (int)EAllAbilities::ENUMLENGTH; i++)
+	{
+		int level = 1;
+		m_AbilityLevels.Add(EAllAbilities(i), level);
+	}
+}
+
+void APlayerCharacter::AddAbilityDirect(TSubclassOf<UBaseAbility> a_Ability)
+{
+	if (m_AbilityNum >= m_AbilityMax) return;
+	m_PlayerAbilities->TryAddAbility(a_Ability);
+	m_AbilityNum++;
+}
+
+void APlayerCharacter::AddAbility(UMainAbilityContainerDataAsset* a_Ability)
+{
+	UE_LOG(LogTemp, Warning, TEXT("AAAAAAAAAAAAAAAAAA0"))
+	if (m_AbilityNum >= m_AbilityMax) return;
+	UE_LOG(LogTemp, Warning, TEXT("AAAAAAAAAAAAAAAAAA1"))
+	EAllAbilities abilityType = a_Ability->GetAbilityType();
+	int abilityLvl = m_AbilityLevels.FindRef(abilityType);
+	TSubclassOf<UBaseAbility> ability = a_Ability->GetAbility(abilityLvl);
+	if (!m_PlayerAbilities->TryAddAbility(ability))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AAAAAAAAAAAAAAAAAA2"))
+		ChangeAbilityLevel(abilityType, 1);
+		if (m_AbilityLevels.FindRef(abilityType) == abilityLvl) return; // ability is already lvl3
+		m_PlayerAbilities->RemoveAbility(ability); // removing the lower lvl ability
+		AddAbility(a_Ability); // adding the new ability
+		return;
+	}
+	m_AbilityNum++;
+}
+
+void APlayerCharacter::ChangeAbilityLevel(EAllAbilities a_Ability, int a_Value)
+{
+	if (!m_AbilityLevels.Find(a_Ability) || m_AbilityLevels[a_Ability] >= 3) return;
+
+	m_AbilityLevels[a_Ability] += a_Value;
 }
 
 void APlayerCharacter::TryAddPlayerHealth(float a_Amount)
@@ -561,8 +611,10 @@ void APlayerCharacter::ChangeToPlayerClassC()
 
 void APlayerCharacter::ChangeToPlayerClassD()
 {
-	m_CurrentPlayerClass = 3;
-	SetupChangedPlayerClass();
+	//testing only!!
+	AddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility1Debug);
+	//m_CurrentPlayerClass = 3;
+	//SetupChangedPlayerClass();
 }
 
 bool APlayerCharacter::CheckIfCurrentPlayerClassIsValid()
