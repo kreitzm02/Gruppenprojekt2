@@ -5,7 +5,9 @@
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
 #include "BaseAbility.h"
+#include "MainAbilityContainerDataAsset.h"
 #include "PlayerCharDataAsset.generated.h"
+
 
 /**
  * 
@@ -44,16 +46,16 @@ public:
 	float m_BaseStamina;
 
 	UPROPERTY(EditAnywhere, Category = "Placeholders", meta = (DisplayName = "Starting Ability"))
-	TSubclassOf<UBaseAbility> m_StartingAbility;
+	UMainAbilityContainerDataAsset* m_StartingAbility;
 
 	UPROPERTY(EditAnywhere, Category = "Placeholders", meta = (DisplayName = "Debug Ability 1"))
-	TSubclassOf<UBaseAbility> m_StartingAbility1Debug;
+	UMainAbilityContainerDataAsset* m_StartingAbility1Debug;
 
 	UPROPERTY(EditAnywhere, Category = "Placeholders", meta = (DisplayName = "Debug Ability 2"))
-	TSubclassOf<UBaseAbility> m_StartingAbility2Debug;
+	UMainAbilityContainerDataAsset* m_StartingAbility2Debug;
 
 	UPROPERTY(EditAnywhere, Category = "Placeholders", meta = (DisplayName = "Debug Ability 3"))
-	TSubclassOf<UBaseAbility> m_StartingAbility3Debug;
+	UMainAbilityContainerDataAsset* m_StartingAbility3Debug;
 
 	UPROPERTY(EditAnywhere, Category = "Animations", meta = (DisplayName = "Idle Animation"))
 	UAnimSequence* m_IdleAnim;

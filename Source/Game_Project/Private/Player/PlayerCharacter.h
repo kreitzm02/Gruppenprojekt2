@@ -7,6 +7,7 @@
 #include "PlayerCharDataAsset.h"
 #include <Components/BoxComponent.h>
 #include "PlayerAnimInstance.h"
+#include "AllAbilities.h"
 #include "Widget_PlayerUI.h"
 #include "Blueprint/UserWidget.h"
 #include "PlayerCharacter.generated.h"
@@ -87,7 +88,7 @@ public:
 	void ChangeAttackDamage(float a_Value);
 	void ChangePlayerStamina(float a_Value);
 
-	void CheckForDeath(); // no functionality yet
+	void CheckForDeath();
 
 	// external way to see and react to player stats
 	float GetPlayerHealth() { return m_PlayerHealth; }
@@ -98,7 +99,7 @@ public:
 	float GetPlayerAttackDamage() { return m_AttackDamage; }
 	float GetPlayerStamina() { return m_PlayerStamina; }
 	void TryAddPlayerHealth(float a_Amount);
-	TArray<float> GetPlayerAbilityCooldownTimes() { return m_AbilityCooldownTimes; }
+	
 
 	// 
 	void ChangeToPlayerClassA();
@@ -118,6 +119,10 @@ private:
 
 	TArray<float> m_AbilityCooldownTimes;
 
+	TArray<UTexture2D*> m_AbilityIcons;
+
+	TArray<FText> m_AbilityNames;
+
 	UPROPERTY()
 	UBoxComponent* m_MeleeHitBox;
 
@@ -127,7 +132,9 @@ private:
 	float m_RunMultiplier = 1.5f;
 
 	UPROPERTY(EditAnywhere, Category = "General Player Settings")
-	int32 m_AbilityNum = 4;
+	int32 m_AbilityMax = 4;
+
+	int32 m_AbilityNum = 0;
 
 	int32 m_CurrentAbilitySlot = 0;
 
@@ -210,6 +217,8 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Basic Weapon Meshes")
 	UStaticMesh* m_Scythe;
 
+	UPROPERTY()
+	TMap<FName, UStaticMeshComponent*> m_AttachedWeapons;
 
 	// weapon setup helper functions
 
@@ -221,7 +230,7 @@ private:
 
 	void SetupChangedPlayerClass();
 
-	//
+	// ui
 
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<UUserWidget> m_playerUI = nullptr;
@@ -229,10 +238,31 @@ private:
 	UPROPERTY()
 	UWidget_PlayerUI* m_playerUIInstance = nullptr;
 
-	UPROPERTY()
-	TMap<FName, UStaticMeshComponent*> m_AttachedWeapons;
+	// abilities
 
+	TMap<EAllAbilities, int> m_AbilityLevels;
+
+	UFUNCTION()
+	void FillAbilityLevelMap();
+	
 public:
+
+	UFUNCTION()
+	void AddAbilityDirect(TSubclassOf<UBaseAbility> a_Ability);
+
+	UFUNCTION()
+	void AddAbility(UMainAbilityContainerDataAsset* a_Ability);
+
+	TArray<float> GetPlayerAbilityCooldownTimes() { return m_AbilityCooldownTimes; }
+
+	TArray<FText> GetPlayerAbilityNames() { return m_AbilityNames; }
+
+	TArray<UTexture2D*> GetPlayerAbilityIcons() { return m_AbilityIcons; }
+
+	void ChangeAbilityLevel(EAllAbilities a_Ability, int a_Value);
+
+	// player presets
+
 	UPROPERTY(EditAnywhere, Category = "Data Asset")
 	TArray<UPlayerCharDataAsset*> m_PlayerCharDataAssets;
 
