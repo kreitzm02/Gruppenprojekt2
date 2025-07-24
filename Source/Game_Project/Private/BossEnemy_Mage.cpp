@@ -55,7 +55,7 @@ void ABossEnemy_Mage::Tick(float DeltaTime)
 
 		if (m_passedCooldownTime >= m_abilityCooldown)
 		{
-			switch (FMath::RandRange(1, 1))
+			switch (FMath::RandRange(0, 0))
 			{
 			case 0:
 				m_burnGroundReady = true;
@@ -125,11 +125,11 @@ void ABossEnemy_Mage::FireFireball(AActor* a_target)
 void ABossEnemy_Mage::FireBurnGround(ACharacter* a_target)
 {
 	FTransform transform = FTransform(FRotator(0.0f, 0.0f, 0.0f), m_projectileSpawnPoint->GetComponentLocation(), FVector(1.0f, 1.0f, 1.0f));
-
+	
 	FVector targetPos = a_target->GetActorLocation();
 	targetPos.Z -= a_target->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
-
-	AEnemy_BurnGroundProjectile* burnGround = GetWorld()->SpawnActorDeferred<AEnemy_BurnGroundProjectile>(m_fireballBP, transform);
+	
+	AEnemy_BurnGroundProjectile* burnGround = GetWorld()->SpawnActorDeferred<AEnemy_BurnGroundProjectile>(m_burnGroundBP, transform);
 	burnGround->SetOwner(this);
 	burnGround->SetTargetPos(targetPos);
 	burnGround->SetFlightTime(m_burnGroundFlightTime);
