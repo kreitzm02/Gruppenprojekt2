@@ -21,7 +21,7 @@ void AEnemy_ProjectileBase::OnConstruction(const FTransform& Transform)
 	Super::OnConstruction(Transform);
 
 	m_projectileMesh->SetRelativeRotation(m_arrowRotation);
-	m_projectileHitbox->SetRelativeScale3D(m_hitboxSize);
+	m_projectileHitbox->SetRelativeScale3D(m_hitboxBoxSize);
 	m_projectileMesh->SetRelativeScale3D(m_arrowSize);
 }
 

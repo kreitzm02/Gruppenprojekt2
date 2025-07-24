@@ -50,9 +50,11 @@ void AEnemyCharacter::OnConstruction(const FTransform& Transform)
 
 	FName boneName = FName("hand_r");
 
-	m_weaponMesh->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, boneName);
-	m_weaponMesh->SetRelativeRotation(m_weaponRotation);
-
+	if (m_weaponMesh)
+	{
+		m_weaponMesh->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, boneName);
+		m_weaponMesh->SetRelativeRotation(m_weaponRotation);
+	}
 }
 
 // Called when the game starts or when spawned
@@ -64,6 +66,7 @@ void AEnemyCharacter::BeginPlay()
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Ignore);
 	m_skeletalMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
+	if (m_weaponMesh)
 	m_weaponMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
 
 	m_characterHitbox->OnComponentBeginOverlap.AddDynamic(this, &AEnemyCharacter::OnHit);

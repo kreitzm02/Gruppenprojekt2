@@ -26,6 +26,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void OnConstruction(const FTransform& Transform) override;
+
 private:
 	virtual void MoveInDirection(float a_deltaTime) override;
 };
