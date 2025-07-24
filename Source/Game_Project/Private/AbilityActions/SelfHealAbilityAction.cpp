@@ -10,14 +10,20 @@ void USelfHealAbilityAction::PrepareAbilityAction(AActor* a_AbilityUser)
 	Super::PrepareAbilityAction(a_AbilityUser);
 	if (APlayerCharacter* player = Cast<APlayerCharacter>(a_AbilityUser))
 	{
-		player->HideAllWeaponsExcept(GetWeaponMeshName());
+		player->HideAllWeaponsExcept(GetWeaponMeshName(m_WeaponMeshName));
 
-		if (m_AnimName == ESelfHealAnimationNames::ANIM_SPELLCAST_LONG)
+		if (m_AnimName == EAAAnimationNames::ANIM_SPELLCAST_LONG)
 			m_AttackMontage = player->m_LongSpellcastMontage;
-		else if (m_AnimName == ESelfHealAnimationNames::ANIM_SPELLCAST_RAISE)
+		else if (m_AnimName == EAAAnimationNames::ANIM_SPELLCAST_RAISE)
 			m_AttackMontage = player->m_RaiseSpellcastMontage;
-		else if (m_AnimName == ESelfHealAnimationNames::ANIM_SPELLCAST_SHOOT)
+		else if (m_AnimName == EAAAnimationNames::ANIM_SPELLCAST_SHOOT)
 			m_AttackMontage = player->m_ShootSpellcastMontage;
+		else if (m_AnimName == EAAAnimationNames::ANIM_1H_MELEE_ATTACK_STAB)
+			m_AttackMontage = player->m_StabAttackMontage;
+		else if (m_AnimName == EAAAnimationNames::ANIM_1H_MELEE_ATTACK_CHOP)
+			m_AttackMontage = player->m_ChopAttackMontage;
+		else if (m_AnimName == EAAAnimationNames::ANIM_1H_MELEE_ATTACK_SLICE_DIAGONAL)
+			m_AttackMontage = player->m_SliceAttackMontage;
 	}
 }
 
@@ -29,41 +35,11 @@ void USelfHealAbilityAction::PlayAbilityAction(AActor* a_AbilityUser)
 	a_AbilityUser->GetWorld()->GetTimerManager().SetTimer(m_StartTimerHandle, FTimerDelegate::CreateUObject(this, &USelfHealAbilityAction::PlaySelfHeal, a_AbilityUser), m_StartingDelay, false);
 }
 
-FName USelfHealAbilityAction::GetWeaponMeshName() const
+void USelfHealAbilityAction::EndAbilityAction(AActor* a_AbilityUser)
 {
-	switch (m_WeaponMeshName)
-	{
-	case ESelfHealWeaponNames::MESH_CUSTOM:
-		return m_CustomWeaponMeshName;
-		break;
-	case ESelfHealWeaponNames::MESH_1H_AXE:
-		return FName("1H_Axe");
-		break;
-	case ESelfHealWeaponNames::MESH_1H_CROSSBOW:
-		return FName("1H_Crossbow");
-		break;
-	case ESelfHealWeaponNames::MESH_1H_DAGGER:
-		return FName("1H_Dagger");
-		break;
-	case ESelfHealWeaponNames::MESH_1H_SCYTHE:
-		return FName("1H_Scythe");
-		break;
-	case ESelfHealWeaponNames::MESH_1H_SWORD:
-		return FName("1H_Sword");
-		break;
-	case ESelfHealWeaponNames::MESH_1H_WAND:
-		return FName("1H_Wand");
-		break;
-	case ESelfHealWeaponNames::MESH_2H_MACE:
-		return FName("2H_Mace");
-		break;
-	case ESelfHealWeaponNames::MESH_2H_STAFF:
-		return FName("2H_Staff");
-		break;
-	default:
-		return FName("1H_Axe");
-		break;
-	}
+	a_AbilityUser->GetWorld()->GetTimerManager().ClearTimer(m_MoveTimerHandle);
+	a_AbilityUser->GetWorld()->GetTimerManager().ClearTimer(m_StartTimerHandle);
+	UE_LOG(LogTemp, Warning, TEXT("Damage Circle Ability Action Ended"));
 }
 
 void USelfHealAbilityAction::PlaySelfHeal(AActor* a_AbilityUser)
@@ -87,12 +63,5 @@ void USelfHealAbilityAction::MoveSelfHeal(AActor* a_AbilityUser)
 {
 	m_VFXComp->SetWorldLocation(a_AbilityUser->GetActorLocation() - FVector(0.0f, 0.0f, 50.0f));
 
-	if (!IsValid(m_VFXComp)) EndSelfHeal(a_AbilityUser);
-}
-
-void USelfHealAbilityAction::EndSelfHeal(AActor* a_AbilityUser)
-{
-	a_AbilityUser->GetWorld()->GetTimerManager().ClearTimer(m_MoveTimerHandle);
-	a_AbilityUser->GetWorld()->GetTimerManager().ClearTimer(m_StartTimerHandle);
-	UE_LOG(LogTemp, Warning, TEXT("Damage Circle Ability Action Ended"));
+	if (!IsValid(m_VFXComp)) EndAbilityAction(a_AbilityUser);
 }

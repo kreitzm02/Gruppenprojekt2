@@ -5,56 +5,25 @@
 #include <NiagaraFunctionLibrary.h>
 #include <Player/PlayerCharacter.h>
 
-FName UStaminaAbilityAction::GetWeaponMeshName() const
-{
-	switch (m_WeaponMeshName)
-	{
-	case EStaminaWeaponNames::MESH_CUSTOM:
-		return m_CustomWeaponMeshName;
-		break;
-	case EStaminaWeaponNames::MESH_1H_AXE:
-		return FName("1H_Axe");
-		break;
-	case EStaminaWeaponNames::MESH_1H_CROSSBOW:
-		return FName("1H_Crossbow");
-		break;
-	case EStaminaWeaponNames::MESH_1H_DAGGER:
-		return FName("1H_Dagger");
-		break;
-	case EStaminaWeaponNames::MESH_1H_SCYTHE:
-		return FName("1H_Scythe");
-		break;
-	case EStaminaWeaponNames::MESH_1H_SWORD:
-		return FName("1H_Sword");
-		break;
-	case EStaminaWeaponNames::MESH_1H_WAND:
-		return FName("1H_Wand");
-		break;
-	case EStaminaWeaponNames::MESH_2H_MACE:
-		return FName("2H_Mace");
-		break;
-	case EStaminaWeaponNames::MESH_2H_STAFF:
-		return FName("2H_Staff");
-		break;
-	default:
-		return FName("1H_Axe");
-		break;
-	}
-}
-
 void UStaminaAbilityAction::PrepareAbilityAction(AActor* a_AbilityUser)
 {
 	Super::PrepareAbilityAction(a_AbilityUser);
 	if (APlayerCharacter* player = Cast<APlayerCharacter>(a_AbilityUser))
 	{
-		player->HideAllWeaponsExcept(GetWeaponMeshName());
+		player->HideAllWeaponsExcept(GetWeaponMeshName(m_WeaponMeshName));
 
-		if (m_AnimName == EStaminaAnimationNames::ANIM_SPELLCAST_LONG)
+		if (m_AnimName == EAAAnimationNames::ANIM_SPELLCAST_LONG)
 			m_AttackMontage = player->m_LongSpellcastMontage;
-		else if (m_AnimName == EStaminaAnimationNames::ANIM_SPELLCAST_RAISE)
+		else if (m_AnimName == EAAAnimationNames::ANIM_SPELLCAST_RAISE)
 			m_AttackMontage = player->m_RaiseSpellcastMontage;
-		else if (m_AnimName == EStaminaAnimationNames::ANIM_SPELLCAST_SHOOT)
+		else if (m_AnimName == EAAAnimationNames::ANIM_SPELLCAST_SHOOT)
 			m_AttackMontage = player->m_ShootSpellcastMontage;
+		else if (m_AnimName == EAAAnimationNames::ANIM_1H_MELEE_ATTACK_STAB)
+			m_AttackMontage = player->m_StabAttackMontage;
+		else if (m_AnimName == EAAAnimationNames::ANIM_1H_MELEE_ATTACK_CHOP)
+			m_AttackMontage = player->m_ChopAttackMontage;
+		else if (m_AnimName == EAAAnimationNames::ANIM_1H_MELEE_ATTACK_SLICE_DIAGONAL)
+			m_AttackMontage = player->m_SliceAttackMontage;
 	}
 }
 
@@ -64,6 +33,13 @@ void UStaminaAbilityAction::PlayAbilityAction(AActor* a_AbilityUser)
 	if (!m_StaminaVFX || !a_AbilityUser) return;
 
 	a_AbilityUser->GetWorld()->GetTimerManager().SetTimer(m_StartTimerHandle, FTimerDelegate::CreateUObject(this, &UStaminaAbilityAction::PlayStamina, a_AbilityUser), m_StartingDelay, false);
+}
+
+void UStaminaAbilityAction::EndAbilityAction(AActor* a_AbilityUser)
+{
+	a_AbilityUser->GetWorld()->GetTimerManager().ClearTimer(m_MoveTimerHandle);
+	a_AbilityUser->GetWorld()->GetTimerManager().ClearTimer(m_StartTimerHandle);
+	UE_LOG(LogTemp, Warning, TEXT("Stamina Ability Action Ended"));
 }
 
 void UStaminaAbilityAction::PlayStamina(AActor* a_AbilityUser)
@@ -87,12 +63,5 @@ void UStaminaAbilityAction::MoveStamina(AActor* a_AbilityUser)
 {
 	m_VFXComp->SetWorldLocation(a_AbilityUser->GetActorLocation() - FVector(0.0f, 0.0f, 50.0f));
 
-	if (!IsValid(m_VFXComp)) EndStamina(a_AbilityUser);
-}
-
-void UStaminaAbilityAction::EndStamina(AActor* a_AbilityUser)
-{
-	a_AbilityUser->GetWorld()->GetTimerManager().ClearTimer(m_MoveTimerHandle);
-	a_AbilityUser->GetWorld()->GetTimerManager().ClearTimer(m_StartTimerHandle);
-	UE_LOG(LogTemp, Warning, TEXT("Stamina Ability Action Ended"));
+	if (!IsValid(m_VFXComp)) EndAbilityAction(a_AbilityUser);
 }

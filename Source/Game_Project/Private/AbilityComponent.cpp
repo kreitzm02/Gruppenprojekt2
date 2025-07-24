@@ -56,7 +56,7 @@ void UAbilityComponent::EquipAbility(int32 a_Index)
 bool UAbilityComponent::TryAddAbility(TSubclassOf<UBaseAbility> a_AbilityClass)
 {
 	if (!a_AbilityClass || !GetOwner()) return false;
-
+	UE_LOG(LogTemp, Warning, TEXT("TryAddAbility was called"));
 	for (UBaseAbility* existingAbility : m_Abilities)
 	{
 		if (existingAbility && existingAbility->GetClass() == a_AbilityClass) return false;
@@ -64,13 +64,14 @@ bool UAbilityComponent::TryAddAbility(TSubclassOf<UBaseAbility> a_AbilityClass)
 
 	UBaseAbility* newAbility = NewObject<UBaseAbility>(this, a_AbilityClass);
 	if (!newAbility) return false;
-
+	UE_LOG(LogTemp, Warning, TEXT("New ability added"));
 	m_Abilities.Add(newAbility);
 	return true;
 }
 
 void UAbilityComponent::RemoveAllAbilities()
 {
+	for (UBaseAbility* ability : m_Abilities) ability->ForceEndAbility(this->GetOwner());
 	m_Abilities.Empty();
 }
 
@@ -105,5 +106,12 @@ UTexture2D* UAbilityComponent::GetAbilityIcon(int32 a_Index)
 	if (m_Abilities.IsValidIndex(a_Index))
 		return m_Abilities[a_Index]->m_AbilityIcon;
 	else return nullptr;
+}
+
+float UAbilityComponent::GetAbilityCooldown(int32 a_Index)
+{
+	if (m_Abilities.IsValidIndex(a_Index))
+		return m_Abilities[a_Index]->m_CooldownTime;
+	else return -1;
 }
 

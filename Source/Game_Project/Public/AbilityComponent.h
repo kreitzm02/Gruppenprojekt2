@@ -52,6 +52,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
 	UTexture2D* GetAbilityIcon(int32 a_Index);
 
+	UFUNCTION(BlueprintCallable, Category = "Abilities")
+	float GetAbilityCooldown(int32 a_Index);
+
 private:
 	UPROPERTY(EditAnywhere)
 	TArray<UBaseAbility*> m_Abilities;

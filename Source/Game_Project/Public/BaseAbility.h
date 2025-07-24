@@ -38,6 +38,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Ability")
 	float GetCooldownTime(UWorld* a_World);
 
+	UFUNCTION(BlueprintCallable, Category = "Ability")
+	void ForceEndAbility(AActor* a_AbilityUser);
+
 private:
 	bool m_IsOnCooldown = false;
 

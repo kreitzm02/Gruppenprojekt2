@@ -40,6 +40,14 @@ float UBaseAbility::GetCooldownTime(UWorld* a_World)
 	return a_World->GetTimerManager().GetTimerElapsed(m_CooldownTimerHandle);
 }
 
+void UBaseAbility::ForceEndAbility(AActor* a_AbilityUser)
+{
+	for (UBaseAbilityAction* action : m_AbilityActions)
+	{
+		action->EndAbilityAction(a_AbilityUser);
+	}
+}
+
 void UBaseAbility::StartCooldown(UWorld* a_World)
 {
 	if (!a_World || m_CooldownTime <= 0.0f) return;
