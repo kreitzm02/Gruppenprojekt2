@@ -30,7 +30,7 @@ private:
 	
 	UPROPERTY(EditAnywhere, Category = "Abilities", meta = (DisplayName = "Level 2 Version"))
 	TSubclassOf<UBaseAbility> m_LVL2;
-
+	
 	UPROPERTY(EditAnywhere, Category = "Abilities", meta = (DisplayName = "Level 3 Version"))
 	TSubclassOf<UBaseAbility> m_LVL3;
 
@@ -41,6 +41,4 @@ public:
 	FString GetDisplayName() { return m_DisplayName; }
 	UFUNCTION(BlueprintCallable)
 	EAllAbilities GetAbilityType() { return m_ThisAbility; }
-	//UFUNCTION(BlueprintCallable)
-	//TSubclassOf<UBaseAbility> GetAbility(int a_Lvl);
 };

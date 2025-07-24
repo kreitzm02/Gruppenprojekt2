@@ -13,14 +13,22 @@ void UDamageBallAbilityAction::PrepareAbilityAction(AActor* a_AbilityUser)
 	Super::PrepareAbilityAction(a_AbilityUser);
 	if (APlayerCharacter* player = Cast<APlayerCharacter>(a_AbilityUser))
 	{
-		player->HideAllWeaponsExcept(GetWeaponMeshName());
+		forceDestroyActive = false;
 
-		if (m_AnimName == EDamageBallAnimationNames::ANIM_SPELLCAST_LONG)
+		player->HideAllWeaponsExcept(GetWeaponMeshName(m_WeaponMeshName));
+
+		if (m_AnimName == EAAAnimationNames::ANIM_SPELLCAST_LONG)
 			m_AttackMontage = player->m_LongSpellcastMontage;
-		else if (m_AnimName == EDamageBallAnimationNames::ANIM_SPELLCAST_RAISE)
+		else if (m_AnimName == EAAAnimationNames::ANIM_SPELLCAST_RAISE)
 			m_AttackMontage = player->m_RaiseSpellcastMontage;
-		else if (m_AnimName == EDamageBallAnimationNames::ANIM_SPELLCAST_SHOOT)
+		else if (m_AnimName == EAAAnimationNames::ANIM_SPELLCAST_SHOOT)
 			m_AttackMontage = player->m_ShootSpellcastMontage;
+		else if (m_AnimName == EAAAnimationNames::ANIM_1H_MELEE_ATTACK_STAB)
+			m_AttackMontage = player->m_StabAttackMontage;
+		else if (m_AnimName == EAAAnimationNames::ANIM_1H_MELEE_ATTACK_CHOP)
+			m_AttackMontage = player->m_ChopAttackMontage;
+		else if (m_AnimName == EAAAnimationNames::ANIM_1H_MELEE_ATTACK_SLICE_DIAGONAL)
+			m_AttackMontage = player->m_SliceAttackMontage;
 	}
 }
 
@@ -31,41 +39,9 @@ void UDamageBallAbilityAction::PlayAbilityAction(AActor* a_AbilityUser)
 	a_AbilityUser->GetWorld()->GetTimerManager().SetTimer(m_StartTimerHandle, FTimerDelegate::CreateUObject(this, &UDamageBallAbilityAction::PlayDamageBall, a_AbilityUser), m_Delay, false);
 }
 
-FName UDamageBallAbilityAction::GetWeaponMeshName() const
+void UDamageBallAbilityAction::EndAbilityAction(AActor* a_AbilityUser)
 {
-	switch (m_WeaponMeshName)
-	{
-	case EDamageBallWeaponNames::MESH_CUSTOM:
-		return m_CustomWeaponMeshName;
-		break;
-	case EDamageBallWeaponNames::MESH_1H_AXE:
-		return FName("1H_Axe");
-		break;
-	case EDamageBallWeaponNames::MESH_1H_CROSSBOW:
-		return FName("1H_Crossbow");
-		break;
-	case EDamageBallWeaponNames::MESH_1H_DAGGER:
-		return FName("1H_Dagger");
-		break;
-	case EDamageBallWeaponNames::MESH_1H_SCYTHE:
-		return FName("1H_Scythe");
-		break;
-	case EDamageBallWeaponNames::MESH_1H_SWORD:
-		return FName("1H_Sword");
-		break;
-	case EDamageBallWeaponNames::MESH_1H_WAND:
-		return FName("1H_Wand");
-		break;
-	case EDamageBallWeaponNames::MESH_2H_MACE:
-		return FName("2H_Mace");
-		break;
-	case EDamageBallWeaponNames::MESH_2H_STAFF:
-		return FName("2H_Staff");
-		break;
-	default:
-		return FName("1H_Axe");
-		break;
-	}
+	forceDestroyActive = true;
 }
 
 void UDamageBallAbilityAction::PlayDamageBall(AActor* a_AbilityUser)
@@ -132,7 +108,7 @@ void UDamageBallAbilityAction::PlayDamageBall(AActor* a_AbilityUser)
 			if (wallHit)
 			{
 				AActor* hitActor = hit.GetActor();
-				if (ballInstance->m_HitCount >= m_CollisionsBeforeDestruction)
+				if (ballInstance->m_HitCount >= m_CollisionsBeforeDestruction || forceDestroyActive)
 				{
 					if (ballInstance->m_VFXComp)
 					{
