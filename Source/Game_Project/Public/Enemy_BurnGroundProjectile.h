@@ -27,7 +27,16 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION()
-	void OnHit(UPrimitiveComponent* a_overlappedComponent, AActor* a_otherActor, UPrimitiveComponent* a_otherComp, int32 a_otherBodyIndex, bool a_bFromSweep, const FHitResult& a_sweepResult);
+	void OnHit();
+
+	UFUNCTION()
+	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+		bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	void SetOwner(AEnemyCharacter* a_owner) { m_owner = a_owner; }
 
@@ -38,6 +47,11 @@ public:
 	void SetLifetime(float a_lifetime) { m_lifetime = a_lifetime; }
 
 private:
+	FTimerHandle m_triggerTimerHandle;
+
+	UPROPERTY()
+	AActor* m_overlappedActor = nullptr;
+
 	UPROPERTY(EditAnywhere, Category = "Debug")
 	bool m_enableDebug = true;
 
@@ -67,10 +81,8 @@ private:
 	UPROPERTY()
 	AEnemyCharacter* m_owner = nullptr;
 
-	UPROPERTY()
 	FVector m_projectileStartPos = FVector::OneVector;
 
-	UPROPERTY()
 	FVector m_projectileTargetPos = FVector::OneVector;
 
 	UPROPERTY(VisibleAnywhere)

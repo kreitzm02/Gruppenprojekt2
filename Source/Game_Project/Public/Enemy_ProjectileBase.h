@@ -52,7 +52,10 @@ protected:
 	FRotator m_arrowRotation = FRotator::ZeroRotator;
 
 	UPROPERTY(EditAnywhere, Category = "Projectile Settings")
-	FVector m_hitboxSize = FVector::OneVector;
+	FVector m_hitboxBoxSize = FVector::OneVector;
+
+	UPROPERTY(EditAnywhere, Category = "Projectile Settings")
+	float m_hitboxSphereSize = 1.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Projectile Settings")
 	FVector m_arrowSize = FVector::OneVector;
