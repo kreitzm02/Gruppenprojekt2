@@ -21,6 +21,9 @@ public:
 	FText m_AbilityName;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability")
+	UTexture2D* m_AbilityIcon;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability")
 	float m_CooldownTime = 1.0f;
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")

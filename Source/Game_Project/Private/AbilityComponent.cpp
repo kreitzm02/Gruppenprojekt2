@@ -53,19 +53,20 @@ void UAbilityComponent::EquipAbility(int32 a_Index)
 	}
 }
 
-void UAbilityComponent::TryAddAbility(TSubclassOf<UBaseAbility> a_AbilityClass)
+bool UAbilityComponent::TryAddAbility(TSubclassOf<UBaseAbility> a_AbilityClass)
 {
-	if (!a_AbilityClass || !GetOwner()) return;
+	if (!a_AbilityClass || !GetOwner()) return false;
 
 	for (UBaseAbility* existingAbility : m_Abilities)
 	{
-		if (existingAbility && existingAbility->GetClass() == a_AbilityClass) return;
+		if (existingAbility && existingAbility->GetClass() == a_AbilityClass) return false;
 	}
 
 	UBaseAbility* newAbility = NewObject<UBaseAbility>(this, a_AbilityClass);
-	if (!newAbility) return;
+	if (!newAbility) return false;
 
 	m_Abilities.Add(newAbility);
+	return true;
 }
 
 void UAbilityComponent::RemoveAllAbilities()
@@ -73,8 +74,36 @@ void UAbilityComponent::RemoveAllAbilities()
 	m_Abilities.Empty();
 }
 
+void UAbilityComponent::RemoveAbility(TSubclassOf<UBaseAbility> a_AbilityClass)
+{
+	for (int i = m_Abilities.Num() - 1; i >= 0; i--)
+	{
+		if (m_Abilities[i] && m_Abilities[i]->GetClass() == a_AbilityClass)
+		{
+			m_Abilities.RemoveAt(i);
+			return;
+		}
+	}
+}
+
 float UAbilityComponent::GetRemainingCooldownFromAbility(int32 a_Index)
 {
-	return m_Abilities[a_Index]->GetCooldownTime(GetOwner()->GetWorld());
+	if (m_Abilities.IsValidIndex(a_Index))
+		return m_Abilities[a_Index]->GetCooldownTime(GetOwner()->GetWorld());
+	else return -1;
+}
+
+FText UAbilityComponent::GetAbilityName(int32 a_Index)
+{
+	if (m_Abilities.IsValidIndex(a_Index))
+		return m_Abilities[a_Index]->m_AbilityName;
+	else return FText::FromString(TEXT("Invalid Ability Name"));
+}
+
+UTexture2D* UAbilityComponent::GetAbilityIcon(int32 a_Index)
+{
+	if (m_Abilities.IsValidIndex(a_Index))
+		return m_Abilities[a_Index]->m_AbilityIcon;
+	else return nullptr;
 }
 
