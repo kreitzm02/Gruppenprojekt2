@@ -6,29 +6,6 @@
 #include "AbilityActions/BaseAbilityAction.h"
 #include "DamageCircleAbilityAction.generated.h"
 
-UENUM(BlueprintType)
-enum class EDamageCircleWeaponNames : uint8
-{
-	MESH_1H_AXE			UMETA(DisplayName = "1H_Axe"),
-	MESH_1H_SWORD		UMETA(DisplayName = "1H_Sword"),
-	MESH_1H_WAND		UMETA(DisplayName = "1H_Wand"),
-	MESH_1H_CROSSBOW	UMETA(DisplayName = "1H_Crossbow"),
-	MESH_KNIFE			UMETA(DisplayName = "Knife"),
-	MESH_2H_MACE		UMETA(DisplayName = "2H_Mace"),
-	MESH_2H_STAFF		UMETA(DisplayName = "2H_Staff"),
-	MESH_1H_DAGGER		UMETA(DisplayName = "1H_Dagger"),
-	MESH_1H_SCYTHE		UMETA(DisplayName = "1H_Scythe"),
-	MESH_CUSTOM			UMETA(DisplayName = "Custom - Use the FTEXT field. Must be the exact weapon name!")
-};
-
-UENUM(BlueprintType)
-enum class EDamageCircleAnimationNames : uint8
-{
-	ANIM_SPELLCAST_LONG		UMETA(DisplayName = "Spellcast_Long"),
-	ANIM_SPELLCAST_RAISE	UMETA(DisplayName = "Spellcast_Raise"),
-	ANIM_SPELLCAST_SHOOT	UMETA(DisplayName = "Spellcast_Shoot")
-};
-
 UCLASS(Blueprintable, EditInlineNew)
 class UDamageCircleAbilityAction : public UBaseAbilityAction
 {
@@ -60,21 +37,17 @@ public:
 	bool m_CircleFollowsUser;
 
 	UPROPERTY(EditAnywhere, Category = "Damage Circle Action Settings", meta = (DisplayName = "Weapon Mesh Name"))
-	EDamageCircleWeaponNames m_WeaponMeshName;
-
-	UPROPERTY(EditAnywhere, Category = "Damage Circle Action Settings", meta = (DisplayName = "Custom Weapon Mesh Name", EditCondition = "m_WeaponMeshName == EDamageCircleWeaponNames::MESH_CUSTOM", EditConditionHides))
-	FName m_CustomWeaponMeshName;
+	EAAWeaponNames m_WeaponMeshName;
 
 	UPROPERTY(EditAnywhere, Category = "Damage Circle Action Settings", meta = (DisplayName = "Animation Name"))
-	EDamageCircleAnimationNames m_AnimName;
+	EAAAnimationNames m_AnimName;
 
-	FName GetWeaponMeshName() const;
-	void EndAbilityAction();
 	void DrawDebug(AActor* a_AbilityUser);
 	void MoveCircle(AActor* a_AbilityUser);
 
 	virtual void PrepareAbilityAction(AActor* a_AbilityUser) override;
 	virtual void PlayAbilityAction(AActor* a_AbilityUser) override;
+	virtual void EndAbilityAction(AActor* a_AbilityUser) override;
 
 private:
 

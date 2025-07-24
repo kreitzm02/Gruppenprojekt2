@@ -42,6 +42,7 @@ void APlayerCharacter::BeginPlay()
 	ChangeToAbilitySlot0(); // the char equips his default ability
 	SetupMovement();
 	m_AbilityCooldownTimes.Init(0.0f, m_AbilityMax);
+	m_AbilityMaxCooldownTimes.Init(0.0f, m_AbilityMax);
 	m_AbilityIcons.Init(nullptr, m_AbilityMax);
 	m_AbilityNames.Init(FText::FromString(TEXT("Empty")), m_AbilityMax);
 
@@ -50,9 +51,60 @@ void APlayerCharacter::BeginPlay()
 		m_playerUIInstance = CreateWidget<UWidget_PlayerUI>(GetWorld(),m_playerUI);
 		m_playerUIInstance->AddToViewport();
 	}
+
+	m_PlayerTotalExp = m_PlayerLevelExp = 0;
+	m_ExpForLevelUp = m_ExpLevelBarrier = 500;
 }
 
-// INPUT 
+// Called every frame
+void APlayerCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (!CheckIfCurrentPlayerClassIsValid())
+	{
+		UE_LOG(LogTemp, Fatal, TEXT("Fatal error: Current player class index is not valid!"));
+	}
+
+	const FVector currentLocation = GetActorLocation();
+	const float speed = FVector::Dist(currentLocation, m_PreviousLocation) / DeltaTime;
+	m_PreviousLocation = currentLocation;
+	const float movementThreshold = 0.0f;
+
+	if (m_AnimInstance)
+	{
+		m_AnimInstance->m_IsRunning = m_PlayerShouldSprint && m_PlayerStamina > 2.0f;
+		m_AnimInstance->m_IsWalking = (m_PlayerShouldSprint && m_PlayerStamina <= 1.0f) || (!m_PlayerShouldSprint && speed > 0.1f);
+		// to avoid t posing when no montage is playing in upper body slot
+		float targetWeight = m_AnimInstance->Montage_IsPlaying(nullptr) ? 1.0f : 0.0f;
+		m_AnimInstance->m_BlendWeight = FMath::FInterpTo(m_AnimInstance->m_BlendWeight, targetWeight, DeltaTime, 9.5f);
+		m_AnimInstance->m_PlayerAlive = m_IsPlayerAlive;
+	}
+
+	CheckForDeath();
+
+	if (UAnimMontage* activeMontage = m_AnimInstance->GetCurrentActiveMontage())
+	{
+		float progress = m_AnimInstance->Montage_GetPosition(activeMontage) / activeMontage->GetPlayLength();
+
+		if (progress > 0.9f)
+		{
+			HideMeleeHitbox();
+		}
+	}
+
+	for (int i = 0; i < m_AbilityMax; i++)
+	{
+		m_AbilityCooldownTimes[i] = m_PlayerAbilities->GetRemainingCooldownFromAbility(i);
+		m_AbilityIcons[i] = m_PlayerAbilities->GetAbilityIcon(i);
+		m_AbilityNames[i] = m_PlayerAbilities->GetAbilityName(i);
+		m_AbilityMaxCooldownTimes[i] = m_PlayerAbilities->GetAbilityCooldown(i);
+	}
+	UpdatePlayerStamina(DeltaTime, speed, movementThreshold);
+	UpdatePlayerSpeed();
+}
+
+#pragma region INPUT
 
 void APlayerCharacter::MoveForward(float a_Value)
 {
@@ -110,78 +162,35 @@ void APlayerCharacter::ChangeToAbilitySlot3()
 	ChangeToAbilitySlot(3);
 }
 
-void APlayerCharacter::ChangeToAbilitySlot(int32 a_Index)
+void APlayerCharacter::ChangeToPlayerClassA()
 {
-	m_CurrentAbilitySlot = a_Index;
-	m_AttackDamage = m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_BaseAttackPoints; // reset current attack damage
-	m_PlayerAbilities->EquipAbility(a_Index); // new damage will be set here if needed
+	m_CurrentPlayerClass = 0;
+	SetupChangedPlayerClass();
 }
 
-void APlayerCharacter::AbilitySlotIncrease()
+void APlayerCharacter::ChangeToPlayerClassB()
 {
-	if (m_CurrentAbilitySlot == m_AbilityMax - 1) m_CurrentAbilitySlot = 0;
-	else if (m_CurrentAbilitySlot >= m_AbilityMax || m_CurrentAbilitySlot <= -1) m_CurrentAbilitySlot = 0;
-	else m_CurrentAbilitySlot++;
-	m_PlayerAbilities->EquipAbility(m_CurrentAbilitySlot);
+	m_CurrentPlayerClass = 1;
+	SetupChangedPlayerClass();
 }
 
-void APlayerCharacter::AbilitySlotDecrease()
+void APlayerCharacter::ChangeToPlayerClassC()
 {
-	if (m_CurrentAbilitySlot == 0) m_CurrentAbilitySlot = m_AbilityMax - 1;
-	else if (m_CurrentAbilitySlot >= m_AbilityMax || m_CurrentAbilitySlot <= -1) m_CurrentAbilitySlot = 0;
-	else m_CurrentAbilitySlot--;
-	m_PlayerAbilities->EquipAbility(m_CurrentAbilitySlot);
+	m_CurrentPlayerClass = 2;
+	SetupChangedPlayerClass();
 }
 
-//
-
-// Called every frame
-void APlayerCharacter::Tick(float DeltaTime)
+void APlayerCharacter::ChangeToPlayerClassD()
 {
-	Super::Tick(DeltaTime);
-
-	if (!CheckIfCurrentPlayerClassIsValid())
-	{
-		UE_LOG(LogTemp, Fatal, TEXT("Fatal error: Current player class index is not valid!"));
-	}
-
-	const FVector currentLocation = GetActorLocation();
-	const float speed = FVector::Dist(currentLocation, m_PreviousLocation) / DeltaTime;
-	m_PreviousLocation = currentLocation;
-	const float movementThreshold = 0.0f;
-
-	if (m_AnimInstance)
-	{
-		m_AnimInstance->m_IsRunning = m_PlayerShouldSprint && m_PlayerStamina > 2.0f;
-		m_AnimInstance->m_IsWalking = (m_PlayerShouldSprint && m_PlayerStamina <= 1.0f) || (!m_PlayerShouldSprint && speed > 0.1f);
-		// to avoid t posing when no montage is playing in upper body slot
-		float targetWeight = m_AnimInstance->Montage_IsPlaying(nullptr) ? 1.0f : 0.0f;
-		m_AnimInstance->m_BlendWeight = FMath::FInterpTo(m_AnimInstance->m_BlendWeight, targetWeight, DeltaTime, 9.5f);
-		m_AnimInstance->m_PlayerAlive = m_IsPlayerAlive;
-	}
-	
-	CheckForDeath();
-
-	if (UAnimMontage* activeMontage = m_AnimInstance->GetCurrentActiveMontage())
-	{
-		float progress = m_AnimInstance->Montage_GetPosition(activeMontage) / activeMontage->GetPlayLength();
-
-		if (progress > 0.9f)
-		{
-			HideMeleeHitbox();
-		}
-	}
-
-	for (int i = 0; i < m_AbilityMax; i++)
-	{
-		m_AbilityCooldownTimes[i] = m_PlayerAbilities->GetRemainingCooldownFromAbility(i);
-		m_AbilityIcons[i] = m_PlayerAbilities->GetAbilityIcon(i);
-		m_AbilityNames[i] = m_PlayerAbilities->GetAbilityName(i);
-	}
-
-	UpdatePlayerStamina(DeltaTime, speed, movementThreshold);
-	UpdatePlayerSpeed();
+	//testing only!!
+	AddExperiencePoints(200);
+	//m_CurrentPlayerClass = 3;
+	//SetupChangedPlayerClass();
 }
+
+#pragma endregion
+
+#pragma region SETUP
 
 // Called to bind functionality to input
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -202,6 +211,24 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction("PlayerClassB", IE_Pressed, this, &APlayerCharacter::ChangeToPlayerClassB);
 	PlayerInputComponent->BindAction("PlayerClassC", IE_Pressed, this, &APlayerCharacter::ChangeToPlayerClassC);
 	PlayerInputComponent->BindAction("PlayerClassD", IE_Pressed, this, &APlayerCharacter::ChangeToPlayerClassD);
+}
+
+void APlayerCharacter::SetupChangedPlayerClass()
+{
+	GetMesh()->SetSkeletalMesh(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_Mesh);
+	GetMesh()->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
+	m_PlayerAbilities->RemoveAllAbilities();
+	AddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility);
+	m_CurrentAbilitySlot = 0;
+
+	// only for debug purposes. the player would normally start with just 1 ability ( the m_StartingAbility)
+	//AddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility1Debug);
+	//AddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility2Debug);
+	//AddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility3Debug);
+
+	// setup the player stats with the default values from the given data asset
+	ResetStatsToDefault();
+	ChangeToAbilitySlot0();
 }
 
 void APlayerCharacter::SetupCamera()
@@ -252,19 +279,6 @@ void APlayerCharacter::SetupPlayer()
 
 	// setup the player stats with the default values from the given data asset
 	ResetStatsToDefault();
-} 
-
-// WEAPONS
-
-void APlayerCharacter::SetWeaponVisibility(FName a_BoneName, bool a_SetVisible)
-{
-	if (UStaticMeshComponent** found = m_AttachedWeapons.Find(a_BoneName))
-	{
-		UStaticMeshComponent* component = *found;
-		component->SetVisibility(a_SetVisible, true);
-		component->SetHiddenInGame(!a_SetVisible, true);
-		component->SetCollisionEnabled(a_SetVisible ? ECollisionEnabled::QueryAndPhysics : ECollisionEnabled::NoCollision);
-	}
 }
 
 void APlayerCharacter::SetupWeapons()
@@ -286,15 +300,15 @@ void APlayerCharacter::SetupWeapons()
 		else if (boneName == TEXT("1H_Wand")) meshAsset = m_Wand;
 		else if (boneName == TEXT("Knife")) meshAsset = m_Blade;
 		else if (boneName == TEXT("1H_Crossbow")) meshAsset = m_Crossbow;
-		else if (boneName == TEXT("2H_Mace")) meshAsset = m_Mace;
+		else if (boneName == TEXT("2H_Mace")) meshAsset = m_DruidStaff;
 		else if (boneName == TEXT("2H_Staff")) meshAsset = m_Staff;
 		else if (boneName == TEXT("1H_Dagger")) meshAsset = m_Dagger;
-		else if (boneName == TEXT("1H_Scythe")) meshAsset = m_Scythe;
+		else if (boneName == TEXT("1H_Scythe")) meshAsset = m_Spellbook;
 		else continue;
 
 		UStaticMeshComponent* meshComponent = AttachWeaponComponentToBone(boneName, meshAsset);
-		meshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		meshComponent->SetCanEverAffectNavigation(false);
+		//meshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		//meshComponent->SetCanEverAffectNavigation(false);
 		//if (meshComponent)
 		//{
 		//	meshComponent->SetVisibility(false, true);
@@ -317,6 +331,37 @@ void APlayerCharacter::SetupMeleeHitbox()
 	m_MeleeHitBox->RegisterComponent();
 
 	m_MeleeHitBox->OnComponentBeginOverlap.AddDynamic(this, &APlayerCharacter::OnHit);
+}
+
+#pragma endregion
+
+#pragma region LEVEL
+
+void APlayerCharacter::UpdatePlayerLevel()
+{
+	m_PlayerLvl++;
+	m_PlayerLevelExp = FMath::Max(0, m_PlayerLevelExp - m_ExpLevelBarrier);
+	m_ExpLevelBarrier *= 1.25f;
+	AddAbility(GetRandomAbilityFromPool());
+	UE_LOG(LogTemp, Warning, TEXT("Player reached Level: %i"), m_PlayerLvl);
+	UE_LOG(LogTemp, Warning, TEXT("Player experience points: %i"), m_PlayerLevelExp);
+	// Debug
+	
+}
+
+#pragma endregion
+
+#pragma region WEAPON
+
+void APlayerCharacter::SetWeaponVisibility(FName a_BoneName, bool a_SetVisible)
+{
+	if (UStaticMeshComponent** found = m_AttachedWeapons.Find(a_BoneName))
+	{
+		UStaticMeshComponent* component = *found;
+		component->SetVisibility(a_SetVisible, true);
+		component->SetHiddenInGame(!a_SetVisible, true);
+		component->SetCollisionEnabled(a_SetVisible ? ECollisionEnabled::QueryAndPhysics : ECollisionEnabled::NoCollision);
+	}
 }
 
 void APlayerCharacter::GetChildBones(const FName& a_ParentBoneName, TArray<FName>& a_OutChildBones) const
@@ -434,6 +479,10 @@ void APlayerCharacter::ShowMeleeHitbox()
 	m_MeleeHitBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 }
 
+#pragma endregion
+
+#pragma region FIGHT
+
 void APlayerCharacter::ClearAlreadyHitActors()
 {
 	m_AlreadyHitActors.Empty();
@@ -460,43 +509,6 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	return totalDmg;
 }
 
-void APlayerCharacter::UpdateHealthBar()
-{
-	float healthPercentage = m_PlayerHealth / m_PlayerMaxHealth;
-	m_playerUIInstance->SetHealthPercent(healthPercentage);
-}
-
-void APlayerCharacter::UpdateStaminabar()
-{
-	float staminaPercentage = m_PlayerStamina / m_PlayerMaxStamina;
-	m_playerUIInstance->SetStaminaPercent(staminaPercentage);
-}
-
-void APlayerCharacter::UpdatePlayerSpeed()
-{
-	if (m_PlayerStamina > 0 && m_PlayerShouldSprint)
-	{
-		GetCharacterMovement()->MaxWalkSpeed = m_PlayerMovementSpeed * m_RunMultiplier;
-	}
-	else
-	{
-		GetCharacterMovement()->MaxWalkSpeed = m_PlayerMovementSpeed;
-	}
-}
-
-void APlayerCharacter::UpdatePlayerStamina(float a_DeltaTime, float a_Speed, float a_MovementThreshold)
-{
-	if (a_Speed > m_PlayerMovementSpeed + a_MovementThreshold)
-	{
-		ChangePlayerStamina(-10.0f * a_DeltaTime);
-	}
-	else
-	{
-		ChangePlayerStamina(5.0f * a_DeltaTime);
-	}
-}
-
-
 void APlayerCharacter::HandleKnockback(FVector a_knockbackDirection, float a_knockbackStrength)
 {
 	LaunchCharacter(a_knockbackDirection * a_knockbackStrength, true, true);
@@ -521,24 +533,25 @@ void APlayerCharacter::CheckForDeath()
 	}
 }
 
-// PLAYER CLASS
+#pragma endregion
 
-void APlayerCharacter::SetupChangedPlayerClass()
+#pragma region UI
+
+void APlayerCharacter::UpdateHealthBar()
 {
-	GetMesh()->SetSkeletalMesh(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_Mesh);
-	GetMesh()->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
-	m_PlayerAbilities->RemoveAllAbilities();
-	AddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility);
-
-	// only for debug purposes. the player would normally start with just 1 ability ( the m_StartingAbility)
-	//AddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility1Debug);
-	//AddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility2Debug);
-	//AddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility3Debug);
-
-	// setup the player stats with the default values from the given data asset
-	ResetStatsToDefault();
-	ChangeToAbilitySlot0();
+	float healthPercentage = m_PlayerHealth / m_PlayerMaxHealth;
+	m_playerUIInstance->SetHealthPercent(healthPercentage);
 }
+
+void APlayerCharacter::UpdateStaminabar()
+{
+	float staminaPercentage = m_PlayerStamina / m_PlayerMaxStamina;
+	m_playerUIInstance->SetStaminaPercent(staminaPercentage);
+}
+
+#pragma endregion
+
+#pragma region ABILITIES
 
 void APlayerCharacter::FillAbilityLevelMap()
 {
@@ -550,6 +563,26 @@ void APlayerCharacter::FillAbilityLevelMap()
 	}
 }
 
+UMainAbilityContainerDataAsset* APlayerCharacter::GetRandomAbilityFromPool()
+{
+	TArray<UMainAbilityContainerDataAsset*> tempPool = m_AbilityPool;
+	UMainAbilityContainerDataAsset* randAbility = nullptr;
+	for (int i = 0; i < m_AbilityPool.Num(); i++)
+	{
+		int32 randIndex = FMath::RandRange(0, tempPool.Num() - 1);
+		if (m_AbilityLevels.FindRef(tempPool[randIndex]->m_ThisAbility) == 3)
+		{
+			tempPool.RemoveAt(randIndex);
+			UE_LOG(LogTemp, Warning, TEXT("Ability was excluded from random selection"));
+			continue;
+		}
+		randAbility = tempPool[randIndex];
+		UE_LOG(LogTemp, Warning, TEXT("Ability was chosen for random selection"));
+		break;
+	}
+	return randAbility;
+}
+
 void APlayerCharacter::AddAbilityDirect(TSubclassOf<UBaseAbility> a_Ability)
 {
 	if (m_AbilityNum >= m_AbilityMax) return;
@@ -557,7 +590,7 @@ void APlayerCharacter::AddAbilityDirect(TSubclassOf<UBaseAbility> a_Ability)
 	m_AbilityNum++;
 }
 
-void APlayerCharacter::AddAbility(UMainAbilityContainerDataAsset* a_Ability)
+void APlayerCharacter::AddAbility(UMainAbilityContainerDataAsset* a_Ability, bool a_IncreaseAbilityCount)
 {
 	UE_LOG(LogTemp, Warning, TEXT("AAAAAAAAAAAAAAAAAA0"))
 	if (m_AbilityNum >= m_AbilityMax) return;
@@ -571,10 +604,10 @@ void APlayerCharacter::AddAbility(UMainAbilityContainerDataAsset* a_Ability)
 		ChangeAbilityLevel(abilityType, 1);
 		if (m_AbilityLevels.FindRef(abilityType) == abilityLvl) return; // ability is already lvl3
 		m_PlayerAbilities->RemoveAbility(ability); // removing the lower lvl ability
-		AddAbility(a_Ability); // adding the new ability
+		AddAbility(a_Ability, false); // adding the new ability
 		return;
 	}
-	m_AbilityNum++;
+	if (a_IncreaseAbilityCount) m_AbilityNum++;
 }
 
 void APlayerCharacter::ChangeAbilityLevel(EAllAbilities a_Ability, int a_Value)
@@ -584,6 +617,44 @@ void APlayerCharacter::ChangeAbilityLevel(EAllAbilities a_Ability, int a_Value)
 	m_AbilityLevels[a_Ability] += a_Value;
 }
 
+void APlayerCharacter::ChangeToAbilitySlot(int32 a_Index)
+{
+	m_CurrentAbilitySlot = a_Index;
+	m_AttackDamage = m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_BaseAttackPoints; // reset current attack damage
+	m_PlayerAbilities->EquipAbility(a_Index); // new damage will be set here if needed
+}
+
+void APlayerCharacter::AbilitySlotIncrease()
+{
+	if (m_CurrentAbilitySlot == m_AbilityMax - 1) m_CurrentAbilitySlot = 0;
+	else if (m_CurrentAbilitySlot >= m_AbilityMax || m_CurrentAbilitySlot <= -1) m_CurrentAbilitySlot = 0;
+	else m_CurrentAbilitySlot++;
+	m_PlayerAbilities->EquipAbility(m_CurrentAbilitySlot);
+}
+
+void APlayerCharacter::AbilitySlotDecrease()
+{
+	if (m_CurrentAbilitySlot == 0) m_CurrentAbilitySlot = m_AbilityMax - 1;
+	else if (m_CurrentAbilitySlot >= m_AbilityMax || m_CurrentAbilitySlot <= -1) m_CurrentAbilitySlot = 0;
+	else m_CurrentAbilitySlot--;
+	m_PlayerAbilities->EquipAbility(m_CurrentAbilitySlot);
+}
+
+#pragma endregion
+
+#pragma region STATS
+
+void APlayerCharacter::AddExperiencePoints(int a_Amount)
+{
+	m_PlayerTotalExp += a_Amount;
+	m_PlayerLevelExp += a_Amount;
+
+	if (m_PlayerLevelExp - m_ExpForLevelUp >= 0)
+	{
+		UpdatePlayerLevel();
+	}
+}
+
 void APlayerCharacter::TryAddPlayerHealth(float a_Amount)
 {
 	if (m_PlayerHealth + a_Amount >= m_PlayerMaxHealth) m_PlayerHealth = m_PlayerMaxHealth;
@@ -591,31 +662,7 @@ void APlayerCharacter::TryAddPlayerHealth(float a_Amount)
 	UpdateHealthBar();
 }
 
-void APlayerCharacter::ChangeToPlayerClassA()
-{
-	m_CurrentPlayerClass = 0;
-	SetupChangedPlayerClass();
-}
 
-void APlayerCharacter::ChangeToPlayerClassB()
-{
-	m_CurrentPlayerClass = 1;
-	SetupChangedPlayerClass();
-}
-
-void APlayerCharacter::ChangeToPlayerClassC()
-{
-	m_CurrentPlayerClass = 2;
-	SetupChangedPlayerClass();
-}
-
-void APlayerCharacter::ChangeToPlayerClassD()
-{
-	//testing only!!
-	AddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility1Debug);
-	//m_CurrentPlayerClass = 3;
-	//SetupChangedPlayerClass();
-}
 
 bool APlayerCharacter::CheckIfCurrentPlayerClassIsValid()
 {
@@ -677,3 +724,28 @@ void APlayerCharacter::ChangePlayerStamina(float a_Value)
 	UpdateStaminabar();
 }
 
+void APlayerCharacter::UpdatePlayerSpeed()
+{
+	if (m_PlayerStamina > 0 && m_PlayerShouldSprint)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = m_PlayerMovementSpeed * m_RunMultiplier;
+	}
+	else
+	{
+		GetCharacterMovement()->MaxWalkSpeed = m_PlayerMovementSpeed;
+	}
+}
+
+void APlayerCharacter::UpdatePlayerStamina(float a_DeltaTime, float a_Speed, float a_MovementThreshold)
+{
+	if (a_Speed > m_PlayerMovementSpeed + a_MovementThreshold)
+	{
+		ChangePlayerStamina(-10.0f * a_DeltaTime);
+	}
+	else
+	{
+		ChangePlayerStamina(5.0f * a_DeltaTime);
+	}
+}
+
+#pragma endregion

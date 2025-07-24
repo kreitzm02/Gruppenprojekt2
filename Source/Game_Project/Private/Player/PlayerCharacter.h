@@ -123,6 +123,8 @@ private:
 
 	TArray<FText> m_AbilityNames;
 
+	TArray<float> m_AbilityMaxCooldownTimes;
+
 	UPROPERTY()
 	UBoxComponent* m_MeleeHitBox;
 
@@ -173,6 +175,28 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	float m_PlayerStamina;
 
+	// leveling
+
+	UPROPERTY(VisibleAnywhere)
+	int m_PlayerTotalExp;
+
+	UPROPERTY(VisibleAnywhere)
+	int m_PlayerLevelExp;
+
+	UPROPERTY(VisibleAnywhere)
+	int m_ExpForLevelUp;
+
+	UPROPERTY(VisibleAnywhere)
+	int m_ExpLevelBarrier;
+
+	UPROPERTY(VisibleAnywhere)
+	int m_PlayerLvl;
+
+	UFUNCTION()
+	void UpdatePlayerLevel();
+
+	bool m_PlayerShouldLevelUp;
+
 	//
 
 	UPROPERTY()
@@ -212,7 +236,7 @@ private:
 	UStaticMesh* m_Blade;
 
 	UPROPERTY(EditAnywhere, Category = "Basic Weapon Meshes")
-	UStaticMesh* m_Mace;
+	UStaticMesh* m_DruidStaff;
 
 	UPROPERTY(EditAnywhere, Category = "Basic Weapon Meshes")
 	UStaticMesh* m_Scythe;
@@ -242,8 +266,17 @@ private:
 
 	TMap<EAllAbilities, int> m_AbilityLevels;
 
+	UPROPERTY(EditAnywhere, Category = "Abilities")
+	TArray<UMainAbilityContainerDataAsset*> m_AbilityPool;
+
 	UFUNCTION()
 	void FillAbilityLevelMap();
+
+	UFUNCTION()
+	UMainAbilityContainerDataAsset* GetRandomAbilityFromPool();
+
+	//UFUNCTION()
+	//void ShowAbilityLevelUpUI(bool a_Show);
 	
 public:
 
@@ -251,7 +284,7 @@ public:
 	void AddAbilityDirect(TSubclassOf<UBaseAbility> a_Ability);
 
 	UFUNCTION()
-	void AddAbility(UMainAbilityContainerDataAsset* a_Ability);
+	void AddAbility(UMainAbilityContainerDataAsset* a_Ability, bool a_IncreaseAbilityCount = true);
 
 	TArray<float> GetPlayerAbilityCooldownTimes() { return m_AbilityCooldownTimes; }
 
@@ -259,7 +292,13 @@ public:
 
 	TArray<UTexture2D*> GetPlayerAbilityIcons() { return m_AbilityIcons; }
 
+	TArray<float> GetPlayerAbilityMaxCooldownTimes() { return m_AbilityMaxCooldownTimes; }
+
 	void ChangeAbilityLevel(EAllAbilities a_Ability, int a_Value);
+
+	//
+
+	void AddExperiencePoints(int a_Amount);
 
 	// player presets
 
