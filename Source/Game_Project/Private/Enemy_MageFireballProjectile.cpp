@@ -14,11 +14,22 @@ AEnemy_MageFireballProjectile::AEnemy_MageFireballProjectile()
 	m_projectileHitbox->SetCollisionResponseToAllChannels(ECR_Block);
 	m_projectileHitbox->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Overlap);
 
-	RootComponent = m_projectileHitbox;
+	//RootComponent = m_projectileHitbox;
 
 	m_projectileMesh->SetupAttachment(RootComponent);
+	m_projectileHitbox->SetupAttachment(m_projectileMesh);
 
+}
 
+void AEnemy_MageFireballProjectile::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+
+	m_projectileHitbox->SetRelativeScale3D(m_hitboxBoxSize);
+
+	Cast<USphereComponent>(m_projectileHitbox)->SetSphereRadius(m_hitboxSphereSize);
+
+	//m_projectileHitbox->SetRelativeScale3D_Direct(m_hitboxBoxSize);
 }
 
 void AEnemy_MageFireballProjectile::BeginPlay()
@@ -30,6 +41,7 @@ void AEnemy_MageFireballProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	m_targetDirection = m_target->GetActorLocation() - this->GetActorLocation();
+	m_targetDirection.Z = 0.0f;
 	m_targetDirection.Normalize();
 	this->SetActorRotation(m_targetDirection.Rotation());
 	MoveInDirection(DeltaTime);
