@@ -39,15 +39,21 @@ public:
 	bool TryBuyHPRegen();
 
 
-
+	UFUNCTION(BlueprintCallable)
 	void SetMusicVolume(float a_volume) { m_musicVolume = a_volume; }
+	UFUNCTION(BlueprintCallable)
 	void SetSFXVolume(float a_volume) { m_sfxVolume = a_volume; }
+
 
 	float GetMusicVolume() { return m_musicVolume; }
 	float GetSFXVolume() { return m_sfxVolume; }
 
 	void SetIsInLevel(bool a_isInLevel) { m_isInLevel = a_isInLevel; }
+
+	UFUNCTION(BlueprintCallable)
 	bool GetIsInLevel() { return m_isInLevel; }
+
+
 
 	void StartGameTimer();
 
