@@ -6,6 +6,7 @@
 #include "Game_GameInstance.h"
 #include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "CustomChunkSystem/CustomChunkManager.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -121,7 +122,7 @@ float AEnemyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 
 	UpdateHealthBar();
 
-	if (m_currentHealth <= 0.0f)
+	if (m_currentHealth <= 0.0f && !m_isDead)
 	{
 		OnDeath();
 	}
@@ -131,12 +132,22 @@ float AEnemyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 
 void AEnemyCharacter::OnDeath()
 {
+	m_isDead = true;
+
 	UGame_GameInstance* gameInstance = Cast<UGame_GameInstance>(GetGameInstance());
 	if (gameInstance && gameInstance->m_playerSave)
 	{
 		gameInstance->m_playerSave->m_currency += m_moneyValueOnDeath;
 		UGameplayStatics::SaveGameToSlot(gameInstance->m_playerSave, TEXT("PlayerSaveSlot"), 0);
 	}
+
+	ACustomChunkManager* chunkManager = Cast<ACustomChunkManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACustomChunkManager::StaticClass()));
+	AExpOrb* expOrb = Cast<AExpOrb>(chunkManager->SpawnActorInChunk(m_expOrbClass,GetActorLocation(),FRotator::ZeroRotator,FActorSpawnParameters()));
+	if (expOrb)
+	{
+		expOrb->SetExpRange(m_minExpWorth, m_maxExpWorth);
+	}
+	
 
 	SetActorEnableCollision(false);
 	GetCharacterMovement()->GravityScale = 0.1f;

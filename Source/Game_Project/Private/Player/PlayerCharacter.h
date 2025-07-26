@@ -257,6 +257,16 @@ private:
 
 	// ui
 
+	FTimerHandle m_setAbilityIconTimer;
+
+	void SetAbilityOneIcon();
+
+	void SetAbilityTwoIcon();
+
+	void SetAbilityThreeIcon();
+
+	void SetAbilityFourIcon();
+
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<UUserWidget> m_playerUI = nullptr;
 

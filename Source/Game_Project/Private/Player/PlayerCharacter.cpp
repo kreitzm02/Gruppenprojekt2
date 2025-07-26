@@ -14,6 +14,8 @@
 #include "Animation/AnimInstance.h"
 #include <Kismet/GameplayStatics.h>
 
+#include "EnemyCharacter.h"
+
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -105,6 +107,30 @@ void APlayerCharacter::Tick(float DeltaTime)
 	}
 	UpdatePlayerStamina(DeltaTime, speed, movementThreshold);
 	UpdatePlayerSpeed();
+
+	switch (m_AbilityMax)
+	{
+	case 1:
+		m_playerUIInstance->SetAbilityOneCooldownPercent(m_PlayerAbilities->GetRemainingCooldownFromAbility(0) / m_PlayerAbilities->GetAbilityCooldown(0));
+		break;
+	case 2:
+		m_playerUIInstance->SetAbilityOneCooldownPercent(m_PlayerAbilities->GetRemainingCooldownFromAbility(0) / m_PlayerAbilities->GetAbilityCooldown(0));
+		m_playerUIInstance->SetAbilityTwoCooldownPercent(m_PlayerAbilities->GetRemainingCooldownFromAbility(1) / m_PlayerAbilities->GetAbilityCooldown(1));
+		break;
+	case 3:
+		m_playerUIInstance->SetAbilityOneCooldownPercent(m_PlayerAbilities->GetRemainingCooldownFromAbility(0) / m_PlayerAbilities->GetAbilityCooldown(0));
+		m_playerUIInstance->SetAbilityTwoCooldownPercent(m_PlayerAbilities->GetRemainingCooldownFromAbility(1) / m_PlayerAbilities->GetAbilityCooldown(1));
+		m_playerUIInstance->SetAbilityThreeCooldownPercent(m_PlayerAbilities->GetRemainingCooldownFromAbility(2) / m_PlayerAbilities->GetAbilityCooldown(2));
+		break;
+	case 4:
+		m_playerUIInstance->SetAbilityOneCooldownPercent(m_PlayerAbilities->GetRemainingCooldownFromAbility(0) / m_PlayerAbilities->GetAbilityCooldown(0));
+		m_playerUIInstance->SetAbilityTwoCooldownPercent(m_PlayerAbilities->GetRemainingCooldownFromAbility(1) / m_PlayerAbilities->GetAbilityCooldown(1));
+		m_playerUIInstance->SetAbilityThreeCooldownPercent(m_PlayerAbilities->GetRemainingCooldownFromAbility(2) / m_PlayerAbilities->GetAbilityCooldown(2));
+		m_playerUIInstance->SetAbilityFourCooldownPercent(m_PlayerAbilities->GetRemainingCooldownFromAbility(3) / m_PlayerAbilities->GetAbilityCooldown(3));
+		break;
+	default:
+		break;
+	}
 
 	UE_LOG(LogTemp, Warning, TEXT("Player Abilities: %i"), m_AbilityNum)
 }
@@ -362,6 +388,8 @@ void APlayerCharacter::UpdatePlayerLevel()
 	m_PlayerLvl++;
 	m_PlayerLevelExp = FMath::Max(0, m_PlayerLevelExp - m_ExpLevelBarrier);
 	m_ExpLevelBarrier *= 1.25f;
+	m_ExpForLevelUp *= 1.25f;
+	m_playerUIInstance->SetExpPercent(float(m_PlayerLevelExp) / m_ExpForLevelUp);
 	for (int i = 0; i < m_LvlUpAbilitySelection.Num(); i++)
 	{
 		m_LvlUpAbilitySelection[i] = GetRandomAbilityFromPool();
@@ -523,9 +551,9 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 		FVector knockbackDirection = GetActorLocation() - DamageCauser->GetActorLocation();
 		knockbackDirection.Z = 0;
 		knockbackDirection.Normalize();
-		HandleKnockback(knockbackDirection, 0.0f /*get knockback strengh from damage causer*/);
-		//ACharacter* damagingUnit = Cast<ACharacter>(DamageCauser);
-		//damagingUnit->GetKnockback();
+
+		AEnemyCharacter* enemy = Cast<AEnemyCharacter>(EventInstigator->GetCharacter());
+		HandleKnockback(knockbackDirection, enemy->GetKnockback());
 	}
 
 	return totalDmg;
@@ -625,6 +653,28 @@ void APlayerCharacter::ToggleLvlUpReplaceUI(bool a_SetActive)
 
 #pragma region ABILITIES
 
+void APlayerCharacter::SetAbilityOneIcon()
+{
+	m_playerUIInstance->SetAbilityOneIcon(m_PlayerAbilities->GetAbilityIcon(0));
+}
+
+void APlayerCharacter::SetAbilityTwoIcon()
+{
+	m_playerUIInstance->SetAbilityTwoIcon(m_PlayerAbilities->GetAbilityIcon(1));
+}
+
+void APlayerCharacter::SetAbilityThreeIcon()
+{
+	m_playerUIInstance->SetAbilityThreeIcon(m_PlayerAbilities->GetAbilityIcon(2));
+}
+
+void APlayerCharacter::SetAbilityFourIcon()
+{
+	m_playerUIInstance->SetAbilityFourIcon(m_PlayerAbilities->GetAbilityIcon(3));
+}
+
+
+
 void APlayerCharacter::FillAbilityLevelMap()
 {
 	if (!m_AbilityLevels.IsEmpty()) return; // if we have a savegame, we can sync the map with the save file before calling this method.
@@ -681,13 +731,54 @@ void APlayerCharacter::AddAbility(UMainAbilityContainerDataAsset* a_Ability, boo
 	if (PlayerHasAbility(a_Ability))
 	{
 		ChangeAbilityLevel(abilityType, 1);
-		if (m_AbilityLevels.FindRef(abilityType) == abilityLvl) return; // ability is already lvl3
+
+		int index = m_AbilityLevels.FindRef(abilityType);
+
+		if (index == abilityLvl) return; // ability is already lvl3
 		m_PlayerAbilities->RemoveAbility(ability); // removing the lower lvl ability
 		AddAbility(a_Ability, false); // adding the new ability
+		switch (index)
+		{
+		case 0:
+			GetWorld()->GetTimerManager().SetTimer(m_setAbilityIconTimer, this, &APlayerCharacter::SetAbilityOneIcon, 0.2f, false);
+			break;
+		case 1:
+			GetWorld()->GetTimerManager().SetTimer(m_setAbilityIconTimer, this, &APlayerCharacter::SetAbilityTwoIcon, 0.2f, false);
+			break;
+		case 2:
+			GetWorld()->GetTimerManager().SetTimer(m_setAbilityIconTimer, this, &APlayerCharacter::SetAbilityThreeIcon, 0.2f, false);
+			break;
+		case 3:
+			GetWorld()->GetTimerManager().SetTimer(m_setAbilityIconTimer, this, &APlayerCharacter::SetAbilityFourIcon, 0.2f, false);
+			break;
+		default:
+			break;
+		}
 		return;
 	}
 	m_PlayerAbilities->TryAddAbility(ability);
 	if (a_IncreaseAbilityCount) m_AbilityNum++;
+
+	int index = m_AbilityLevels.FindRef(abilityType);
+
+	switch (index)
+	{
+	case 1:
+		GetWorld()->GetTimerManager().SetTimer(m_setAbilityIconTimer, this, &APlayerCharacter::SetAbilityOneIcon, 0.2f, false);
+		break;
+	case 2:
+		GetWorld()->GetTimerManager().SetTimer(m_setAbilityIconTimer, this, &APlayerCharacter::SetAbilityTwoIcon, 0.2f, false);
+		break;
+	case 3:
+		GetWorld()->GetTimerManager().SetTimer(m_setAbilityIconTimer, this, &APlayerCharacter::SetAbilityThreeIcon, 0.2f, false);
+		break;
+	case 4:
+		GetWorld()->GetTimerManager().SetTimer(m_setAbilityIconTimer, this, &APlayerCharacter::SetAbilityFourIcon, 0.2f, false);
+		break;
+	default:
+		break;
+	}
+
 	return;
 }
 
@@ -768,6 +859,8 @@ void APlayerCharacter::AddExperiencePoints(int a_Amount)
 {
 	m_PlayerTotalExp += a_Amount;
 	m_PlayerLevelExp += a_Amount;
+
+	m_playerUIInstance->SetExpPercent(float(m_PlayerLevelExp) / m_ExpForLevelUp);
 
 	if (m_PlayerLevelExp - m_ExpForLevelUp >= 0)
 	{
