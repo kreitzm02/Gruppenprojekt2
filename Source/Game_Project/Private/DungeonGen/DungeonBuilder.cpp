@@ -779,15 +779,19 @@ void UDungeonBuilder::GenerateEnemies()
 		FInt32Vector2 intPos = m_Data->m_AllRooms[i].GetRoomCenter();
 		FVector position = { (float)intPos.X * m_UnitSize, (float)intPos.Y * m_UnitSize, 0 };
 
-		int32 randIndex = FMath::RandRange(0, m_DungeonTheme->m_EnemyCharacters.Num() - 1);
-		TSubclassOf<AEnemyCharacter> enemyToSpawn = m_DungeonTheme->m_EnemyCharacters[randIndex];
-
-		if (enemyToSpawn)
+		int enemiesInRoom = FMath::RandRange(2, 5);
+		for (int j = 0; j < enemiesInRoom; j++)
 		{
-			//GetWorld()->SpawnActor<AEnemyCharacter>(enemyToSpawn, position, {0, 0, 0});
-			FActorSpawnParameters params;
-			ACustomChunkManager* chunkManager = Cast<ACustomChunkManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACustomChunkManager::StaticClass()));
-			chunkManager->SpawnActorInChunk(enemyToSpawn, position, FRotator::ZeroRotator, params);
+			int32 randIndex = FMath::RandRange(0, m_DungeonTheme->m_EnemyCharacters.Num() - 1);
+			TSubclassOf<AEnemyCharacter> enemyToSpawn = m_DungeonTheme->m_EnemyCharacters[randIndex];
+
+			if (enemyToSpawn)
+			{
+				//GetWorld()->SpawnActor<AEnemyCharacter>(enemyToSpawn, position, {0, 0, 0});
+				FActorSpawnParameters params;
+				ACustomChunkManager* chunkManager = Cast<ACustomChunkManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACustomChunkManager::StaticClass()));
+				chunkManager->SpawnActorInChunk(enemyToSpawn, position, FRotator::ZeroRotator, params);
+			}
 		}
 	}
 }

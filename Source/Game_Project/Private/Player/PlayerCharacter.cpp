@@ -45,6 +45,7 @@ void APlayerCharacter::BeginPlay()
 	m_AbilityMaxCooldownTimes.Init(0.0f, m_AbilityMax);
 	m_AbilityIcons.Init(nullptr, m_AbilityMax);
 	m_AbilityNames.Init(FText::FromString(TEXT("Empty")), m_AbilityMax);
+	m_LvlUpAbilitySelection.Init(nullptr, 3);
 
 	if (m_playerUI)
 	{
@@ -54,6 +55,7 @@ void APlayerCharacter::BeginPlay()
 
 	m_PlayerTotalExp = m_PlayerLevelExp = 0;
 	m_ExpForLevelUp = m_ExpLevelBarrier = 500;
+	m_PlayerLvl = 1;
 }
 
 // Called every frame
@@ -98,10 +100,13 @@ void APlayerCharacter::Tick(float DeltaTime)
 		m_AbilityCooldownTimes[i] = m_PlayerAbilities->GetRemainingCooldownFromAbility(i);
 		m_AbilityIcons[i] = m_PlayerAbilities->GetAbilityIcon(i);
 		m_AbilityNames[i] = m_PlayerAbilities->GetAbilityName(i);
+		UE_LOG(LogTemp, Warning, TEXT("Slot: %i, Ability: %s"), i, *m_PlayerAbilities->GetAbilityName(i).ToString())
 		m_AbilityMaxCooldownTimes[i] = m_PlayerAbilities->GetAbilityCooldown(i);
 	}
 	UpdatePlayerStamina(DeltaTime, speed, movementThreshold);
 	UpdatePlayerSpeed();
+
+	UE_LOG(LogTemp, Warning, TEXT("Player Abilities: %i"), m_AbilityNum)
 }
 
 #pragma region INPUT
@@ -186,6 +191,21 @@ void APlayerCharacter::ChangeToPlayerClassD()
 	AddExperiencePoints(200);
 	//m_CurrentPlayerClass = 3;
 	//SetupChangedPlayerClass();
+}
+
+void APlayerCharacter::ActivateMouseCursor(bool a_SetActive)
+{
+	APlayerController* pc = Cast<APlayerController>(GetController());
+	if (pc && a_SetActive)
+	{
+		pc->bShowMouseCursor = true;
+		pc->SetInputMode(FInputModeUIOnly());
+	}
+	else if (pc && !a_SetActive)
+	{
+		pc->bShowMouseCursor = false;
+		pc->SetInputMode(FInputModeGameOnly());
+	}
 }
 
 #pragma endregion
@@ -342,11 +362,13 @@ void APlayerCharacter::UpdatePlayerLevel()
 	m_PlayerLvl++;
 	m_PlayerLevelExp = FMath::Max(0, m_PlayerLevelExp - m_ExpLevelBarrier);
 	m_ExpLevelBarrier *= 1.25f;
-	AddAbility(GetRandomAbilityFromPool());
+	for (int i = 0; i < m_LvlUpAbilitySelection.Num(); i++)
+	{
+		m_LvlUpAbilitySelection[i] = GetRandomAbilityFromPool();
+	}
+	ToggleLvlUpUI(true);
 	UE_LOG(LogTemp, Warning, TEXT("Player reached Level: %i"), m_PlayerLvl);
 	UE_LOG(LogTemp, Warning, TEXT("Player experience points: %i"), m_PlayerLevelExp);
-	// Debug
-	
 }
 
 #pragma endregion
@@ -549,6 +571,56 @@ void APlayerCharacter::UpdateStaminabar()
 	m_playerUIInstance->SetStaminaPercent(staminaPercentage);
 }
 
+void APlayerCharacter::ToggleLvlUpUI(bool a_SetActive)
+{
+	if (m_lvlUpUI && !m_lvlUpUIInstance)
+	{
+		m_lvlUpUIInstance = CreateWidget<UWLvlUpAbilitySelect>(GetWorld(), m_lvlUpUI);
+	}
+
+	if (!a_SetActive)
+	{
+		ActivateMouseCursor(false);
+		m_lvlUpUIInstance->RemoveFromViewport();
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.0f);
+	}
+	else
+	{
+		ActivateMouseCursor(true);
+		m_lvlUpUIInstance->AddToViewport(2);
+		m_lvlUpUIInstance->SetButtonTexts(
+			FText::FromString(m_LvlUpAbilitySelection[0]->m_DisplayName),
+			FText::FromString(m_LvlUpAbilitySelection[1]->m_DisplayName),
+			FText::FromString(m_LvlUpAbilitySelection[2]->m_DisplayName));
+		m_lvlUpUIInstance->SetLevelUpText(FText::FromString(FString::Printf(TEXT("You have reached Level %i!"), m_PlayerLvl)));
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.0f);
+	}
+}
+
+void APlayerCharacter::ToggleLvlUpReplaceUI(bool a_SetActive)
+{
+	if (m_lvlUpReplaceUI && !m_lvlUpReplaceUIInstance)
+	{
+		m_lvlUpReplaceUIInstance = CreateWidget<UWLvlUpAbilityReplace>(GetWorld(), m_lvlUpReplaceUI);
+	}
+
+	if (!a_SetActive)
+	{
+		ActivateMouseCursor(false);
+		m_lvlUpReplaceUIInstance->RemoveFromViewport();
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.0f);
+	}
+	else
+	{
+		ActivateMouseCursor(true);
+		m_lvlUpReplaceUIInstance->AddToViewport(2);
+		m_lvlUpReplaceUIInstance->SetButtonTexts(
+			m_PlayerAbilities->GetAbilityName(0), m_PlayerAbilities->GetAbilityName(1),
+			m_PlayerAbilities->GetAbilityName(2), m_PlayerAbilities->GetAbilityName(3));
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.0f);
+	}
+}
+
 #pragma endregion
 
 #pragma region ABILITIES
@@ -573,14 +645,24 @@ UMainAbilityContainerDataAsset* APlayerCharacter::GetRandomAbilityFromPool()
 		if (m_AbilityLevels.FindRef(tempPool[randIndex]->m_ThisAbility) == 3)
 		{
 			tempPool.RemoveAt(randIndex);
-			UE_LOG(LogTemp, Warning, TEXT("Ability was excluded from random selection"));
 			continue;
 		}
 		randAbility = tempPool[randIndex];
-		UE_LOG(LogTemp, Warning, TEXT("Ability was chosen for random selection"));
 		break;
 	}
 	return randAbility;
+}
+
+bool APlayerCharacter::PlayerHasAbility(UMainAbilityContainerDataAsset* a_Ability)
+{
+	EAllAbilities abilityType = a_Ability->GetAbilityType();
+	int abilityLvl = m_AbilityLevels.FindRef(abilityType);
+	TSubclassOf<UBaseAbility> newAbility = a_Ability->GetAbility(abilityLvl);
+	for (UBaseAbility* ability : m_PlayerAbilities->m_Abilities)
+	{
+		if (ability && ability->GetClass() == newAbility) return true;
+	}
+	return false;
 }
 
 void APlayerCharacter::AddAbilityDirect(TSubclassOf<UBaseAbility> a_Ability)
@@ -592,28 +674,42 @@ void APlayerCharacter::AddAbilityDirect(TSubclassOf<UBaseAbility> a_Ability)
 
 void APlayerCharacter::AddAbility(UMainAbilityContainerDataAsset* a_Ability, bool a_IncreaseAbilityCount)
 {
-	UE_LOG(LogTemp, Warning, TEXT("AAAAAAAAAAAAAAAAAA0"))
-	if (m_AbilityNum >= m_AbilityMax) return;
-	UE_LOG(LogTemp, Warning, TEXT("AAAAAAAAAAAAAAAAAA1"))
 	EAllAbilities abilityType = a_Ability->GetAbilityType();
 	int abilityLvl = m_AbilityLevels.FindRef(abilityType);
 	TSubclassOf<UBaseAbility> ability = a_Ability->GetAbility(abilityLvl);
-	if (!m_PlayerAbilities->TryAddAbility(ability))
+
+	if (PlayerHasAbility(a_Ability))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("AAAAAAAAAAAAAAAAAA2"))
 		ChangeAbilityLevel(abilityType, 1);
 		if (m_AbilityLevels.FindRef(abilityType) == abilityLvl) return; // ability is already lvl3
 		m_PlayerAbilities->RemoveAbility(ability); // removing the lower lvl ability
 		AddAbility(a_Ability, false); // adding the new ability
 		return;
 	}
+	m_PlayerAbilities->TryAddAbility(ability);
 	if (a_IncreaseAbilityCount) m_AbilityNum++;
+	return;
+}
+
+void APlayerCharacter::ReplaceAbility(UMainAbilityContainerDataAsset* a_NewAbility, int a_OldAbilitySlot)
+{
+	if (m_AbilityNum < m_AbilityMax) // player has less than 4 abilities
+	{
+		AddAbility(a_NewAbility, true);
+		return;
+	}
+	EAllAbilities abilityType = a_NewAbility->GetAbilityType();
+	int abilityLvl = m_AbilityLevels.FindRef(abilityType);
+	TSubclassOf<UBaseAbility> ability = a_NewAbility->GetAbility(abilityLvl);
+	m_PlayerAbilities->RemoveAbilityFromIndex(a_OldAbilitySlot);
+	m_AbilityNum--;
+	AddAbility(a_NewAbility, true);
 }
 
 void APlayerCharacter::ChangeAbilityLevel(EAllAbilities a_Ability, int a_Value)
 {
 	if (!m_AbilityLevels.Find(a_Ability) || m_AbilityLevels[a_Ability] >= 3) return;
-
+	
 	m_AbilityLevels[a_Ability] += a_Value;
 }
 
@@ -638,6 +734,30 @@ void APlayerCharacter::AbilitySlotDecrease()
 	else if (m_CurrentAbilitySlot >= m_AbilityMax || m_CurrentAbilitySlot <= -1) m_CurrentAbilitySlot = 0;
 	else m_CurrentAbilitySlot--;
 	m_PlayerAbilities->EquipAbility(m_CurrentAbilitySlot);
+}
+
+void APlayerCharacter::AddAbilityFromUI(int a_Index)
+{
+	UE_LOG(LogTemp, Warning, TEXT("AddAbilityFromUI - Called"));
+	m_AbilityToAddIndex = a_Index;
+	if (m_AbilityNum < m_AbilityMax || PlayerHasAbility(m_LvlUpAbilitySelection[m_AbilityToAddIndex]))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AddAbilityFromUI - Calling AddAbility"));
+		AddAbility(m_LvlUpAbilitySelection[m_AbilityToAddIndex], true);
+	}
+	else
+	{
+		ToggleLvlUpUI(false);
+		ToggleLvlUpReplaceUI(true);
+		return;
+	}
+	ToggleLvlUpUI(false);
+}
+
+void APlayerCharacter::ReplaceAbilityFromUI(int a_IndexToReplace)
+{
+	ReplaceAbility(m_LvlUpAbilitySelection[m_AbilityToAddIndex], a_IndexToReplace);
+	ToggleLvlUpReplaceUI(false);
 }
 
 #pragma endregion

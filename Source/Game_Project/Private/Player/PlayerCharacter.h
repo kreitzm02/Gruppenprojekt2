@@ -10,8 +10,9 @@
 #include "AllAbilities.h"
 #include "Widget_PlayerUI.h"
 #include "Blueprint/UserWidget.h"
+#include <WLvlUpAbilitySelect.h>
+#include "WLvlUpAbilityReplace.h"
 #include "PlayerCharacter.generated.h"
-
 
 
 UCLASS()
@@ -262,6 +263,20 @@ private:
 	UPROPERTY()
 	UWidget_PlayerUI* m_playerUIInstance = nullptr;
 
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UWLvlUpAbilitySelect> m_lvlUpUI = nullptr;
+
+	UPROPERTY()
+	UWLvlUpAbilitySelect* m_lvlUpUIInstance = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UWLvlUpAbilityReplace> m_lvlUpReplaceUI = nullptr;
+
+	UPROPERTY()
+	UWLvlUpAbilityReplace* m_lvlUpReplaceUIInstance = nullptr;
+
+	void ActivateMouseCursor(bool a_SetActive);
+
 	// abilities
 
 	TMap<EAllAbilities, int> m_AbilityLevels;
@@ -273,10 +288,21 @@ private:
 	void FillAbilityLevelMap();
 
 	UFUNCTION()
+	void ToggleLvlUpUI(bool a_SetActive);
+
+	UFUNCTION()
+	void ToggleLvlUpReplaceUI(bool a_SetActive);
+
+	UFUNCTION()
 	UMainAbilityContainerDataAsset* GetRandomAbilityFromPool();
 
-	//UFUNCTION()
-	//void ShowAbilityLevelUpUI(bool a_Show);
+	UFUNCTION()
+	bool PlayerHasAbility(UMainAbilityContainerDataAsset* a_Ability);
+
+	UPROPERTY()
+	TArray<UMainAbilityContainerDataAsset*> m_LvlUpAbilitySelection;
+
+	int32 m_AbilityToAddIndex;
 	
 public:
 
@@ -285,6 +311,9 @@ public:
 
 	UFUNCTION()
 	void AddAbility(UMainAbilityContainerDataAsset* a_Ability, bool a_IncreaseAbilityCount = true);
+
+	UFUNCTION()
+	void ReplaceAbility(UMainAbilityContainerDataAsset* a_NewAbility, int a_OldAbilitySlot);
 
 	TArray<float> GetPlayerAbilityCooldownTimes() { return m_AbilityCooldownTimes; }
 
@@ -299,6 +328,12 @@ public:
 	//
 
 	void AddExperiencePoints(int a_Amount);
+
+	// ui callable
+
+	void AddAbilityFromUI(int a_Index);
+
+	void ReplaceAbilityFromUI(int a_IndexToReplace);
 
 	// player presets
 
