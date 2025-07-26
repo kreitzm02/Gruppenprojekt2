@@ -344,6 +344,28 @@ void AOverworldGeneration::BeginPlay()
         portalActor = Cast<ADungeonEntrancePortal>(m_chunkManager->SpawnActorInChunk(m_dungeonEntrance, TilePosition(position.X, position.Y) + FVector(0, 0, m_dungeonEntranceHeightOffset) + m_worldOffsetVector, FRotator::ZeroRotator, FActorSpawnParameters()));
 	}
 
+    //enemiesSpawn
+    for (int i = m_emptyTiles->Num() - 1; i >= 0; i--)
+    {
+        int enemyDensityRandom = m_randomNumber.RandRange(1, 100);
+        FVector position = (*m_emptyTiles)[i];
+        float currentDistToSpawn = FVector::Dist(TilePosition(position.X, position.Y) + m_worldOffsetVector, FVector::ZeroVector + m_worldOffsetVector);
+
+        UE_LOG(LogTemp,Error, TEXT("currentDistance: %f"), currentDistToSpawn)
+
+        if (currentDistToSpawn >= m_enemyFreeRangeFromSpawn)
+        {
+            if (enemyDensityRandom <= m_enemyDensity)
+            {
+                AEnemyCharacter* enemy;
+                enemy = Cast<AEnemyCharacter>(m_chunkManager->SpawnActorInChunk(m_possibleEnemies[m_randomNumber.RandRange(0, m_possibleEnemies.Num() - 1)], TilePosition(position.X, position.Y) + m_worldOffsetVector, FRotator::ZeroRotator, FActorSpawnParameters()));
+
+                m_emptyTiles->RemoveAt(i);
+            }
+        }
+    }
+
+
 
     if (!m_navMesh)
     {

@@ -23,4 +23,7 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "UI")
 	void SetAbilityOneCooldownPercent(float a_cooldownPercent);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "UI")
+	void SetAbilityOneIcon(UTexture2D* a_abilityIcon);
 };

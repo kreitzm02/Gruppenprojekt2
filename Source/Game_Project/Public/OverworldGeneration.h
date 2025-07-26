@@ -6,6 +6,7 @@
 #include "OverworldTileData.h"
 #include "CoreMinimal.h"
 #include "DungeonEntrancePortal.h"
+#include "EnemyCharacter.h"
 #include "GameFramework/Actor.h"
 #include "CustomChunkSystem/CustomChunkManager.h"
 #include "Kismet/GameplayStatics.h"
@@ -109,6 +110,15 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Overworld settings", meta = (ClampMin = "0", ClampMax = "100", UIMin = "0", UIMax = "100"))
 	int m_natureDensity = 0;
 
+	UPROPERTY(EditAnywhere, Category = "Overworld settings", meta = (ClampMin = "0", ClampMax = "100", UIMin = "0", UIMax = "100"))
+	int m_enemyDensity = 0;
+
+	UPROPERTY(EditAnywhere, Category = "Overworld settings")
+	float m_enemyFreeRangeFromSpawn = 1000.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Overworld settings", meta = (ClampMin = "0", ClampMax = "100", UIMin = "0", UIMax = "100"))
+	int m_torchDensity = 0;
+
 	UPROPERTY(EditAnywhere, Category = "Overworld settings")
 	TArray<UOverworldTileData*> m_tileData = {};
 
@@ -127,8 +137,8 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Overworld settings")
 	float m_dungeonEntranceHeightOffset = 0;
 
-	//UPROPERTY(EditAnywhere, Category = "Overworld settings")
-	//TArray<AEnemySpawn*> m_dungeonEntrance = {};
+	UPROPERTY(EditAnywhere, Category = "Overworld settings")
+	TArray<TSubclassOf<AEnemyCharacter>> m_possibleEnemies = {};
 
 	FRandomStream m_randomNumber;
 
