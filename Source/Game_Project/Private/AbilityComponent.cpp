@@ -2,6 +2,7 @@
 
 
 #include "AbilityComponent.h"
+#include <Kismet/GameplayStatics.h>
 
 // Sets default values for this component's properties
 UAbilityComponent::UAbilityComponent()
@@ -85,6 +86,13 @@ void UAbilityComponent::RemoveAbility(TSubclassOf<UBaseAbility> a_AbilityClass)
 			return;
 		}
 	}
+}
+
+void UAbilityComponent::RemoveAbilityFromIndex(int a_Index)
+{
+	if (a_Index > m_Abilities.Num()) return;
+
+	m_Abilities.RemoveAt(a_Index);
 }
 
 float UAbilityComponent::GetRemainingCooldownFromAbility(int32 a_Index)
