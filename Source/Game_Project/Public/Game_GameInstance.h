@@ -40,7 +40,14 @@ public:
 
 
 
+	void SetMusicVolume(float a_volume) { m_musicVolume = a_volume; }
+	void SetSFXVolume(float a_volume) { m_sfxVolume = a_volume; }
 
+	float GetMusicVolume() { return m_musicVolume; }
+	float GetSFXVolume() { return m_sfxVolume; }
+
+	void SetIsInLevel(bool a_isInLevel) { m_isInLevel = a_isInLevel; }
+	bool GetIsInLevel() { return m_isInLevel; }
 
 	void StartGameTimer();
 
@@ -60,4 +67,11 @@ private:
 
 	UPROPERTY()
 	class UWidget_GameTimer* m_timerWidgetInstance = nullptr;
+
+
+	float m_musicVolume = 1.0f;
+
+	float m_sfxVolume = 1.0f;
+
+	bool m_isInLevel = false;
 };
