@@ -97,7 +97,7 @@ void UFSM_EnemyStateMachineComponent::TransitionHandler(float a_deltaTime)
 			if (m_currentState->IsA(UFSM_Dead::StaticClass()))
 			{
 				AEnemyCharacter* ownerCharacter = Cast<AEnemyCharacter>(GetOwner());
-				ownerCharacter->SetDeathState(true);
+				
 				m_isDead = true;
 			}
 			else

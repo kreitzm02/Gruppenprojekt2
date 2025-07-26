@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ExpOrb.h"
 #include "Widget_EnemyHealthBar.h"
 #include "Components/BoxComponent.h"
 #include "Components/WidgetComponent.h"
@@ -69,7 +70,6 @@ public:
 
 	float GetKnockback() { return m_knockback; }
 
-	void SetDeathState(bool a_isDead) { m_isDead = a_isDead; }
 protected:
 	void UpdateHealthBar();
 
@@ -129,6 +129,12 @@ protected:
 	float m_knockback = 400.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
+	float m_minExpWorth = 50.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
+	float m_maxExpWorth = 100.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
 	int m_moneyValueOnDeath = 5;
 
 	UPROPERTY(EditAnywhere, Category = "Weapon Rotation")
@@ -143,4 +149,7 @@ protected:
 	float m_currentHealth;
 
 	float m_attackDuration = 0.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
+	TSubclassOf<AExpOrb> m_expOrbClass = nullptr;
 };
