@@ -67,6 +67,8 @@ public:
 
 	float GetAttackDamage() { return m_attackDamage; }
 
+	float GetKnockback() { return m_knockback; }
+
 	void SetDeathState(bool a_isDead) { m_isDead = a_isDead; }
 protected:
 	void UpdateHealthBar();
@@ -122,6 +124,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
 	float m_maxHealth = 100.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
+	float m_knockback = 400.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
+	int m_moneyValueOnDeath = 5;
 
 	UPROPERTY(EditAnywhere, Category = "Weapon Rotation")
 	FRotator m_weaponRotation = FRotator::ZeroRotator;

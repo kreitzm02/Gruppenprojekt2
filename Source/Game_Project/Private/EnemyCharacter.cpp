@@ -3,6 +3,7 @@
 
 #include "EnemyCharacter.h"
 #include "FSM_EnemyStateMachineComponent.h"
+#include "Game_GameInstance.h"
 #include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -130,6 +131,13 @@ float AEnemyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 
 void AEnemyCharacter::OnDeath()
 {
+	UGame_GameInstance* gameInstance = Cast<UGame_GameInstance>(GetGameInstance());
+	if (gameInstance && gameInstance->m_playerSave)
+	{
+		gameInstance->m_playerSave->m_currency += m_moneyValueOnDeath;
+		UGameplayStatics::SaveGameToSlot(gameInstance->m_playerSave, TEXT("PlayerSaveSlot"), 0);
+	}
+
 	SetActorEnableCollision(false);
 	GetCharacterMovement()->GravityScale = 0.1f;
 	m_widgetHealthBar->SetVisibility(ESlateVisibility::Collapsed);
