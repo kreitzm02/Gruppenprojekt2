@@ -140,6 +140,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Overworld settings")
 	TArray<TSubclassOf<AEnemyCharacter>> m_possibleEnemies = {};
 
+	UPROPERTY(EditAnywhere, Category = "Overworld settings")
+	TSubclassOf<AActor> m_torch = nullptr;
+
 	FRandomStream m_randomNumber;
 
 	TArray<PositionAndEdgeData> m_lastGeneratedTiles = {};

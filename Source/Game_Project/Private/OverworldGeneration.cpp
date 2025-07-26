@@ -365,6 +365,21 @@ void AOverworldGeneration::BeginPlay()
         }
     }
 
+    //nature placement
+    for (int i = m_emptyTiles->Num() - 1; i >= 0; i--)
+    {
+        int torchDensityRandom = m_randomNumber.RandRange(1, 100);
+        FVector position = (*m_emptyTiles)[i];
+        if (torchDensityRandom <= m_torchDensity)
+        {
+            AActor* actor;
+            //tileActor = GetWorld()->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), TilePosition(position.X, position.Y) + m_worldOffsetVector, FRotator::ZeroRotator);
+            actor = Cast<AActor>(m_chunkManager->SpawnActorInChunk(m_torch, TilePosition(position.X, position.Y) + m_worldOffsetVector, FRotator::ZeroRotator, FActorSpawnParameters()));
+            
+            m_emptyTiles->RemoveAt(i);
+        }
+    }
+
 
 
     if (!m_navMesh)
