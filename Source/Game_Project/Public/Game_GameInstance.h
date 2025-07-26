@@ -49,7 +49,11 @@ public:
 	float GetSFXVolume() { return m_sfxVolume; }
 
 	void SetIsInLevel(bool a_isInLevel) { m_isInLevel = a_isInLevel; }
+
+	UFUNCTION(BlueprintCallable)
 	bool GetIsInLevel() { return m_isInLevel; }
+
+
 
 	void StartGameTimer();
 
