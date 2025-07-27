@@ -39,7 +39,6 @@ public:
 
 private:
 
-	UPROPERTY()
-	ULevelStreamingDynamic* m_LoadedDungeonInstance = nullptr;
+	static ULevelStreamingDynamic* m_LoadedDungeonInstance;
 		
 };

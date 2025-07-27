@@ -4,6 +4,8 @@
 #include "DungeonLevelStreamer.h"
 #include "LoadingScreenManager.h"
 
+ULevelStreamingDynamic* UDungeonLevelStreamer::m_LoadedDungeonInstance = nullptr;
+
 // Sets default values for this component's properties
 UDungeonLevelStreamer::UDungeonLevelStreamer()
 {
