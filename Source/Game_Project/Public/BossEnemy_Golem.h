@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "DungeonExitPortal.h"
 #include "EnemyCharacter.h"
 #include "BossEnemy_Golem.generated.h"
 
@@ -129,4 +130,7 @@ private:
 	bool m_smashReady = false;
 
 	bool m_jumpReady = false;
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
+	TSubclassOf<ADungeonExitPortal> m_dungeonExitBP = nullptr;
 };

@@ -58,14 +58,6 @@ void AEnemy_GolemBoulder::OnHit(UPrimitiveComponent* a_overlappedComponent, AAct
 				UGameplayStatics::ApplyDamage(a_otherActor, m_owner->GetAttackDamage(), m_owner->GetController(), this, nullptr);
 				DestroyBoulder();
 			}
-			else
-			{
-				DestroyBoulder();
-			}
-		}
-		else
-		{
-			DestroyBoulder();
 		}
 	}
 }

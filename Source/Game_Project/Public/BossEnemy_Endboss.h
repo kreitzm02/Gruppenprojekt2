@@ -43,6 +43,8 @@ private:
 
 	FVector GetDirToPlayerNormalized();
 
+	void ResetMoveSpeed();
+
 	void SetCorners();
 
 	void MoveToPlayerFurthestEdge();
@@ -181,6 +183,10 @@ private:
 	bool m_periodicBurnGroundStarted = false;
 
 
+
+	float m_baseMaxMoveSpeed;
+
+	float m_baseAcceleration;
 
 
 	UPROPERTY()

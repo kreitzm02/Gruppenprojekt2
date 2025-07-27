@@ -14,6 +14,7 @@ ADungeonExitPortal::ADungeonExitPortal()
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
 	m_portalTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("Portal Trigger"));
 	m_portalVFX = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Portal VFX"));
+	m_DungeonLevelStreamer = CreateDefaultSubobject<UDungeonLevelStreamer>(TEXT("Dungeon Level Streaming Component"));
 
 	m_portalVFX->SetupAttachment(RootComponent);
 	m_portalTrigger->SetupAttachment(m_portalVFX);
@@ -43,6 +44,6 @@ void ADungeonExitPortal::OnPortalEnter(UPrimitiveComponent* a_overlappedComponen
 {
 	UE_LOG(LogTemp, Warning, TEXT("Entered Portal"))
 	ULoadingScreenManager::Get(GetWorld())->StartLoading(GetWorld());
-	//unload dungeon
+	m_DungeonLevelStreamer->UnloadDungeon();
 }
 
