@@ -84,9 +84,6 @@ void AEnemyCharacter::BeginPlay()
 
 	UUserWidget* widgetObject = m_healthBarComponent->GetUserWidgetObject();
 	m_widgetHealthBar = Cast<UWidget_EnemyHealthBar>(widgetObject);
-
-	UGame_GameInstance* gameInstance = Cast<UGame_GameInstance>(GetGameInstance());
-	gameInstance->AddGameTimerToViewport();
 }
 
 // Called every frame

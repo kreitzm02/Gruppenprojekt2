@@ -61,6 +61,8 @@ public:
 
 	void StartGameTimer();
 
+	bool TimerWidgetNotNullptr() { if (m_timerWidgetInstance) return true; return false; }
+
 	void AddGameTimerToViewport();
 
 private:
