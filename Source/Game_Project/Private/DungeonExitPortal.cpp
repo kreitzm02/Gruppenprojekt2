@@ -2,6 +2,8 @@
 
 
 #include "DungeonExitPortal.h"
+#include "DungeonLevelStreamer.h"
+#include "LoadingScreenManager.h"
 
 // Sets default values
 ADungeonExitPortal::ADungeonExitPortal()
@@ -40,5 +42,7 @@ void ADungeonExitPortal::Tick(float DeltaTime)
 void ADungeonExitPortal::OnPortalEnter(UPrimitiveComponent* a_overlappedComponent, AActor* a_otherActor, UPrimitiveComponent* a_otherComp, int32 a_otherBodyIndex, bool a_bFromSweep, const FHitResult& a_sweepResult)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Entered Portal"))
+	ULoadingScreenManager::Get(GetWorld())->StartLoading(GetWorld());
+	//unload dungeon
 }
 

@@ -7,6 +7,9 @@
 
 void UWidget_PauseMenu::ResumeGame()
 {
+	APlayerController* pc = GetWorld()->GetFirstPlayerController();
+	pc->SetInputMode(FInputModeGameOnly());
+	pc->bShowMouseCursor = false;
 	UGameplayStatics::SetGamePaused(GetWorld(), false);
 	RemoveFromParent();
 }
@@ -24,6 +27,11 @@ void UWidget_PauseMenu::OpenOptionsWidget()
 		RemoveFromParent();
 		m_optionsMenu->SetPauseMenu(this);
 		m_optionsMenu->AddToViewport();
+
+		FInputModeUIOnly InputMode;
+		InputMode.SetWidgetToFocus(m_optionsMenu->TakeWidget());
+		APlayerController* pc = GetWorld()->GetFirstPlayerController();
+		pc->SetInputMode(InputMode);
 	}
 }
 
