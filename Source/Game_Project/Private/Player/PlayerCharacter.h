@@ -12,8 +12,8 @@
 #include "Blueprint/UserWidget.h"
 #include <WLvlUpAbilitySelect.h>
 #include "WLvlUpAbilityReplace.h"
+#include <Widget_PauseMenu.h>
 #include "PlayerCharacter.generated.h"
-
 
 UCLASS()
 class APlayerCharacter : public ACharacter
@@ -50,6 +50,7 @@ protected:
 	void ChangeToAbilitySlot(int32 a_Index);
 	void AbilitySlotIncrease();
 	void AbilitySlotDecrease();
+	void ActivatePauseMenu();
 
 public:	
 	// Called every frame
@@ -277,6 +278,12 @@ private:
 
 	UPROPERTY()
 	UWidget_PlayerUI* m_playerUIInstance = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UWidget_PauseMenu> m_PauseUI = nullptr;
+
+	UPROPERTY()
+	UWidget_PauseMenu* m_PauseUIInstance = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<UWLvlUpAbilitySelect> m_lvlUpUI = nullptr;
