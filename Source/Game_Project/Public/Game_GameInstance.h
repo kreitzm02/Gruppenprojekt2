@@ -61,6 +61,8 @@ public:
 
 	void StartGameTimer();
 
+	void AddGameTimerToViewport();
+
 private:
 	void TickTimer();
 	void OnTimerEnd();

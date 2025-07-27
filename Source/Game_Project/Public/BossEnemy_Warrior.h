@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "DungeonExitPortal.h"
 #include "EnemyCharacter.h"
 #include "BossEnemy_Warrior.generated.h"
 
@@ -104,4 +105,7 @@ private:
 	bool m_chargeReady = false;
 
 	bool m_spinReady = false;
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
+	TSubclassOf<ADungeonExitPortal> m_dungeonExitBP = nullptr;
 };

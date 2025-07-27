@@ -42,6 +42,9 @@ void ABossEnemy_Endboss::BeginPlay()
 	GetCharacterMovement()->MaxWalkSpeed = m_maxWalkSpeed;
 	GetCharacterMovement()->MaxAcceleration = m_accelerationSpeed;
 
+	m_baseMaxMoveSpeed = GetCharacterMovement()->MaxWalkSpeed;
+	m_baseAcceleration = GetCharacterMovement()->MaxAcceleration;
+
 	m_nextSpecialAtPercent -= m_specialsAfterLostHPPercent;
 
 	m_leftHandAtkAnimLength = m_leftHandAtkAnim->GetPlayLength();
@@ -107,6 +110,11 @@ void ABossEnemy_Endboss::Tick(float DeltaTime)
 		}
 		SetCorners();
 	}
+
+	UE_LOG(LogTemp, Error, TEXT("Xmin: %f"), m_xSizeMin)
+	UE_LOG(LogTemp, Error, TEXT("Xmax: %f"), m_xSizeMax)
+	UE_LOG(LogTemp, Error, TEXT("Ymin: %f"), m_ySizeMin)
+	UE_LOG(LogTemp, Error, TEXT("Ymax: %f"), m_ySizeMax)
 
 
 	if (m_isDoingSpecialAtk && !m_isDead)
@@ -305,6 +313,12 @@ void ABossEnemy_Endboss::SetCorners()
 	m_cornersSet = true;
 }
 
+void ABossEnemy_Endboss::ResetMoveSpeed()
+{
+	GetCharacterMovement()->MaxWalkSpeed = m_baseMaxMoveSpeed;
+	GetCharacterMovement()->MaxAcceleration = m_baseAcceleration;
+}
+
 
 void ABossEnemy_Endboss::MoveToPlayerFurthestEdge()
 {
@@ -332,6 +346,9 @@ void ABossEnemy_Endboss::MoveToPlayerFurthestEdge()
 	}
 	m_skeletalMesh->PlayAnimation(m_chaseAnimation, true);
 
+	GetCharacterMovement()->MaxWalkSpeed *= 2;
+	GetCharacterMovement()->MaxAcceleration *= 2;
+
 	m_aiController->MoveToLocation(moveLoc);
 	m_movingToEdge = true;
 }
@@ -343,6 +360,7 @@ void ABossEnemy_Endboss::CheckIfMovedToEdge()
 	if (distance <= 100.0f)
 	{
 		m_multipleProjectileAtkCount += 2;
+		ResetMoveSpeed();
 		m_movingToEdge = false;
 		m_isDoingSpecialAtk = true;
 	}

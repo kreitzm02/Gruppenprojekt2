@@ -3,8 +3,10 @@
 
 #include "Game_GameInstance.h"
 
+#include "LoadingScreenManager.h"
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/PlayerCharacter.h"
 
 
 void UGame_GameInstance::Init()
@@ -119,6 +121,12 @@ void UGame_GameInstance::StartGameTimer()
 	}
 }
 
+void UGame_GameInstance::AddGameTimerToViewport()
+{
+	m_timerWidgetInstance->AddToViewport();
+}
+
+
 void UGame_GameInstance::TickTimer()
 {
 	m_remainingTime--;
@@ -137,9 +145,14 @@ void UGame_GameInstance::OnTimerEnd()
 {
 	GetWorld()->GetTimerManager().ClearTimer(m_gameTimerHandle);
 
+	UE_LOG(LogTemp, Error, TEXT("TIMER ENDED !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"))
+
 	if (m_timerWidgetInstance)
 	{
 		m_timerWidgetInstance->RemoveFromParent();
 		m_timerWidgetInstance->Destruct();
 	}
+	ACharacter* player = GetFirstLocalPlayerController()->GetCharacter();
+	ULoadingScreenManager::Get(player->GetWorld())->StartLoading(player->GetWorld());
+	UGameplayStatics::OpenLevel(this, "EndbossArena");
 }

@@ -90,8 +90,9 @@ float ABossEnemy_Mage::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 
 	UpdateHealthBar();
 
-	if (m_currentHealth <= 0.0f)
+	if (m_currentHealth <= 0.0f && !m_isDead)
 	{
+		GetWorld()->SpawnActor<ADungeonExitPortal>(m_dungeonExitBP, GetActorLocation(), FRotator::ZeroRotator);
 		OnDeath();
 	}
 

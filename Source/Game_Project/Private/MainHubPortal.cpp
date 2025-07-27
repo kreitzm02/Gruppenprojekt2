@@ -6,6 +6,8 @@
 #include "LoadingScreenManager.h"
 #include <Player/PlayerCharacter.h>
 
+#include "Game_GameInstance.h"
+
 // Sets default values
 AMainHubPortal::AMainHubPortal()
 {
@@ -53,5 +55,8 @@ void AMainHubPortal::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor*
     {
         ULoadingScreenManager::Get(Player->GetWorld())->StartLoading(Player->GetWorld());
         UGameplayStatics::OpenLevel(this, "temp");
+
+        UGame_GameInstance* gameInstance = Cast<UGame_GameInstance>(GetGameInstance());
+        gameInstance->StartGameTimer();
     }
 }
