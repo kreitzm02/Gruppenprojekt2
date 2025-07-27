@@ -34,6 +34,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Dungeon")
 	void LoadDungeon();
 
+	UFUNCTION(BlueprintCallable, Category = "Dungeon")
+	void UnloadDungeon();
+
 private:
 
 	UPROPERTY()
