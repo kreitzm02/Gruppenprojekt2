@@ -11,7 +11,7 @@ AExpOrb::AExpOrb()
 	PrimaryActorTick.bCanEverTick = true;
 
     m_CollisionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionSphere"));
-    m_CollisionSphere->InitSphereRadius(50.f);
+    m_CollisionSphere->InitSphereRadius(25.f);
     m_CollisionSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
     m_CollisionSphere->SetCollisionObjectType(ECC_WorldDynamic);
     m_CollisionSphere->SetCollisionResponseToAllChannels(ECR_Ignore);

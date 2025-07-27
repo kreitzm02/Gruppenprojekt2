@@ -166,7 +166,6 @@ void ADungeonGen::GenerateDungeon()
 	m_Builder->SpawnBossEnemyRandom();
 	m_Builder->BuildTorches();
 	BuildNavMeshForDungeon();
-	ULoadingScreenManager::Get(GetWorld())->EndLoading();
 }
 
 void ADungeonGen::BuildNavMeshForDungeon()
