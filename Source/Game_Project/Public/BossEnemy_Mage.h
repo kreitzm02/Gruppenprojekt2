@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "DungeonExitPortal.h"
 #include "EnemyCharacter.h"
 #include "Components/ArrowComponent.h"
 #include "BossEnemy_Mage.generated.h"
@@ -134,4 +135,7 @@ private:
 	UArrowComponent* m_projectileSpawnPoint = nullptr;
 
 	float m_fireballCastTime = 0.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
+	TSubclassOf<ADungeonExitPortal> m_dungeonExitBP = nullptr;
 };

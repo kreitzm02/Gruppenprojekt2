@@ -263,7 +263,13 @@ private:
 
 	// ui
 
-	FTimerHandle m_setAbilityIconTimer;
+	FTimerHandle m_setAbilityOneIconTimer;
+
+	FTimerHandle m_setAbilityTwoIconTimer;
+
+	FTimerHandle m_setAbilityThreeIconTimer;
+
+	FTimerHandle m_setAbilityFourIconTimer;
 
 	void SetAbilityOneIcon();
 
