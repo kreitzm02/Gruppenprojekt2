@@ -5,6 +5,9 @@
 #include "LoadingScreenManager.h"
 #include "DungeonEntrancePortal.h"
 
+#include "CustomChunkSystem/CustomChunkManager.h"
+#include "Kismet/GameplayStatics.h"
+
 // Sets default values
 ADungeonEntrancePortal::ADungeonEntrancePortal()
 {
@@ -29,7 +32,7 @@ ADungeonEntrancePortal::ADungeonEntrancePortal()
 void ADungeonEntrancePortal::BeginPlay()
 {
 	Super::BeginPlay();
-
+	m_chunkManager = Cast<ACustomChunkManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACustomChunkManager::StaticClass()));
 	m_portalTrigger->OnComponentBeginOverlap.AddDynamic(this, &ADungeonEntrancePortal::OnPortalEnter);
 }
 
@@ -38,7 +41,15 @@ void ADungeonEntrancePortal::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	//enemies spawn logic
-	UE_LOG(LogTemp, Warning, TEXT("Portal is Loaded"));
+	if (m_dungeonCleared)
+	{
+		m_passedTime += DeltaTime;
+		if (m_passedTime >= m_spawnInterval)
+		{
+			m_chunkManager->SpawnActorInChunk(m_possibleEnemies[FMath::RandRange(0, m_possibleEnemies.Num() - 1)], GetActorLocation(), FRotator::ZeroRotator, FActorSpawnParameters());
+			m_passedTime = 0.0f;
+		}
+	}
 }
 
 void ADungeonEntrancePortal::OnPortalEnter(UPrimitiveComponent* a_overlappedComponent, AActor* a_otherActor, UPrimitiveComponent* a_otherComp, int32 a_otherBodyIndex, bool a_bFromSweep, const FHitResult& a_sweepResult)

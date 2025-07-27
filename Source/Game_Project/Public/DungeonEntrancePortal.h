@@ -3,10 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EnemyCharacter.h"
 #include "NiagaraComponent.h"
 #include "Components/BoxComponent.h"
 #include "GameFramework/Actor.h"
 #include "DungeonEntrancePortal.generated.h"
+
+class ACustomChunkManager;
 
 UCLASS()
 class GAME_PROJECT_API ADungeonEntrancePortal : public AActor
@@ -43,4 +46,15 @@ private:
 	UPROPERTY(EditAnywhere)
 	UBoxComponent* m_portalTrigger = nullptr;
 	bool m_dungeonCleared = false;
+
+	UPROPERTY(EditAnywhere, Category = "Settings")
+	TArray<TSubclassOf<AEnemyCharacter>> m_possibleEnemies = {};
+
+	UPROPERTY()
+	ACustomChunkManager* m_chunkManager = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Settings")
+	float m_spawnInterval = 30.0f;
+
+	float m_passedTime = 0.0f;
 };

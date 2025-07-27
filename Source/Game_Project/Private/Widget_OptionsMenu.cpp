@@ -8,4 +8,9 @@ void UWidget_OptionsMenu::BackToPauseMenu()
 {
 	RemoveFromParent();
 	m_pauseMenu->AddToViewport();
+
+	FInputModeUIOnly InputMode;
+	InputMode.SetWidgetToFocus(m_pauseMenu->TakeWidget());
+	APlayerController* pc = GetWorld()->GetFirstPlayerController();
+	pc->SetInputMode(InputMode);
 }

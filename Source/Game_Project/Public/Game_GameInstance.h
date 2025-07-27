@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "PlayerSave.h"
 #include "Widget_GameTimer.h"
+#include "Widget_PlayerUI.h"
 #include "Engine/GameInstance.h"
 #include "Game_GameInstance.generated.h"
 
@@ -53,7 +54,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool GetIsInLevel() { return m_isInLevel; }
 
+	void SetPlayerUI(UWidget_PlayerUI* a_playerUI) { m_playerUI = a_playerUI; }
 
+	UFUNCTION(BlueprintCallable)
+	UWidget_PlayerUI* GetPlayerUI() { return m_playerUI; }
 
 	void StartGameTimer();
 
@@ -74,6 +78,8 @@ private:
 	UPROPERTY()
 	class UWidget_GameTimer* m_timerWidgetInstance = nullptr;
 
+	UPROPERTY()
+	UWidget_PlayerUI* m_playerUI = nullptr;
 
 	float m_musicVolume = 1.0f;
 
