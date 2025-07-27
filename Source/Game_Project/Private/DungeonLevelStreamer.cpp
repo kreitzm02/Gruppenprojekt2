@@ -56,3 +56,17 @@ void UDungeonLevelStreamer::LoadDungeon()
     }
 }
 
+void UDungeonLevelStreamer::UnloadDungeon()
+{
+    if (m_LoadedDungeonInstance)
+    {
+        m_LoadedDungeonInstance->SetIsRequestingUnloadAndRemoval(true);
+        UE_LOG(LogTemp, Log, TEXT("Dungeon unload requested."));
+        m_LoadedDungeonInstance = nullptr;
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("No dungeon instance to unload."));
+    }
+}
+

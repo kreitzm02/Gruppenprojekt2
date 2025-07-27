@@ -1,0 +1,57 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "MainHubPortal.h"
+#include <Kismet/GameplayStatics.h>
+#include "LoadingScreenManager.h"
+#include <Player/PlayerCharacter.h>
+
+// Sets default values
+AMainHubPortal::AMainHubPortal()
+{
+ 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = true;
+	// Root Component
+    RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
+
+    // Trigger Box
+    m_BoxCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("TriggerBox"));
+    m_BoxCollider->SetupAttachment(RootComponent);
+    m_BoxCollider->SetBoxExtent(FVector(50.0f, 10.0f, 200.0f));
+    m_BoxCollider->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+    m_BoxCollider->SetCollisionObjectType(ECC_WorldDynamic);
+    m_BoxCollider->SetCollisionResponseToAllChannels(ECR_Ignore);
+    m_BoxCollider->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+    m_BoxCollider->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Overlap);
+    m_BoxCollider->OnComponentBeginOverlap.AddDynamic(this, &AMainHubPortal::OnOverlapBegin);
+
+    // Visual Mesh (optional)
+    m_Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
+    m_Mesh->SetupAttachment(RootComponent);
+    m_Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+// Called when the game starts or when spawned
+void AMainHubPortal::BeginPlay()
+{
+	Super::BeginPlay();
+	
+}
+
+// Called every frame
+void AMainHubPortal::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+}
+
+void AMainHubPortal::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+    bool bFromSweep, const FHitResult& SweepResult)
+{
+    if (APlayerCharacter* Player = Cast<APlayerCharacter>(OtherActor))
+    {
+        ULoadingScreenManager::Get(Player->GetWorld())->StartLoading(Player->GetWorld());
+        UGameplayStatics::OpenLevel(this, "temp");
+    }
+}

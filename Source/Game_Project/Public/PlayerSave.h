@@ -5,8 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/SaveGame.h"
 #include <AllAbilities.h>
+#include <BaseAbility.h>
 #include "PlayerSave.generated.h"
-
 /**
  * 
  */
@@ -88,10 +88,16 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player Saves")
 	int m_healthRegenCount = 0;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player Save")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player Saves")
 	int m_CurrentPlayerClass;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player Save")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player Saves")
 	TMap<EAllAbilities, int> m_AbilityLevels;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player Saves")
+	TArray<UBaseAbility*> m_Abilities;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player Saves")
+	TArray<TSubclassOf<UBaseAbility>> m_AbilityClasses;
 
 };

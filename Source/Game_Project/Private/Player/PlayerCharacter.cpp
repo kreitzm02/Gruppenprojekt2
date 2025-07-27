@@ -60,6 +60,12 @@ void APlayerCharacter::BeginPlay()
 		FillAbilityLevelMap(); // fill only if m_AbilityLevels is empty
 		gameInstance->m_playerSave->m_AbilityLevels = m_AbilityLevels; // and then sync it
 	}
+
+	if (LevelName == "BossArena") // keep abilities when entering the boss arena levels
+	{
+		m_PlayerAbilities->m_Abilities = gameInstance->m_playerSave->m_Abilities;
+		m_PlayerAbilities->m_AbilityClasses = gameInstance->m_playerSave->m_AbilityClasses;
+	}
 	
 	SetupPlayer();
 
@@ -291,9 +297,9 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction("EquipAbilityD", IE_Pressed, this, &APlayerCharacter::ChangeToAbilitySlot3);
 	PlayerInputComponent->BindAction("AbilityIncrease", IE_Pressed, this, &APlayerCharacter::AbilitySlotIncrease);
 	PlayerInputComponent->BindAction("AbilityDecrease", IE_Pressed, this, &APlayerCharacter::AbilitySlotDecrease);
-	PlayerInputComponent->BindAction("PlayerClassA", IE_Pressed, this, &APlayerCharacter::ChangeToPlayerClassA);
-	PlayerInputComponent->BindAction("PlayerClassB", IE_Pressed, this, &APlayerCharacter::ChangeToPlayerClassB);
-	PlayerInputComponent->BindAction("PlayerClassC", IE_Pressed, this, &APlayerCharacter::ChangeToPlayerClassC);
+	//PlayerInputComponent->BindAction("PlayerClassA", IE_Pressed, this, &APlayerCharacter::ChangeToPlayerClassA);
+	//PlayerInputComponent->BindAction("PlayerClassB", IE_Pressed, this, &APlayerCharacter::ChangeToPlayerClassB);
+	//PlayerInputComponent->BindAction("PlayerClassC", IE_Pressed, this, &APlayerCharacter::ChangeToPlayerClassC);
 	PlayerInputComponent->BindAction("PlayerClassD", IE_Pressed, this, &APlayerCharacter::ChangeToPlayerClassD);
 }
 
@@ -406,7 +412,7 @@ void APlayerCharacter::SetupMeleeHitbox()
 {
 	m_MeleeHitBox = NewObject<UBoxComponent>(this, TEXT("MeleeHitBox"));
 	m_MeleeHitBox->SetupAttachment(GetMesh(), TEXT("handslot_r"));
-	m_MeleeHitBox->SetBoxExtent(FVector(0.25f, 0.25f, 0.25f));
+	m_MeleeHitBox->SetBoxExtent(FVector(0.4f, 0.4f, 0.4f));
 	m_MeleeHitBox->SetRelativeLocation(FVector(0.0f, -0.57f, -0.1f));
 	m_MeleeHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	m_MeleeHitBox->SetCollisionObjectType(ECollisionChannel::ECC_Pawn);
@@ -801,6 +807,8 @@ void APlayerCharacter::AddAbility(UMainAbilityContainerDataAsset* a_Ability, boo
 		default:
 			break;
 		}
+		Cast<UGame_GameInstance>(GetGameInstance())->m_playerSave->m_Abilities = m_PlayerAbilities->m_Abilities;
+		Cast<UGame_GameInstance>(GetGameInstance())->m_playerSave->m_AbilityClasses = m_PlayerAbilities->m_AbilityClasses;
 		return;
 	}
 	m_PlayerAbilities->TryAddAbility(ability);
@@ -825,7 +833,8 @@ void APlayerCharacter::AddAbility(UMainAbilityContainerDataAsset* a_Ability, boo
 	default:
 		break;
 	}
-
+	Cast<UGame_GameInstance>(GetGameInstance())->m_playerSave->m_Abilities = m_PlayerAbilities->m_Abilities;
+	Cast<UGame_GameInstance>(GetGameInstance())->m_playerSave->m_AbilityClasses = m_PlayerAbilities->m_AbilityClasses;
 	return;
 }
 
