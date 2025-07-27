@@ -4,7 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include <Components/WidgetComponent.h>
+#include <Components/SphereComponent.h>
+#include <Player/PlayerCharacter.h>
 #include "NPC.generated.h"
+
 
 UCLASS()
 class GAME_PROJECT_API ANPC : public AActor
@@ -23,25 +27,42 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-private:
-	UPROPERTY(EditAnywhere, Category = "NPC Settings", meta = (DisplayName = "Skeletal Mesh"))
-	USkeletalMesh* m_NPCMesh;
+	virtual void Interact();
 
-	UPROPERTY(EditAnywhere, Category = "NPC Settings", meta = (DisplayName = "Idle Animation"))
+	UPROPERTY(EditAnywhere, Category = "NPC")
+	FText m_DisplayName;
+
+	UPROPERTY(EditAnywhere, Category = "NPC")
+	USkeletalMeshComponent* m_Mesh;
+
+	UPROPERTY(EditAnywhere, Category = "NPC")
+	UWidgetComponent* m_InteractionWidget;
+
+	UPROPERTY(VisibleAnywhere)
+	USphereComponent* m_InteractionSphere;
+
+	UPROPERTY()
+	APlayerCharacter* m_OverlappingPlayer;
+
+	UFUNCTION()
+	void OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+		bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	bool IsPlayerInRange() const { return m_OverlappingPlayer != nullptr; }
+
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	UAnimSequence* m_IdleAnimation;
 
-	UPROPERTY(EditAnywhere, Category = "NPC Settings", meta = (DisplayName = "Interact Animation"))
-	UAnimSequence* m_InteractAnimation;
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	TArray<UAnimSequence*> m_RandomAnims;
 
-	UPROPERTY(EditAnywhere, Category = "NPC Settings", meta = (DisplayName = "Random Animation"))
-	UAnimSequence* m_AltAnimation;
+	FTimerHandle m_RandomAnimTimer;
 
-	bool IsInteractedWith();
-	void PlayInteraction();
-
-	FTimerHandle m_RandAnimSwitchHandle;
-
-	double m_TimeToSwitchRandAnim;
-	UAnimSequence* m_CurrentAnim;
-	USkeletalMeshComponent* m_MeshComp;
+	void TryPlayRandomAnim();
+	
 };

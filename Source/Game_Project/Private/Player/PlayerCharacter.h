@@ -90,6 +90,7 @@ public:
 	void ChangePlayerStamina(float a_Value);
 
 	void CheckForDeath();
+	void RespawnAfterDeath();
 
 	// external way to see and react to player stats
 	float GetPlayerHealth() { return m_PlayerHealth; }
@@ -146,6 +147,10 @@ private:
 	bool m_IsPlayerAlive = true;
 
 	bool m_PlayerShouldSprint = false;
+
+	bool m_PlayerIsInMainhub = false;
+
+	void SetCurrentPlayerClass(int a_ClassIndex);
 
 	// player stats
 
@@ -338,6 +343,8 @@ public:
 	//
 
 	void AddExperiencePoints(int a_Amount);
+
+	void InteractWithNearbyNPC();
 
 	// ui callable
 

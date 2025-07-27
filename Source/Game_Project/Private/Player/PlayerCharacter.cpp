@@ -8,13 +8,16 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/InputComponent.h"
 #include "Engine/SkeletalMeshSocket.h"
+#include "LoadingScreenManager.h"
 #include "MainAbilityContainer.h"
 #include "GameFramework/Controller.h"
+#include "NPC.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Animation/AnimInstance.h"
 #include <Kismet/GameplayStatics.h>
 
 #include "EnemyCharacter.h"
+#include <Game_GameInstance.h>
 
 
 // Sets default values
@@ -31,7 +34,33 @@ APlayerCharacter::APlayerCharacter()
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	FillAbilityLevelMap();
+
+	ULoadingScreenManager::Get(GetWorld())->EndLoading();
+
+	if (APlayerController* pc = GetWorld()->GetFirstPlayerController())
+	{
+		pc->bShowMouseCursor = false;
+		pc->SetInputMode(FInputModeGameOnly());
+	}
+
+	EnableInput(Cast<APlayerController>(GetController()));
+
+	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.0f);
+
+	FString LevelName = UGameplayStatics::GetCurrentLevelName(this, true);
+	m_PlayerIsInMainhub = LevelName == "MainHub1";
+
+	// TODO: Create LoadFromSaveFile()
+	UGame_GameInstance* gameInstance = Cast<UGame_GameInstance>(GetGameInstance());
+	m_AbilityLevels = gameInstance->m_playerSave->m_AbilityLevels;
+	m_CurrentPlayerClass = gameInstance->m_playerSave->m_CurrentPlayerClass;
+
+	if (m_AbilityLevels.Num() <= 0)
+	{
+		FillAbilityLevelMap(); // fill only if m_AbilityLevels is empty
+		gameInstance->m_playerSave->m_AbilityLevels = m_AbilityLevels; // and then sync it
+	}
+	
 	SetupPlayer();
 
 	m_AnimInstance = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
@@ -167,7 +196,14 @@ void APlayerCharacter::StopSprint()
 
 void APlayerCharacter::UseAbility()
 {
-	m_PlayerAbilities->ActivateAbility(m_CurrentAbilitySlot); 
+	if (m_PlayerIsInMainhub)
+	{
+		InteractWithNearbyNPC();
+	}
+	else
+	{
+		m_PlayerAbilities->ActivateAbility(m_CurrentAbilitySlot);
+	}
 }
 
 void APlayerCharacter::ChangeToAbilitySlot0()
@@ -580,7 +616,16 @@ void APlayerCharacter::CheckForDeath()
 	{
 		m_IsPlayerAlive = false;
 		DisableInput(Cast<APlayerController>(GetController()));
+		FTimerHandle deathDelayTimer;
+		float deathDelayBeforeRespawn = 3.0f;
+		GetWorld()->GetTimerManager().SetTimer(deathDelayTimer, FTimerDelegate::CreateUObject(this, &APlayerCharacter::RespawnAfterDeath), deathDelayBeforeRespawn, false);
 	}
+}
+
+void APlayerCharacter::RespawnAfterDeath()
+{
+	ULoadingScreenManager::Get(GetWorld())->StartLoading(GetWorld());
+	UGameplayStatics::OpenLevel(this, FName("MainHub1"));
 }
 
 #pragma endregion
@@ -802,6 +847,9 @@ void APlayerCharacter::ChangeAbilityLevel(EAllAbilities a_Ability, int a_Value)
 	if (!m_AbilityLevels.Find(a_Ability) || m_AbilityLevels[a_Ability] >= 3) return;
 	
 	m_AbilityLevels[a_Ability] += a_Value;
+
+	UGame_GameInstance* gameInstance = Cast<UGame_GameInstance>(GetGameInstance());
+	gameInstance->m_playerSave->m_AbilityLevels = m_AbilityLevels;
 }
 
 void APlayerCharacter::ChangeToAbilitySlot(int32 a_Index)
@@ -865,6 +913,22 @@ void APlayerCharacter::AddExperiencePoints(int a_Amount)
 	if (m_PlayerLevelExp - m_ExpForLevelUp >= 0)
 	{
 		UpdatePlayerLevel();
+	}
+}
+
+void APlayerCharacter::InteractWithNearbyNPC()
+{
+	TArray<AActor*> NPCs;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ANPC::StaticClass(), NPCs);
+
+	for (AActor* Actor : NPCs)
+	{
+		ANPC* NPC = Cast<ANPC>(Actor);
+		if (NPC && NPC->IsPlayerInRange() && NPC->m_OverlappingPlayer == this)
+		{
+			NPC->Interact();
+			return;
+		}
 	}
 }
 
@@ -959,6 +1023,14 @@ void APlayerCharacter::UpdatePlayerStamina(float a_DeltaTime, float a_Speed, flo
 	{
 		ChangePlayerStamina(5.0f * a_DeltaTime);
 	}
+}
+
+void APlayerCharacter::SetCurrentPlayerClass(int a_ClassIndex)
+{
+	m_CurrentPlayerClass = a_ClassIndex;
+	SetupChangedPlayerClass();
+	UGame_GameInstance* gameInstance = Cast<UGame_GameInstance>(GetGameInstance());
+	gameInstance->m_playerSave->m_CurrentPlayerClass = m_CurrentPlayerClass;
 }
 
 #pragma endregion
