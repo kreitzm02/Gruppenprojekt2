@@ -82,6 +82,8 @@ void APlayerCharacter::BeginPlay()
 	{
 		m_playerUIInstance = CreateWidget<UWidget_PlayerUI>(GetWorld(),m_playerUI);
 		m_playerUIInstance->AddToViewport();
+		m_playerUIInstance->UpdateShownMoney();
+		gameInstance->SetPlayerUI(m_playerUIInstance);
 	}
 
 	m_PlayerTotalExp = m_PlayerLevelExp = 0;

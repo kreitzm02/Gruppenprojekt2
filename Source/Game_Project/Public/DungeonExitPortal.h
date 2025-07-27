@@ -28,7 +28,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void SetDungeonAsCleared();
+	UPROPERTY(VisibleAnywhere, Category = "Dungeon Streaming", meta = (AllowPrivateAccess = "true"))
+	class UDungeonLevelStreamer* m_DungeonLevelStreamer;
 
 
 private:

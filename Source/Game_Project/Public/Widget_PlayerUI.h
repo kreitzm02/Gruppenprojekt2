@@ -47,4 +47,10 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "UI")
 	void SetAbilityFourIcon(UTexture2D* a_abilityIcon);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "UI")
+	void UpdateShownMoney();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "UI")
+	void ShowMoneyInPlayerUI(bool a_shouldShow);
 };

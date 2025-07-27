@@ -138,6 +138,7 @@ void AEnemyCharacter::OnDeath()
 	if (gameInstance && gameInstance->m_playerSave)
 	{
 		gameInstance->m_playerSave->m_currency += m_moneyValueOnDeath;
+		gameInstance->GetPlayerUI()->UpdateShownMoney();
 		UGameplayStatics::SaveGameToSlot(gameInstance->m_playerSave, TEXT("PlayerSaveSlot"), 0);
 	}
 
