@@ -38,7 +38,7 @@ void ADungeonGen::BeginPlay()
 		APlayerCharacter* PC = *It;
 		if (PC)
 		{
-			FInt32Vector2 startPos = m_Data.m_EndRoom.GetRoomCenter();
+			FInt32Vector2 startPos = m_Data.m_StartRoom.GetRoomCenter();
 			PC->SetActorLocation(FVector((float)startPos.X * m_UnitSize, (float)startPos.Y * m_UnitSize, 100.0f));
 			PC->SetActorRotation(FRotator::ZeroRotator);
 			UE_LOG(LogTemp, Log, TEXT("PlayerCharacter (Iterator) auf Startraum gesetzt."));
@@ -134,6 +134,7 @@ void ADungeonGen::GenerateCorridors()
 
 void ADungeonGen::GenerateDungeon()
 {
+	m_Seed = FMath::Rand();
 	m_DungeonRng.Initialize(m_Seed);
 	m_Data = { m_MaxRoomAmount, m_GridLength, m_GridWidth };
 	GenerateRooms();
@@ -166,6 +167,7 @@ void ADungeonGen::GenerateDungeon()
 	m_Builder->SpawnBossEnemyRandom();
 	m_Builder->BuildTorches();
 	BuildNavMeshForDungeon();
+	ULoadingScreenManager::Get(GetWorld())->EndLoading();
 }
 
 void ADungeonGen::BuildNavMeshForDungeon()

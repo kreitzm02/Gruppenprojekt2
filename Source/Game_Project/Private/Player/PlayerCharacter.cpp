@@ -278,6 +278,22 @@ void APlayerCharacter::ActivateMouseCursor(bool a_SetActive)
 	}
 }
 
+void APlayerCharacter::ActivatePauseMenu()
+{
+	if (m_PauseUI && !m_PauseUIInstance)
+	{
+		m_PauseUIInstance = CreateWidget<UWidget_PauseMenu>(GetWorld(), m_PauseUI);
+	}
+
+	ActivateMouseCursor(true);
+	m_PauseUIInstance->AddToViewport(2);
+	UGameplayStatics::SetGamePaused(GetWorld(), false);
+	FInputModeUIOnly InputMode;
+	InputMode.SetWidgetToFocus(m_PauseUIInstance->TakeWidget());
+	APlayerController* pc = GetWorld()->GetFirstPlayerController();
+	pc->SetInputMode(InputMode);
+}
+
 #pragma endregion
 
 #pragma region SETUP
@@ -301,6 +317,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	//PlayerInputComponent->BindAction("PlayerClassB", IE_Pressed, this, &APlayerCharacter::ChangeToPlayerClassB);
 	//PlayerInputComponent->BindAction("PlayerClassC", IE_Pressed, this, &APlayerCharacter::ChangeToPlayerClassC);
 	PlayerInputComponent->BindAction("PlayerClassD", IE_Pressed, this, &APlayerCharacter::ChangeToPlayerClassD);
+	PlayerInputComponent->BindAction("Pause", IE_Pressed, this, &APlayerCharacter::ActivatePauseMenu);
 }
 
 void APlayerCharacter::SetupChangedPlayerClass()
@@ -1028,11 +1045,11 @@ void APlayerCharacter::UpdatePlayerStamina(float a_DeltaTime, float a_Speed, flo
 {
 	if (a_Speed > m_PlayerMovementSpeed + a_MovementThreshold)
 	{
-		ChangePlayerStamina(-10.0f * a_DeltaTime);
+		ChangePlayerStamina(-8.0f * a_DeltaTime);
 	}
 	else
 	{
-		ChangePlayerStamina(5.0f * a_DeltaTime);
+		ChangePlayerStamina(8.0f * a_DeltaTime);
 	}
 }
 
