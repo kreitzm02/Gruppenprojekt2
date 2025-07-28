@@ -92,6 +92,8 @@ void ABossEnemy_Endboss::BeginPlay()
 	}
 
 	m_skeletalMesh->PlayAnimation(m_idleAnimation, true);
+
+	m_atkTimer = 999.0f;
 }
 
 
@@ -210,7 +212,7 @@ void ABossEnemy_Endboss::Tick(float DeltaTime)
 		}
 		else
 		{
-			if (!m_shotFired || m_atkTimer <= m_bothHandsAtkAnimLength)
+			if (!m_shotFired && m_atkTimer <= m_bothHandsAtkAnimLength)
 			{
 				m_atkTimer += DeltaTime;
 				if (m_atkTimer >= m_shootAtAnimOffset && !m_shotFired)
@@ -348,14 +350,14 @@ void ABossEnemy_Endboss::MoveToPlayerFurthestEdge()
 
 	GetCharacterMovement()->MaxWalkSpeed *= 2;
 	GetCharacterMovement()->MaxAcceleration *= 2;
-
+	m_moveToEdgeLocation = moveLoc;
 	m_aiController->MoveToLocation(moveLoc);
 	m_movingToEdge = true;
 }
 
 void ABossEnemy_Endboss::CheckIfMovedToEdge()
 {
-	float distance = FVector::Dist(GetActorLocation(), m_aiController->GetImmediateMoveDestination());
+	float distance = FVector::Dist(GetActorLocation(), m_moveToEdgeLocation);
 
 	if (distance <= 100.0f)
 	{

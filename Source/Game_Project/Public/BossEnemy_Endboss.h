@@ -225,4 +225,6 @@ private:
 	bool m_needAtkInit = true;
 
 	float m_cooldown = 1.0f;
+
+	FVector m_moveToEdgeLocation = FVector::ZeroVector;
 };
