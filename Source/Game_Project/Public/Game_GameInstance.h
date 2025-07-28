@@ -45,8 +45,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetSFXVolume(float a_volume) { m_sfxVolume = a_volume; }
 
-
+	UFUNCTION(BlueprintCallable)
 	float GetMusicVolume() { return m_musicVolume; }
+	UFUNCTION(BlueprintCallable)
 	float GetSFXVolume() { return m_sfxVolume; }
 
 	void SetIsInLevel(bool a_isInLevel) { m_isInLevel = a_isInLevel; }
