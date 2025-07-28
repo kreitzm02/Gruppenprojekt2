@@ -22,10 +22,7 @@ void UFSM_BossMageFireball::OnEnter()
 {
 	Super::OnEnter();
 
-	if (ACharacter* character = Cast<ACharacter>(m_ownerCharacter))
-	{
-		character->GetCharacterMovement()->StopMovementImmediately();
-	}
+	m_ownerCharacter->GetCharacterMovement()->StopMovementImmediately();
 
 	m_passedTime = 0.0f;
 
