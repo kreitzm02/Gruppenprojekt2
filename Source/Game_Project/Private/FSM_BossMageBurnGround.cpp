@@ -3,6 +3,7 @@
 
 #include "FSM_BossMageBurnGround.h"
 #include "Animation/AnimSingleNodeInstance.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Engine/OverlapResult.h"
 
 void UFSM_BossMageBurnGround::Initialize()
@@ -18,6 +19,10 @@ void UFSM_BossMageBurnGround::Initialize()
 void UFSM_BossMageBurnGround::OnEnter()
 {
 	Super::OnEnter();
+
+	
+	m_ownerCharacter->GetCharacterMovement()->StopMovementImmediately();
+	
 
 	if (m_ownerCharacter == nullptr)
 	{
