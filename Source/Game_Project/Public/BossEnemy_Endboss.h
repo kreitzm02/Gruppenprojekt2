@@ -29,7 +29,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	virtual float TakeDamage(float a_damageAmount, FDamageEvent const& a_damageEvent, AController* a_eventInstigator, AActor* a_damageCauser) override;
 
 	void SetArenaXMin(float a_xSizeMin) { m_xSizeMin = a_xSizeMin; }
 	void SetArenaXMax(float a_xSizeMax) { m_xSizeMax = a_xSizeMax; }

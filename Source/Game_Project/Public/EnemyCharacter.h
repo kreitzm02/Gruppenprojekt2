@@ -36,6 +36,8 @@ public:
 
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
+	void TakeKnockback(float a_knockbackStrength, FVector a_knockbackDirection);
+
 	UFUNCTION()
 	void HandleKnockback(FVector a_knockbackDirection, float a_knockbackStrength);
 

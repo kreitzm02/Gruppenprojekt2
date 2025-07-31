@@ -64,7 +64,7 @@ void AEnemy_GolemBoulder::OnHit(UPrimitiveComponent* a_overlappedComponent, AAct
 
 void AEnemy_GolemBoulder::OnHitPhysically(UPrimitiveComponent* a_hitComponent, AActor* a_otherActor, UPrimitiveComponent* a_otherComp, FVector a_normalImpulse, const FHitResult& a_hit)
 {
-	if (a_otherActor && a_otherActor != this)
+	if (a_otherActor && a_otherActor != this && !a_otherActor->IsA(AEnemy_GolemBoulder::StaticClass()))
 	{
 		if (a_otherComp)
 		{

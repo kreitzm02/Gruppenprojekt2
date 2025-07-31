@@ -149,8 +149,8 @@ private:
 	TArray<PositionAndEdgeData> m_currentGeneratedTiles = {};
 
 	
-	TArray<FVector>* m_endTiles = new TArray<FVector>;
-	TArray<FVector>* m_emptyTiles = new TArray<FVector>;
+	TArray<FVector> m_endTiles = {};
+	TArray<FVector> m_emptyTiles = {};
 
 	//map for each tile with each m_rotation and associated road data ordered after road count of roads on each edge
 	TMap<int, TArray<TArray<TileRoadWithRotationData>>>* m_possibleTilesMap = new TMap<int, TArray<TArray<TileRoadWithRotationData>>>();
