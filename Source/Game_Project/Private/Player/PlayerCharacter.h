@@ -390,6 +390,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	UAnimMontage* m_LongSpellcastMontage;
 
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float m_KnockbackStrenght = 700.0f;
+
 	UPROPERTY()
 	UPlayerAnimInstance* m_AnimInstance;
 };

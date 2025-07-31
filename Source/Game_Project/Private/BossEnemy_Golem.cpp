@@ -74,22 +74,13 @@ void ABossEnemy_Golem::Tick(float DeltaTime)
 	}
 }
 
-float ABossEnemy_Golem::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+float ABossEnemy_Golem::TakeDamage(float a_damageAmount, FDamageEvent const& a_damageEvent, AController* a_eventInstigator, AActor* a_damageCauser)
 {
-	m_currentHealth = FMath::Clamp(m_currentHealth - DamageAmount, 0.0f, m_maxHealth);
+	m_currentHealth = FMath::Clamp(m_currentHealth - a_damageAmount, 0.0f, m_maxHealth);
 
 	m_currentDoStuffMultiplier = 1 + (1 - m_currentHealth / m_maxHealth) / m_maxMultiplierAtHPPercent * (m_doStuffMaxMultiplier - 1);
 	m_currentDoStuffMultiplier = FMath::Clamp(m_currentDoStuffMultiplier, 1.0f, m_doStuffMaxMultiplier);
 
-	if (DamageCauser)
-	{
-		FVector knockbackDirection = GetActorLocation() - DamageCauser->GetActorLocation();
-		knockbackDirection.Z = 0;
-		knockbackDirection.Normalize();
-		HandleKnockback(knockbackDirection, 600.0f /*get knockback strengh from damage causer*/);
-		//ACharacter* damagingUnit = Cast<ACharacter>(DamageCauser);
-		//damagingUnit->GetKnockback();
-	}
 
 	UpdateHealthBar();
 
@@ -99,7 +90,7 @@ float ABossEnemy_Golem::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 		OnDeath();
 	}
 
-	return DamageAmount;
+	return a_damageAmount;
 }
 
 void ABossEnemy_Golem::CreateSmashShockwaveWithBoulder(AActor* a_boulderTarget)

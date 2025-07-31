@@ -262,11 +262,11 @@ void AOverworldGeneration::BeginPlay()
 
                 if (IsTileTileType(possibleTiles[selectedTile], RoadNoEdges))
                 {
-	                m_emptyTiles->Add(a_pos);
+	                m_emptyTiles.Add(a_pos);
                 }
                 else if (i >= m_worldSize - 1 && IsTileTileType(possibleTiles[selectedTile], RoadEnd))
                 {
-	                m_endTiles->Add(a_pos);
+	                m_endTiles.Add(a_pos);
                 }
 
                 //select a random tile out of the possible ones and spawns it
@@ -317,10 +317,10 @@ void AOverworldGeneration::BeginPlay()
     }
 
     //nature placement
-    for (int i = m_emptyTiles->Num() - 1; i >= 0; i--)
+    for (int i = m_emptyTiles.Num() - 1; i >= 0; i--)
     {
         int natureDensityRandom = m_randomNumber.RandRange(1, 100);
-        FVector position = (*m_emptyTiles)[i];
+        FVector position = m_emptyTiles[i];
         if (natureDensityRandom <= m_natureDensity)
         {
             //tileActor = GetWorld()->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), TilePosition(position.X, position.Y) + m_worldOffsetVector, FRotator::ZeroRotator);
@@ -331,24 +331,24 @@ void AOverworldGeneration::BeginPlay()
                 tileActor->GetStaticMeshComponent()->SetStaticMesh(m_natureDecorations[m_randomNumber.RandRange(0, m_natureDecorations.Num() - 1)]);
                 tileActor->SetMobility(EComponentMobility::Static);
             }
-            m_emptyTiles->RemoveAt(i);
+            m_emptyTiles.RemoveAt(i);
         }
     }
 
     //dungeon portals spawn
-	for (int i = m_endTiles->Num() - 1; i >= 0; i--)
+	for (int i = m_endTiles.Num() - 1; i >= 0; i--)
 	{
-		FVector position = (*m_endTiles)[i];
+		FVector position = m_endTiles[i];
         ADungeonEntrancePortal* portalActor = nullptr;
 		//portalActor = GetWorld()->SpawnActor<ADungeonEntrancePortal>(m_dungeonEntrance, TilePosition(position.X, position.Y) + FVector(0, 0, m_dungeonEntranceHeightOffset) + m_worldOffsetVector, FRotator::ZeroRotator);
         portalActor = Cast<ADungeonEntrancePortal>(m_chunkManager->SpawnActorInChunk(m_dungeonEntrance, TilePosition(position.X, position.Y) + FVector(0, 0, m_dungeonEntranceHeightOffset) + m_worldOffsetVector, FRotator::ZeroRotator, FActorSpawnParameters()));
 	}
 
     //enemiesSpawn
-    for (int i = m_emptyTiles->Num() - 1; i >= 0; i--)
+    for (int i = m_emptyTiles.Num() - 1; i >= 0; i--)
     {
         int enemyDensityRandom = m_randomNumber.RandRange(1, 100);
-        FVector position = (*m_emptyTiles)[i];
+        FVector position = m_emptyTiles[i];
         float currentDistToSpawn = FVector::Dist(TilePosition(position.X, position.Y) + m_worldOffsetVector, FVector::ZeroVector + m_worldOffsetVector);
 
         UE_LOG(LogTemp,Error, TEXT("currentDistance: %f"), currentDistToSpawn)
@@ -360,22 +360,22 @@ void AOverworldGeneration::BeginPlay()
                 AEnemyCharacter* enemy;
                 enemy = Cast<AEnemyCharacter>(m_chunkManager->SpawnActorInChunk(m_possibleEnemies[m_randomNumber.RandRange(0, m_possibleEnemies.Num() - 1)], TilePosition(position.X, position.Y) + m_worldOffsetVector, FRotator::ZeroRotator, FActorSpawnParameters()));
 
-                m_emptyTiles->RemoveAt(i);
+                m_emptyTiles.RemoveAt(i);
             }
         }
     }
 
     //torch placement
-    for (int i = m_emptyTiles->Num() - 1; i >= 0; i--)
+    for (int i = m_emptyTiles.Num() - 1; i >= 0; i--)
     {
         int torchDensityRandom = m_randomNumber.RandRange(1, 100);
-        FVector position = (*m_emptyTiles)[i];
+        FVector position = m_emptyTiles[i];
         if (torchDensityRandom <= m_torchDensity)
         {
             AActor* actor;
             actor = Cast<AActor>(m_chunkManager->SpawnActorInChunk(m_torch, TilePosition(position.X, position.Y) + m_worldOffsetVector, FRotator::ZeroRotator, FActorSpawnParameters()));
             
-            m_emptyTiles->RemoveAt(i);
+            m_emptyTiles.RemoveAt(i);
         }
     }
 
@@ -394,6 +394,9 @@ void AOverworldGeneration::BeginPlay()
             navSys->Build();
         }
     }
+
+    delete m_possibleTilesMap;
+    m_possibleTilesMap = nullptr;
 }
 
 

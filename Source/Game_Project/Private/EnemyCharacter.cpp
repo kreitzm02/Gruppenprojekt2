@@ -160,6 +160,11 @@ void AEnemyCharacter::OnDeath()
 	SetLifeSpan(4);
 }
 
+void AEnemyCharacter::TakeKnockback(float a_knockbackStrength, FVector a_knockbackDirection)
+{
+	HandleKnockback(a_knockbackDirection, a_knockbackStrength);
+}
+
 
 void AEnemyCharacter::HandleKnockback(FVector a_knockbackDirection, float a_knockbackStrength)
 {
