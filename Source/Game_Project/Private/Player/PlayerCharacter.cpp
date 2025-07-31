@@ -95,6 +95,12 @@ void APlayerCharacter::BeginPlay()
 	m_PlayerTotalExp = m_PlayerLevelExp = 0;
 	m_ExpForLevelUp = m_ExpLevelBarrier = 500;
 	m_PlayerLvl = 1;
+
+
+	if (gameInstance->TimerWidgetNotNullptr())
+	{
+		gameInstance->AddGameTimerToViewport();
+	}
 }
 
 // Called every frame

@@ -68,13 +68,20 @@ void AEnemy_Necromancer::Summon()
 
 		FTransform spawnTransform(rotation, location, scale);
 
-		AEnemy_NecroSummon* necroSummon = GetWorld()->SpawnActorDeferred<AEnemy_NecroSummon>(m_necroSummonBP, spawnTransform);
+		if (!m_chunkManager)
+		{
+			m_chunkManager = Cast<ACustomChunkManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACustomChunkManager::StaticClass()));
+		}
+
+		//AEnemy_NecroSummon* necroSummon = GetWorld()->SpawnActorDeferred<AEnemy_NecroSummon>(m_necroSummonBP, spawnTransform);
+		AEnemy_NecroSummon* necroSummon = Cast<AEnemy_NecroSummon>(m_chunkManager->SpawnActorInChunkDeferred(m_necroSummonBP, spawnTransform));
 		necroSummon->GetCharacterMovement()->GravityScale = 0.0f;
 		necroSummon->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		necroSummon->GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		necroSummon->SetHeightOffset(m_summonsHeightOffset);
 		necroSummon->SetOwnerNecromancer(this);
-		UGameplayStatics::FinishSpawningActor(necroSummon, spawnTransform);
+		//UGameplayStatics::FinishSpawningActor(necroSummon, spawnTransform);
+		m_chunkManager->FinishSpawningActorInChunk(necroSummon, spawnTransform);
 	}
 }
 

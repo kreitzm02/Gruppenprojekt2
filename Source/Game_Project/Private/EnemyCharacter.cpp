@@ -84,9 +84,6 @@ void AEnemyCharacter::BeginPlay()
 
 	UUserWidget* widgetObject = m_healthBarComponent->GetUserWidgetObject();
 	m_widgetHealthBar = Cast<UWidget_EnemyHealthBar>(widgetObject);
-
-	UGame_GameInstance* gameInstance = Cast<UGame_GameInstance>(GetGameInstance());
-	gameInstance->AddGameTimerToViewport();
 }
 
 // Called every frame
@@ -146,11 +143,14 @@ void AEnemyCharacter::OnDeath()
 		UGameplayStatics::SaveGameToSlot(gameInstance->m_playerSave, TEXT("PlayerSaveSlot"), 0);
 	}
 
-	ACustomChunkManager* chunkManager = Cast<ACustomChunkManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACustomChunkManager::StaticClass()));
-	AExpOrb* expOrb = Cast<AExpOrb>(chunkManager->SpawnActorInChunk(m_expOrbClass,GetActorLocation(),FRotator::ZeroRotator,FActorSpawnParameters()));
-	if (expOrb)
+	if (m_expOrbClass)
 	{
-		expOrb->SetExpRange(m_minExpWorth, m_maxExpWorth);
+		ACustomChunkManager* chunkManager = Cast<ACustomChunkManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACustomChunkManager::StaticClass()));
+		AExpOrb* expOrb = Cast<AExpOrb>(chunkManager->SpawnActorInChunk(m_expOrbClass,GetActorLocation(),FRotator::ZeroRotator,FActorSpawnParameters()));
+		if (expOrb)
+		{
+			expOrb->SetExpRange(m_minExpWorth, m_maxExpWorth);
+		}
 	}
 	
 

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "EnemyCharacter.h"
+#include "CustomChunkSystem/CustomChunkManager.h"
 #include "Enemy_Necromancer.generated.h"
 
 
@@ -68,4 +69,7 @@ private:
 	float m_passedCooldownTime = 0.0f;
 
 	bool m_summonReady = true;
+
+	UPROPERTY(VisibleAnywhere)
+	ACustomChunkManager* m_chunkManager = nullptr;
 };

@@ -26,6 +26,8 @@ public:
 	TMap<FIntPoint, FCustomChunk> m_AllChunks;
 
 	AActor* SpawnActorInChunk(UClass* a_ActorClass, const FVector& a_Position, const FRotator& a_Rotation, const FActorSpawnParameters& a_SpawnParameters);
+	AActor* SpawnActorInChunkDeferred(UClass* a_ActorClass, const FTransform& a_transform);
+	AActor* FinishSpawningActorInChunk(AActor* Actor, const FTransform& SpawnTransform);
 
 protected:
 	// Called when the game starts or when spawned

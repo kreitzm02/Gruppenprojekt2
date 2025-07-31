@@ -55,7 +55,7 @@ void ABossEnemy_Mage::Tick(float DeltaTime)
 
 		if (m_passedCooldownTime >= m_abilityCooldown)
 		{
-			switch (FMath::RandRange(0, 0))
+			switch (FMath::RandRange(0, 1))
 			{
 			case 0:
 				m_burnGroundReady = true;

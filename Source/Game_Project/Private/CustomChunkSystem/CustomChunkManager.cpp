@@ -28,6 +28,29 @@ AActor* ACustomChunkManager::SpawnActorInChunk(UClass* a_ActorClass, const FVect
 	return newActor;
 }
 
+AActor* ACustomChunkManager::SpawnActorInChunkDeferred(UClass* a_ActorClass, const FTransform& a_transform)
+{
+	AActor* newActor = GetWorld()->SpawnActorDeferred<AActor>(a_ActorClass, a_transform);
+	if (!newActor) return nullptr;
+
+	FIntPoint chunkPosition = GetChunkPosFromWorldPos(a_transform.GetLocation());
+
+	if (!m_AllChunks.Contains(chunkPosition)) m_AllChunks.Add(chunkPosition, FCustomChunk(chunkPosition.X, chunkPosition.Y));
+
+	FCustomChunk& chunk = m_AllChunks[chunkPosition];
+	chunk.m_AllActorsInThisChunk.Add(newActor);
+
+	return newActor;
+}
+
+AActor* ACustomChunkManager::FinishSpawningActorInChunk(AActor* a_actor, const FTransform& a_spawnTransform)
+{
+	AActor* actor = UGameplayStatics::FinishSpawningActor(a_actor, a_spawnTransform);
+
+	return actor;
+}
+
+
 // Called when the game starts or when spawned
 void ACustomChunkManager::BeginPlay()
 {
