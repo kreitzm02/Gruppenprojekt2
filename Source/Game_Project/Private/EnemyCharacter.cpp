@@ -9,6 +9,7 @@
 #include "CustomChunkSystem/CustomChunkManager.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/AudioComponent.h"
 
 // Sets default values
 AEnemyCharacter::AEnemyCharacter()
@@ -20,7 +21,8 @@ AEnemyCharacter::AEnemyCharacter()
 
 	m_weaponMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WeaponMesh"));
 	
-
+	m_ownActionSoundComp = CreateDefaultSubobject<UAudioComponent>(TEXT("Own Action Sounds"));
+	m_receivingActionSoundComp = CreateDefaultSubobject<UAudioComponent>(TEXT("Receiving Action Sounds"));
 
 	m_stateMachine = CreateDefaultSubobject<UFSM_EnemyStateMachineComponent>(TEXT("StateMachineComponent"));
 
@@ -45,6 +47,13 @@ AEnemyCharacter::AEnemyCharacter()
 	m_healthBarComponent->SetupAttachment(RootComponent);
 	m_healthBarComponent->SetWidgetSpace(EWidgetSpace::Screen);
 
+
+	static ConstructorHelpers::FObjectFinder<USoundWave> soundAsset(TEXT("/Game/Enemy/SFX/SFX_EnemyHit.SFX_EnemyHit"));
+	if (soundAsset.Succeeded())
+	{
+		m_hitSound = soundAsset.Object;
+	}
+
 }
 
 void AEnemyCharacter::OnConstruction(const FTransform& Transform)
@@ -65,6 +74,8 @@ void AEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	m_gameInstance = Cast<UGame_GameInstance>(GetGameInstance());
+
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Ignore);
@@ -84,6 +95,11 @@ void AEnemyCharacter::BeginPlay()
 
 	UUserWidget* widgetObject = m_healthBarComponent->GetUserWidgetObject();
 	m_widgetHealthBar = Cast<UWidget_EnemyHealthBar>(widgetObject);
+
+	m_ownActionSoundComp->SetVolumeMultiplier(m_gameInstance->GetSFXVolume());
+	m_receivingActionSoundComp->SetVolumeMultiplier(m_gameInstance->GetSFXVolume());
+
+	m_gameInstance->OnSFXVolumeChanged.AddDynamic(this, &AEnemyCharacter::HandleVolumeChanged);
 }
 
 // Called every frame
@@ -110,18 +126,10 @@ float AEnemyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 {
 	m_currentHealth = FMath::Clamp(m_currentHealth - DamageAmount, 0.0f, m_maxHealth);
 
-	if (DamageCauser)
-	{
-		FVector knockbackDirection = GetActorLocation() - DamageCauser->GetActorLocation();
-		knockbackDirection.Z = 0;
-		knockbackDirection.Normalize();
-		HandleKnockback(knockbackDirection,600.0f /*get knockback strengh from damage causer*/);
-		//ACharacter* damagingUnit = Cast<ACharacter>(DamageCauser);
-		//damagingUnit->GetKnockback();
-
-	}
-
 	UpdateHealthBar();
+
+	m_receivingActionSoundComp->Sound = m_hitSound;
+	m_receivingActionSoundComp->Play(0.0f);
 
 	if (m_currentHealth <= 0.0f && !m_isDead)
 	{
@@ -135,12 +143,11 @@ void AEnemyCharacter::OnDeath()
 {
 	m_isDead = true;
 
-	UGame_GameInstance* gameInstance = Cast<UGame_GameInstance>(GetGameInstance());
-	if (gameInstance && gameInstance->m_playerSave)
+	if (m_gameInstance && m_gameInstance->m_playerSave)
 	{
-		gameInstance->m_playerSave->m_currency += m_moneyValueOnDeath;
-		gameInstance->GetPlayerUI()->UpdateShownMoney();
-		UGameplayStatics::SaveGameToSlot(gameInstance->m_playerSave, TEXT("PlayerSaveSlot"), 0);
+		m_gameInstance->m_playerSave->m_currency += m_moneyValueOnDeath;
+		m_gameInstance->GetPlayerUI()->UpdateShownMoney();
+		UGameplayStatics::SaveGameToSlot(m_gameInstance->m_playerSave, TEXT("PlayerSaveSlot"), 0);
 	}
 
 	if (m_expOrbClass)
@@ -181,5 +188,18 @@ void AEnemyCharacter::OnHit(UPrimitiveComponent* a_overlappedComponent, AActor* 
 			UGameplayStatics::ApplyDamage(a_otherActor, m_attackDamage, GetController(), this, nullptr);
 			UE_LOG(LogTemp, Warning, TEXT("Enemy hit a player"))
 		}
+	}
+}
+
+
+void AEnemyCharacter::HandleVolumeChanged(float a_newVolume)
+{
+	if (m_ownActionSoundComp)
+	{
+		m_ownActionSoundComp->SetVolumeMultiplier(a_newVolume);
+	}
+	if (m_receivingActionSoundComp)
+	{
+		m_receivingActionSoundComp->SetVolumeMultiplier(a_newVolume);
 	}
 }
