@@ -57,6 +57,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Damage Ball Action Settings", meta = (DisplayName = "Ball Size"))
 	float m_BallSize;
 
+	UPROPERTY(EditAnywhere, Category = "Damage Circle Action Settings", meta = (DisplayName = "Knockback Strenght"))
+	float m_KnockbackStrenght = 700.0f;
+
 	UPROPERTY(EditAnywhere, Category = "Damage Ball Action Settings", meta = (DisplayName = "Color Glow Strength"))
 	float m_ColorGlowStrength;
 

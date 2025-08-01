@@ -7,6 +7,8 @@
 #include <Player/PlayerCharacter.h>
 #include <Game_GameInstance.h>
 
+#include "EnemyCharacter.h"
+
 void UDamageCircleAbilityAction::PrepareAbilityAction(AActor* a_AbilityUser)
 {
 	Super::PrepareAbilityAction(a_AbilityUser);
@@ -82,6 +84,10 @@ void UDamageCircleAbilityAction::PerformDamageTick(AActor* a_AbilityUser)
 				m_AlreadyHitActors.Add(hitActor);
 				float finalAttackDamage = m_DamagePerHit * Cast<UGame_GameInstance>(a_AbilityUser->GetWorld()->GetGameInstance())->m_playerSave->GetPlayerDmgMultiplier();
 				UGameplayStatics::ApplyDamage(hitActor, finalAttackDamage, nullptr, a_AbilityUser, nullptr);
+				if (AEnemyCharacter* hitEnemy = Cast<AEnemyCharacter>(hitActor))
+				{
+					hitEnemy->TakeKnockback(m_KnockbackStrenght, (hitEnemy->GetActorLocation() - location).GetSafeNormal());
+				}
 			}
 		}
 	}

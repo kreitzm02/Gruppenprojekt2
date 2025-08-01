@@ -27,7 +27,7 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
-	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	virtual float TakeDamage(float a_damageAmount, FDamageEvent const& a_damageEvent, AController* a_eventInstigator, AActor* a_damageCauser) override;
 
 	float GetMultiplier() { return m_currentDoStuffMultiplier; }
 

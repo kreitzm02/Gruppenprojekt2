@@ -146,8 +146,12 @@ void UDamageBallAbilityAction::PlayDamageBall(AActor* a_AbilityUser)
 					{
 						ballInstance->m_AlreadyHitActors.Add(hitActor);
 						ballInstance->m_HitCount++;
-						float finalAttackDamage = m_Damage * Cast<UGame_GameInstance>(a_AbilityUser->GetWorld()->GetGameInstance())->m_playerSave->GetPlayerDmgMultiplier();
+            float finalAttackDamage = m_Damage * Cast<UGame_GameInstance>(a_AbilityUser->GetWorld()->GetGameInstance())->m_playerSave->GetPlayerDmgMultiplier();
 						UGameplayStatics::ApplyDamage(hitActor, finalAttackDamage, nullptr, a_AbilityUser, nullptr);
+						if (AEnemyCharacter* hitEnemy = Cast<AEnemyCharacter>(hitActor))
+						{
+							hitEnemy->TakeKnockback(m_KnockbackStrenght, (hitEnemy->GetActorLocation() - ballInstance->m_CurrPosition).GetSafeNormal());
+						}
 
 						if (ballInstance->m_HitCount >= m_CollisionsBeforeDestruction)
 						{

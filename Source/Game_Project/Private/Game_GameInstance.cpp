@@ -150,7 +150,7 @@ void UGame_GameInstance::OnTimerEnd()
 	if (m_timerWidgetInstance)
 	{
 		m_timerWidgetInstance->RemoveFromParent();
-		m_timerWidgetInstance->Destruct();
+		m_timerWidgetInstance = nullptr;
 	}
 	ACharacter* player = GetFirstLocalPlayerController()->GetCharacter();
 	ULoadingScreenManager::Get(player->GetWorld())->StartLoading(player->GetWorld());

@@ -30,6 +30,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Damage Circle Action Settings", meta = (DisplayName = "Circle Radius"))
 	float m_CircleSize;
 
+	UPROPERTY(EditAnywhere, Category = "Damage Circle Action Settings", meta = (DisplayName = "Knockback Strenght"))
+	float m_KnockbackStrenght = 300.0f;
+
 	UPROPERTY(EditAnywhere, Category = "Damage Circle Action Settings", meta = (DisplayName = "Circle Color"))
 	FColor m_Color;
 

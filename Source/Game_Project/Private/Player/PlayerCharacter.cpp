@@ -644,6 +644,10 @@ void APlayerCharacter::OnHit(UPrimitiveComponent* a_overlappedComponent, AActor*
 		float finalAttackDamage = m_AttackDamage * Cast<UGame_GameInstance>(GetGameInstance())->m_playerSave->m_damageMultiplier;
 		m_AlreadyHitActors.Add(a_otherActor);
 		UGameplayStatics::ApplyDamage(a_otherActor, finalAttackDamage, GetController(), this, nullptr);
+		if (AEnemyCharacter* hitEnemy = Cast<AEnemyCharacter>(a_otherActor))
+		{
+			hitEnemy->TakeKnockback(m_KnockbackStrenght, (hitEnemy->GetActorLocation() - GetActorLocation()).GetSafeNormal());
+		}
 	}
 }
 
