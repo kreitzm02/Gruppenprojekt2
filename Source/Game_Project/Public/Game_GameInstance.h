@@ -9,15 +9,22 @@
 #include "Engine/GameInstance.h"
 #include "Game_GameInstance.generated.h"
 
-/**
- * 
- */
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMusicVolumeChanged, float, a_newVolume);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSFXVolumeChanged, float, a_newVolume);
+
 UCLASS()
 class GAME_PROJECT_API UGame_GameInstance : public UGameInstance
 {
 	GENERATED_BODY()
 public:
 	virtual void Init() override;
+
+	UPROPERTY(BlueprintAssignable, Category = "Audio")
+	FOnMusicVolumeChanged OnMusicVolumeChanged;
+
+	UPROPERTY(BlueprintAssignable, Category = "Audio")
+	FOnMusicVolumeChanged OnSFXVolumeChanged;
 
 	UPROPERTY(BlueprintReadOnly)
 	UPlayerSave* m_playerSave = nullptr;
@@ -41,9 +48,9 @@ public:
 
 
 	UFUNCTION(BlueprintCallable)
-	void SetMusicVolume(float a_volume) { m_musicVolume = a_volume; }
+	void SetMusicVolume(float a_volume);
 	UFUNCTION(BlueprintCallable)
-	void SetSFXVolume(float a_volume) { m_sfxVolume = a_volume; }
+	void SetSFXVolume(float a_volume);
 
 	UFUNCTION(BlueprintCallable)
 	float GetMusicVolume() { return m_musicVolume; }

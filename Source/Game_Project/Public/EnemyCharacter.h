@@ -78,6 +78,9 @@ protected:
 
 	virtual void OnDeath();
 
+	UFUNCTION()
+	void HandleVolumeChanged(float a_newVolume);
+
 	bool m_isDead = false;
 
 	UPROPERTY()

@@ -95,6 +95,11 @@ void AEnemyCharacter::BeginPlay()
 
 	UUserWidget* widgetObject = m_healthBarComponent->GetUserWidgetObject();
 	m_widgetHealthBar = Cast<UWidget_EnemyHealthBar>(widgetObject);
+
+	m_ownActionSoundComp->SetVolumeMultiplier(m_gameInstance->GetSFXVolume());
+	m_receivingActionSoundComp->SetVolumeMultiplier(m_gameInstance->GetSFXVolume());
+
+	m_gameInstance->OnSFXVolumeChanged.AddDynamic(this, &AEnemyCharacter::HandleVolumeChanged);
 }
 
 // Called every frame
@@ -125,7 +130,6 @@ float AEnemyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 
 	m_receivingActionSoundComp->Sound = m_hitSound;
 	m_receivingActionSoundComp->Play(0.0f);
-	m_receivingActionSoundComp->SetVolumeMultiplier(m_gameInstance->GetSFXVolume());
 
 	if (m_currentHealth <= 0.0f && !m_isDead)
 	{
@@ -184,5 +188,18 @@ void AEnemyCharacter::OnHit(UPrimitiveComponent* a_overlappedComponent, AActor* 
 			UGameplayStatics::ApplyDamage(a_otherActor, m_attackDamage, GetController(), this, nullptr);
 			UE_LOG(LogTemp, Warning, TEXT("Enemy hit a player"))
 		}
+	}
+}
+
+
+void AEnemyCharacter::HandleVolumeChanged(float a_newVolume)
+{
+	if (m_ownActionSoundComp)
+	{
+		m_ownActionSoundComp->SetVolumeMultiplier(a_newVolume);
+	}
+	if (m_receivingActionSoundComp)
+	{
+		m_receivingActionSoundComp->SetVolumeMultiplier(a_newVolume);
 	}
 }
