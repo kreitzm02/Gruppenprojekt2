@@ -7,6 +7,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include <EnemyCharacter.h>
 #include <Kismet/GameplayStatics.h>
+#include <Game_GameInstance.h>
 
 void UDamageBallAbilityAction::PrepareAbilityAction(AActor* a_AbilityUser)
 {
@@ -133,7 +134,7 @@ void UDamageBallAbilityAction::PlayDamageBall(AActor* a_AbilityUser)
 
 			// enemy hit
 			TArray<FOverlapResult> overlaps;
-			FCollisionShape shape = FCollisionShape::MakeSphere(m_BallSize);
+			FCollisionShape shape = FCollisionShape::MakeSphere(m_BallSize * 1.33f);
 			bool overlap = a_AbilityUser->GetWorld()->OverlapMultiByChannel(overlaps, nextPos, FQuat::Identity, ECC_Pawn, shape);
 
 			if (overlap)
@@ -145,7 +146,8 @@ void UDamageBallAbilityAction::PlayDamageBall(AActor* a_AbilityUser)
 					{
 						ballInstance->m_AlreadyHitActors.Add(hitActor);
 						ballInstance->m_HitCount++;
-						UGameplayStatics::ApplyDamage(hitActor, m_Damage, nullptr, a_AbilityUser, nullptr);
+						float finalAttackDamage = m_Damage * Cast<UGame_GameInstance>(a_AbilityUser->GetWorld()->GetGameInstance())->m_playerSave->GetPlayerDmgMultiplier();
+						UGameplayStatics::ApplyDamage(hitActor, finalAttackDamage, nullptr, a_AbilityUser, nullptr);
 
 						if (ballInstance->m_HitCount >= m_CollisionsBeforeDestruction)
 						{

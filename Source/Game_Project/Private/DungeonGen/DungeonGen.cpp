@@ -31,6 +31,7 @@ ADungeonGen::ADungeonGen()
 void ADungeonGen::BeginPlay()
 {
 	Super::BeginPlay();
+	m_ThisLevel = GetLevel();
 	GenerateDungeon();
 
 	for (TActorIterator<APlayerCharacter> It(GetWorld()); It; ++It)
@@ -157,7 +158,7 @@ void ADungeonGen::GenerateDungeon()
 	}
 
 	m_Builder = NewObject<UDungeonBuilder>(this);
-	m_Builder->Init(m_UnitSize, m_DungeonTheme, &m_Data, GetWorld(), m_WallOffset);
+	m_Builder->Init(m_UnitSize, m_DungeonTheme, &m_Data, GetWorld(), m_WallOffset, m_ThisLevel);
 	m_Builder->BuildFloor();
 	m_Builder->BuildWall();
 	m_Builder->BuildDebugObjects();

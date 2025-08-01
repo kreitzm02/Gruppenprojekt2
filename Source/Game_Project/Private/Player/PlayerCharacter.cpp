@@ -19,7 +19,7 @@
 #include "EnemyCharacter.h"
 #include <Game_GameInstance.h>
 
-
+#pragma region UNREAL METHODS
 // Sets default values
 APlayerCharacter::APlayerCharacter()
 {
@@ -52,19 +52,17 @@ void APlayerCharacter::BeginPlay()
 
 	// TODO: Create LoadFromSaveFile()
 	UGame_GameInstance* gameInstance = Cast<UGame_GameInstance>(GetGameInstance());
-	m_AbilityLevels = gameInstance->m_playerSave->m_AbilityLevels;
 	m_CurrentPlayerClass = gameInstance->m_playerSave->m_CurrentPlayerClass;
 	
-	if (m_AbilityLevels.Num() <= 0)
-	{
-		FillAbilityLevelMap(); // fill only if m_AbilityLevels is empty
-		gameInstance->m_playerSave->m_AbilityLevels = m_AbilityLevels; // and then sync it
-	}
+	FillAbilityLevelMap();
 
-	if (LevelName == "test") // keep abilities when entering the boss arena levels
+	if (LevelName == "EndbossArena" || LevelName == "MainHub1" || LevelName == "TutorialArea1") // keep abilities when entering these levels
 	{
-		m_PlayerAbilities->m_Abilities = gameInstance->m_playerSave->m_Abilities;
-		m_PlayerAbilities->m_AbilityClasses = gameInstance->m_playerSave->m_AbilityClasses;
+		for (int i = 0; i < gameInstance->m_playerSave->m_AbilityClasses.Num(); i++)
+		{
+			AddAbilityDirect(gameInstance->m_playerSave->m_AbilityClasses[i]);
+		}
+		m_AbilityLevels = gameInstance->m_playerSave->m_AbilityLevels;
 	}
 	
 	SetupPlayer();
@@ -93,7 +91,7 @@ void APlayerCharacter::BeginPlay()
 	}
 
 	m_PlayerTotalExp = m_PlayerLevelExp = 0;
-	m_ExpForLevelUp = m_ExpLevelBarrier = 500;
+	m_ExpForLevelUp = m_ExpLevelBarrier = 150;
 	m_PlayerLvl = 1;
 
 
@@ -176,7 +174,10 @@ void APlayerCharacter::Tick(float DeltaTime)
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("Player Abilities: %i"), m_AbilityNum)
+
+	m_PlayerMaxHealth = m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_BaseHealthPoints * Cast<UGame_GameInstance>(GetGameInstance())->m_playerSave->GetPlayerHPMultiplier();
 }
+#pragma endregion
 
 #pragma region INPUT
 
@@ -333,6 +334,7 @@ void APlayerCharacter::SetupChangedPlayerClass()
 	m_PlayerAbilities->RemoveAllAbilities();
 	AddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility);
 	m_CurrentAbilitySlot = 0;
+	Cast<UGame_GameInstance>(GetGameInstance())->m_playerSave->m_CurrentPlayerClass = m_CurrentPlayerClass; 
 
 	// only for debug purposes. the player would normally start with just 1 ability ( the m_StartingAbility)
 	//AddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility1Debug);
@@ -454,8 +456,11 @@ void APlayerCharacter::UpdatePlayerLevel()
 {
 	m_PlayerLvl++;
 	m_PlayerLevelExp = FMath::Max(0, m_PlayerLevelExp - m_ExpLevelBarrier);
-	m_ExpLevelBarrier *= 1.25f;
-	m_ExpForLevelUp *= 1.25f;
+	if (m_PlayerLvl < 25)
+	{
+		m_ExpLevelBarrier *= 1 + (((100 - 4 * m_PlayerLvl) / m_PlayerLvl) / 100);
+		m_ExpForLevelUp *= 1 + (((100 - 4 * m_PlayerLvl) / m_PlayerLvl) / 100);
+	}
 	m_playerUIInstance->SetExpPercent(float(m_PlayerLevelExp) / m_ExpForLevelUp);
 	for (int i = 0; i < m_LvlUpAbilitySelection.Num(); i++)
 	{
@@ -636,8 +641,9 @@ void APlayerCharacter::OnHit(UPrimitiveComponent* a_overlappedComponent, AActor*
 	if (a_otherActor && a_otherActor != this && a_otherComp)
 	{
 		if (m_AlreadyHitActors.Contains(a_otherActor)) return;
+		float finalAttackDamage = m_AttackDamage * Cast<UGame_GameInstance>(GetGameInstance())->m_playerSave->m_damageMultiplier;
 		m_AlreadyHitActors.Add(a_otherActor);
-		UGameplayStatics::ApplyDamage(a_otherActor, m_AttackDamage, GetController(), this, nullptr);
+		UGameplayStatics::ApplyDamage(a_otherActor, finalAttackDamage, GetController(), this, nullptr);
 	}
 }
 
@@ -772,7 +778,7 @@ UMainAbilityContainerDataAsset* APlayerCharacter::GetRandomAbilityFromPool()
 	for (int i = 0; i < m_AbilityPool.Num(); i++)
 	{
 		int32 randIndex = FMath::RandRange(0, tempPool.Num() - 1);
-		if (m_AbilityLevels.FindRef(tempPool[randIndex]->m_ThisAbility) == 3)
+		if (m_AbilityLevels.FindRef(tempPool[randIndex]->m_ThisAbility) == 3 && PlayerHasAbility(tempPool[randIndex]))
 		{
 			tempPool.RemoveAt(randIndex);
 			continue;
@@ -921,8 +927,8 @@ void APlayerCharacter::ReplaceAbilityFromUI(int a_IndexToReplace)
 
 void APlayerCharacter::AddExperiencePoints(int a_Amount)
 {
-	m_PlayerTotalExp += a_Amount;
-	m_PlayerLevelExp += a_Amount;
+	m_PlayerTotalExp += a_Amount * Cast<UGame_GameInstance>(GetGameInstance())->m_playerSave->GetPlayerXPGainMultiplier();
+	m_PlayerLevelExp += a_Amount * Cast<UGame_GameInstance>(GetGameInstance())->m_playerSave->GetPlayerXPGainMultiplier();
 
 	m_playerUIInstance->SetExpPercent(float(m_PlayerLevelExp) / m_ExpForLevelUp);
 
@@ -932,21 +938,7 @@ void APlayerCharacter::AddExperiencePoints(int a_Amount)
 	}
 }
 
-void APlayerCharacter::InteractWithNearbyNPC()
-{
-	TArray<AActor*> NPCs;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ANPC::StaticClass(), NPCs);
 
-	for (AActor* Actor : NPCs)
-	{
-		ANPC* NPC = Cast<ANPC>(Actor);
-		if (NPC && NPC->IsPlayerInRange() && NPC->m_OverlappingPlayer == this)
-		{
-			NPC->Interact();
-			return;
-		}
-	}
-}
 
 void APlayerCharacter::TryAddPlayerHealth(float a_Amount)
 {
@@ -1033,11 +1025,11 @@ void APlayerCharacter::UpdatePlayerStamina(float a_DeltaTime, float a_Speed, flo
 {
 	if (a_Speed > m_PlayerMovementSpeed + a_MovementThreshold)
 	{
-		ChangePlayerStamina(-8.0f * a_DeltaTime);
+		ChangePlayerStamina(-12.5f * a_DeltaTime);
 	}
 	else
 	{
-		ChangePlayerStamina(8.0f * a_DeltaTime);
+		ChangePlayerStamina(8.0f * Cast<UGame_GameInstance>(GetGameInstance())->m_playerSave->GetPlayerStaminaRegenMultiplier() * a_DeltaTime);
 	}
 }
 
@@ -1050,3 +1042,19 @@ void APlayerCharacter::SetCurrentPlayerClass(int a_ClassIndex)
 }
 
 #pragma endregion
+
+void APlayerCharacter::InteractWithNearbyNPC()
+{
+	TArray<AActor*> NPCs;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ANPC::StaticClass(), NPCs);
+
+	for (AActor* Actor : NPCs)
+	{
+		ANPC* NPC = Cast<ANPC>(Actor);
+		if (NPC && NPC->IsPlayerInRange() && NPC->m_OverlappingPlayer == this)
+		{
+			NPC->Interact();
+			return;
+		}
+	}
+}

@@ -4,6 +4,7 @@
 #include "AbilityActions/SelfHealAbilityAction.h"
 #include <Player/PlayerCharacter.h>
 #include <NiagaraFunctionLibrary.h>
+#include <Game_GameInstance.h>
 
 void USelfHealAbilityAction::PrepareAbilityAction(AActor* a_AbilityUser)
 {
@@ -51,7 +52,7 @@ void USelfHealAbilityAction::PlaySelfHeal(AActor* a_AbilityUser)
 	// heal player
 	if (APlayerCharacter* player = Cast<APlayerCharacter>(a_AbilityUser))
 	{
-		player->TryAddPlayerHealth(m_HPAmount);
+		player->TryAddPlayerHealth(m_HPAmount * Cast<UGame_GameInstance>(a_AbilityUser->GetWorld()->GetGameInstance())->m_playerSave->GetPlayerHPRegenMultiplier());
 	}
 
 	a_AbilityUser->GetWorld()->GetTimerManager().SetTimer(m_MoveTimerHandle, FTimerDelegate::CreateUObject(this, &USelfHealAbilityAction::MoveSelfHeal, a_AbilityUser), 0.01f, true);

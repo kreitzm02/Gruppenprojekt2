@@ -5,6 +5,7 @@
 #include "Engine/OverlapResult.h"
 #include "Engine/StaticMeshActor.h"
 #include <Player/PlayerCharacter.h>
+#include <Game_GameInstance.h>
 
 void UDamageCircleAbilityAction::PrepareAbilityAction(AActor* a_AbilityUser)
 {
@@ -79,7 +80,8 @@ void UDamageCircleAbilityAction::PerformDamageTick(AActor* a_AbilityUser)
 			{
 				if (m_AlreadyHitActors.Contains(hitActor)) continue;
 				m_AlreadyHitActors.Add(hitActor);
-				UGameplayStatics::ApplyDamage(hitActor, m_DamagePerHit, nullptr, a_AbilityUser, nullptr);
+				float finalAttackDamage = m_DamagePerHit * Cast<UGame_GameInstance>(a_AbilityUser->GetWorld()->GetGameInstance())->m_playerSave->GetPlayerDmgMultiplier();
+				UGameplayStatics::ApplyDamage(hitActor, finalAttackDamage, nullptr, a_AbilityUser, nullptr);
 			}
 		}
 	}

@@ -78,6 +78,7 @@ private:
 	UPROPERTY()
 	UDungeonBuilder* m_Builder;
 	FRandomStream m_DungeonRng;
+	ULevel* m_ThisLevel;
 
 	void GenerateRooms();
 	void GenerateCorridors();

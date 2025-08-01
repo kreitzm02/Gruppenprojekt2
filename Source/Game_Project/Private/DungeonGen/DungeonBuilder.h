@@ -21,9 +21,10 @@ class UDungeonBuilder : public UObject
 	FDungeonData* m_Data;
 	UWorld* m_WorldContext;
 	float m_WallOffset;
+	ULevel* m_Level;
 
 public:
-	void Init(float a_UnitSize, UDungeonTheme* a_Theme, FDungeonData* a_Data, UWorld* a_World, float a_WallOffset);
+	void Init(float a_UnitSize, UDungeonTheme* a_Theme, FDungeonData* a_Data, UWorld* a_World, float a_WallOffset, ULevel* a_Level);
 	void BuildFloor();
 	void BuildWall();
 	void BuildDebugObjects();
@@ -35,6 +36,7 @@ public:
 
 private:
 	void TryPlaceWall(int32 a_GridX, int32 a_GridY, const FVector& a_Position, const FRotator& a_Rotation, int32 a_WallIndex) const;
+	void TryPlaceDoor(int32 a_GridX, int32 a_GridY) const;
 	bool IsWithinBounds(int32 a_GridX, int32 a_GridY) const;
 	bool TryPlacePrefabCornerFacingCenter(TArray<TArray<ECellType>> a_Grid, int32 a_GridX, int32 a_GridY, FDungeonRoom a_Room, UStaticMesh* a_Mesh, int32 a_Probabilty);
 	bool TryPlacePrefabCornerOrthoRotation(TArray<TArray<ECellType>> a_Grid, int32 a_GridX, int32 a_GridY, FDungeonRoom a_Room, UStaticMesh* a_Mesh, int32 a_Probabilty);
