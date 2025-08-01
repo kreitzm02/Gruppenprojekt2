@@ -100,6 +100,21 @@ bool UGame_GameInstance::TryBuyHPRegen()
 	return false;
 }
 
+void UGame_GameInstance::SetMusicVolume(float a_volume)
+{
+	m_musicVolume = a_volume;
+	OnMusicVolumeChanged.Broadcast(a_volume);
+}
+
+void UGame_GameInstance::SetSFXVolume(float a_volume)
+{
+	m_sfxVolume = a_volume;
+	OnSFXVolumeChanged.Broadcast(a_volume);
+}
+
+
+
+
 
 
 
