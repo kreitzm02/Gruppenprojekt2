@@ -37,8 +37,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Meshes", meta = (DisplayName = "Boss Floor Mesh"))
 	UStaticMesh* m_BossFloorMesh;
 
-	UPROPERTY(EditAnywhere, Category = "Meshes", meta = (DisplayName = "Chest Mesh"))
-	USkeletalMesh* m_ChestMesh;
+	UPROPERTY(EditAnywhere, Category = "Meshes", meta = (DisplayName = "Door Mesh"))
+	TSubclassOf<AActor> m_DoorMesh;
 
 	UPROPERTY(EditAnywhere, Category = "Meshes", meta = (DisplayName = "O Corner Wall Mesh"))
 	UStaticMesh* m_WallOCornerMesh;

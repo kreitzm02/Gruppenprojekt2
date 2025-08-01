@@ -10,6 +10,7 @@
 #include "GameFramework/Character.h"
 #include "EnemyCharacter.generated.h"
 
+class UGame_GameInstance;
 class UFSM_EnemyStateMachineComponent;
 
 UCLASS()
@@ -79,6 +80,9 @@ protected:
 
 	bool m_isDead = false;
 
+	UPROPERTY()
+	UGame_GameInstance* m_gameInstance;
+
 	UPROPERTY(VisibleAnywhere)
 	USkeletalMeshComponent* m_skeletalMesh;
 
@@ -87,6 +91,12 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	UFSM_EnemyStateMachineComponent* m_stateMachine;
+
+	UPROPERTY(VisibleAnywhere)
+	UAudioComponent* m_ownActionSoundComp;
+
+	UPROPERTY(VisibleAnywhere)
+	UAudioComponent* m_receivingActionSoundComp;
 
 	UPROPERTY(VisibleAnywhere, Category = "Enemy Properties")
 	UBoxComponent* m_characterHitbox;
@@ -154,4 +164,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
 	TSubclassOf<AExpOrb> m_expOrbClass = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
+	USoundWave* m_hitSound = nullptr;
 };
