@@ -3,6 +3,7 @@
 
 #include "WLvlUpAbilityReplace.h"
 #include <Player/PlayerCharacter.h>
+#include <Kismet/GameplayStatics.h>
 
 void UWLvlUpAbilityReplace::NativeConstruct()
 {
@@ -27,6 +28,11 @@ void UWLvlUpAbilityReplace::NativeConstruct()
 	{
 		Button_Ability4->OnClicked.RemoveDynamic(this, &UWLvlUpAbilityReplace::OnButton4Clicked);
 		Button_Ability4->OnClicked.AddDynamic(this, &UWLvlUpAbilityReplace::OnButton4Clicked);
+	}
+	if (Button_Skip)
+	{
+		Button_Skip->OnClicked.RemoveDynamic(this, &UWLvlUpAbilityReplace::OnButton5Clicked);
+		Button_Skip->OnClicked.AddDynamic(this, &UWLvlUpAbilityReplace::OnButton5Clicked);
 	}
 }
 
@@ -72,4 +78,16 @@ void UWLvlUpAbilityReplace::OnButton4Clicked()
 		{
 			player->ReplaceAbilityFromUI(3);
 		}
+}
+
+void UWLvlUpAbilityReplace::OnButton5Clicked()
+{
+	APlayerController* pc = GetOwningPlayer();
+	if (pc)
+	{
+		pc->bShowMouseCursor = false;
+		pc->SetInputMode(FInputModeGameOnly());
+	}
+	RemoveFromViewport();
+	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.0f);
 }

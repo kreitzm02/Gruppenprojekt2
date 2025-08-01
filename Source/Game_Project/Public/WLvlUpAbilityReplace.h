@@ -32,6 +32,9 @@ public:
     UButton* Button_Ability4;
 
     UPROPERTY(meta = (BindWidget))
+    UButton* Button_Skip;
+
+    UPROPERTY(meta = (BindWidget))
     UTextBlock* Text_Ability1;
 
     UPROPERTY(meta = (BindWidget))
@@ -56,4 +59,7 @@ public:
 
     UFUNCTION()
     void OnButton4Clicked();
+
+    UFUNCTION()
+    void OnButton5Clicked();
 };
