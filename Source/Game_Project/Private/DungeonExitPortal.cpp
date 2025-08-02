@@ -45,5 +45,7 @@ void ADungeonExitPortal::OnPortalEnter(UPrimitiveComponent* a_overlappedComponen
 	UE_LOG(LogTemp, Warning, TEXT("Entered Portal"))
 	ULoadingScreenManager::Get(GetWorld())->StartLoading(GetWorld());
 	m_DungeonLevelStreamer->UnloadDungeon();
+	// TODO - teleport player to overworld
+	ULoadingScreenManager::Get(GetWorld())->EndLoading();
 }
 

@@ -162,6 +162,8 @@ void AEnemyCharacter::OnDeath()
 	
 
 	SetActorEnableCollision(false);
+	m_weaponHitbox->SetCollisionResponseToAllChannels(ECR_Ignore);
+	m_characterHitbox->SetCollisionResponseToAllChannels(ECR_Ignore);
 	GetCharacterMovement()->GravityScale = 0.1f;
 	m_widgetHealthBar->SetVisibility(ESlateVisibility::Collapsed);
 	SetLifeSpan(4);
@@ -169,7 +171,9 @@ void AEnemyCharacter::OnDeath()
 
 void AEnemyCharacter::TakeKnockback(float a_knockbackStrength, FVector a_knockbackDirection)
 {
-	HandleKnockback(a_knockbackDirection, a_knockbackStrength);
+	a_knockbackDirection.Z = 0;
+	FVector dir = a_knockbackDirection.GetSafeNormal();
+	HandleKnockback(dir, a_knockbackStrength);
 }
 
 
