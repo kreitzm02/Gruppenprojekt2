@@ -42,16 +42,21 @@ public:
 	void ForceEndAbility(AActor* a_AbilityUser);
 
 private:
+	UPROPERTY()
 	bool m_IsOnCooldown = false;
 
+	UPROPERTY()
 	bool m_IsInitialized = false;
 
+	UPROPERTY()
 	float m_ConstCooldownTime = 1.0f;
 
+	UFUNCTION()
 	void StartCooldown(UWorld* a_World);
 
 	UPROPERTY(EditAnywhere, Instanced, Category = "Ability", meta = (DisplayName = "Enemy Abilities"))
 	TArray<UBaseAbilityAction*> m_AbilityActions;
 
+	UPROPERTY()
 	FTimerHandle m_CooldownTimerHandle;
 };
