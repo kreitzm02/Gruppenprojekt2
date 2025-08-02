@@ -120,13 +120,18 @@ void UFSM_BossWarriorCharge::OnUpdate(float a_deltatime)
 
 			m_chargeDirectionNormal.Z = 0.0f;
 			m_owner->SetActorRotation(m_chargeDirectionNormal.Rotation());
-			
+
+			//m_owner->PlayChargingSound(true);
+
 			m_resetChargeDirection = false;
 		}
 		if (m_passedOnPointTime >= m_chargeOnPointDuration)
 		{
 			m_owner->GetCharacterMovement()->MaxWalkSpeed = m_chargeSpeed * m_owner->GetMultiplier();
 			m_passedOnPointTime = 0.0f;
+
+			m_owner->StopOwnSound();
+
 			m_isCharging = true;
 		}
 	}

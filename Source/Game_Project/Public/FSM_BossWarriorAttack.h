@@ -30,4 +30,10 @@ private:
 
 	UPROPERTY()
 	ABossEnemy_Warrior* m_thisEnemy = nullptr;
+
+	float m_passedTime = 0.0f;
+
+	float m_animationDuration = 0.0f;
+
+	bool m_animationStarted = false;
 };

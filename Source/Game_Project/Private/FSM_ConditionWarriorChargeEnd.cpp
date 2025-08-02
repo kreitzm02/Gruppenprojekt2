@@ -39,7 +39,7 @@ bool UFSM_ConditionWarriorChargeEnd::IsConditionMet(float a_deltaTime)
 		queryParams
 	);
 
-	if (!hasOverlap || m_chargeCurrentDuration >= m_chargeDuration) return true;
+	if (hasOverlap || m_chargeCurrentDuration >= m_chargeDuration) return true;
 	else return false;
 
 }

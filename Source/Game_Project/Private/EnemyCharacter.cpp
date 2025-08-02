@@ -9,7 +9,6 @@
 #include "CustomChunkSystem/CustomChunkManager.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "Components/AudioComponent.h"
 
 // Sets default values
 AEnemyCharacter::AEnemyCharacter()
@@ -114,6 +113,34 @@ void AEnemyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
+
+void AEnemyCharacter::PlayOwnSound(float a_startPoint)
+{
+	m_ownActionSoundComp->Play(a_startPoint);
+}
+
+
+void AEnemyCharacter::PlayBasicAttackSound(bool a_shouldLoop, float a_startPoint, float a_soundDuration)
+{
+	if (a_soundDuration == 0.0f)
+	{
+		a_soundDuration = m_basicAttackSound->Duration - a_startPoint;
+	}
+	m_basicAttackSound->bLooping = false;
+	m_ownActionSoundComp->Sound = m_basicAttackSound;
+
+	GetWorld()->GetTimerManager().SetTimer(m_ownSoundPlayTimer, [this, a_startPoint]()
+	{
+		PlayOwnSound(a_startPoint);
+	}, a_soundDuration,a_shouldLoop);
+}
+
+void AEnemyCharacter::StopOwnSound()
+{
+	GetWorld()->GetTimerManager().ClearTimer(m_ownSoundPlayTimer);
+	m_ownActionSoundComp->Stop();
+}
+
 
 void AEnemyCharacter::UpdateHealthBar()
 {
