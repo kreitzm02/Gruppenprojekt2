@@ -3,6 +3,7 @@
 
 #include "DungeonExitPortal.h"
 #include "DungeonLevelStreamer.h"
+#include "Game_GameInstance.h"
 #include "LoadingScreenManager.h"
 
 // Sets default values
@@ -45,7 +46,7 @@ void ADungeonExitPortal::OnPortalEnter(UPrimitiveComponent* a_overlappedComponen
 	UE_LOG(LogTemp, Warning, TEXT("Entered Portal"))
 	ULoadingScreenManager::Get(GetWorld())->StartLoading(GetWorld());
 	m_DungeonLevelStreamer->UnloadDungeon();
-	// TODO - teleport player to overworld
+	a_otherActor->SetActorLocation(Cast<UGame_GameInstance>(GetGameInstance())->GetLastOverworldPos());
 	ULoadingScreenManager::Get(GetWorld())->EndLoading();
 }
 

@@ -75,6 +75,10 @@ public:
 
 	float m_AdditionalDamage = 0.0f;
 
+	void SetLastOverworldPos(FVector a_lastPos) { m_lastPlayerOverworldPos = a_lastPos; }
+
+	FVector GetLastOverworldPos() { return m_lastPlayerOverworldPos; }
+
 private:
 	void TickTimer();
 	void OnTimerEnd();
@@ -100,4 +104,7 @@ private:
 	float m_sfxVolume = 1.0f;
 
 	bool m_isInLevel = false;
+
+
+	FVector m_lastPlayerOverworldPos = FVector::ZeroVector;
 };

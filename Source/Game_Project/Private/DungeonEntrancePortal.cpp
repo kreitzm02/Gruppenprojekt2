@@ -2,6 +2,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "DungeonEntrancePortal.h"
 #include "DungeonLevelStreamer.h"
+#include "Game_GameInstance.h"
 #include "LoadingScreenManager.h"
 #include "CustomChunkSystem/CustomChunkManager.h"
 #include "Kismet/GameplayStatics.h"
@@ -58,6 +59,7 @@ void ADungeonEntrancePortal::OnPortalEnter(UPrimitiveComponent* a_overlappedComp
 		SetDungeonAsCleared();
 		ULoadingScreenManager::Get(GetWorld())->StartLoading(GetWorld());
 		m_DungeonLevelStreamer->LoadDungeon();
+		Cast<UGame_GameInstance>(GetGameInstance())->SetLastOverworldPos(a_otherActor->GetActorLocation());
 	}
 }
 
