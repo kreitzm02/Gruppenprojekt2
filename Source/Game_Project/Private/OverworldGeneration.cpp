@@ -176,7 +176,7 @@ void AOverworldGeneration::BeginPlay()
                     }
                 }
 
-                TArray<TileRoadWithRotationData> possibleTiles;
+                TArray<FTileRoadWithRotationData> possibleTiles;
 
                 for (int j = minRoadCount; j <= maxRoadCount; j++)
                 {
@@ -184,9 +184,9 @@ void AOverworldGeneration::BeginPlay()
                     {
                         j++;
                     }
-                    for(TArray<TileRoadWithRotationData> a_tileArray : (*m_possibleTilesMap)[j])
+                    for(TArray<FTileRoadWithRotationData> a_tileArray : (*m_possibleTilesMap)[j])
                     {
-                        for(TileRoadWithRotationData a_tile : a_tileArray)//compare tiles bool array with neededEdgeData but ignoring the null data
+                        for(FTileRoadWithRotationData a_tile : a_tileArray)//compare tiles bool array with neededEdgeData but ignoring the null data
                         {
                             for (int k = 0; k < a_tile.m_edgeHasRoad.Num(); k++)
                             {
@@ -212,7 +212,7 @@ void AOverworldGeneration::BeginPlay()
                 if (roadStraightnessRandom <= m_roadStraightness)
                 {
                     selectedTile = 0;
-                    for (TileRoadWithRotationData a_tile : possibleTiles)
+                    for (FTileRoadWithRotationData a_tile : possibleTiles)
                     {
                         
                         if (IsTileTileType(a_tile, RoadStraight))
@@ -232,7 +232,7 @@ void AOverworldGeneration::BeginPlay()
                     selectedTile = 0;
                     TArray<int> bigCurveRoadTiles = {};
                     TArray<int> threeRoadTiles = {};
-                    for (TileRoadWithRotationData a_tile : possibleTiles)
+                    for (FTileRoadWithRotationData a_tile : possibleTiles)
                     {
                         
                         if (IsTileTileType(a_tile, RoadBigCurve))
@@ -407,10 +407,10 @@ void AOverworldGeneration::BeginPlay()
 //initializes the map of all possible tiles
 void AOverworldGeneration::InitializeTMap()
 {
-	TArray<TileRoadWithRotationData> tempData = {};
+	TArray<FTileRoadWithRotationData> tempData = {};
     for (int i = 0; i <= 6; i++)
     { 
-        m_possibleTilesMap->Add(i, TArray<TArray<TileRoadWithRotationData>>());
+        m_possibleTilesMap->Add(i, TArray<TArray<FTileRoadWithRotationData>>());
     }
 	for (UOverworldTileData* a_tileData : m_tileData)
 	{
@@ -422,9 +422,9 @@ void AOverworldGeneration::InitializeTMap()
 }
 
 //calculates all possible placements of a tile
-TArray<AOverworldGeneration::TileRoadWithRotationData> AOverworldGeneration::GetRotatedTileAndEdges(UOverworldTileData* a_tileData, int& a_roadCount)
+TArray<FTileRoadWithRotationData> AOverworldGeneration::GetRotatedTileAndEdges(UOverworldTileData* a_tileData, int& a_roadCount)
 {
-	TArray<TileRoadWithRotationData> shiftedEdgeDataAndRotation;
+	TArray<FTileRoadWithRotationData> shiftedEdgeDataAndRotation;
     TArray<bool> edgeData = a_tileData->GetEdgeData();
 
     FRotator rotations;
@@ -443,7 +443,7 @@ TArray<AOverworldGeneration::TileRoadWithRotationData> AOverworldGeneration::Get
         {
 	        shiftedEdgeData[(j + i) % edgeData.Num()] = edgeData[j];
         }
-	    for (TileRoadWithRotationData a_data : shiftedEdgeDataAndRotation)
+	    for (FTileRoadWithRotationData a_data : shiftedEdgeDataAndRotation)
 	    {
 		    if (shiftedEdgeData == a_data.m_edgeHasRoad)
 		    {
@@ -453,7 +453,7 @@ TArray<AOverworldGeneration::TileRoadWithRotationData> AOverworldGeneration::Get
 	    }
         if (allowToAdd)
         {
-	        shiftedEdgeDataAndRotation.Add(TileRoadWithRotationData(a_tileData->GetTileMeshPtr(),rotations, shiftedEdgeData));
+	        shiftedEdgeDataAndRotation.Add(FTileRoadWithRotationData(a_tileData->GetTileMeshPtr(),rotations, shiftedEdgeData));
         }
     }
 
@@ -613,7 +613,7 @@ void AOverworldGeneration::GetPossibleRoadCount(TArray<TOptional<bool>> a_needed
 }
 
 
-bool AOverworldGeneration::IsTileTileType(TileRoadWithRotationData a_tile, TileType a_tiletype)
+bool AOverworldGeneration::IsTileTileType(FTileRoadWithRotationData a_tile, TileType a_tiletype)
 {
     TArray<bool> tilesBaseBool = {};
 

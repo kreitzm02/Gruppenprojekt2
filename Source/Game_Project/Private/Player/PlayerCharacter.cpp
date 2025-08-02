@@ -293,12 +293,12 @@ void APlayerCharacter::ActivatePauseMenu()
 	}
 
 	ActivateMouseCursor(true);
-	m_PauseUIInstance->AddToViewport(2);
-	UGameplayStatics::SetGamePaused(GetWorld(), false);
 	FInputModeUIOnly InputMode;
 	InputMode.SetWidgetToFocus(m_PauseUIInstance->TakeWidget());
 	APlayerController* pc = GetWorld()->GetFirstPlayerController();
 	pc->SetInputMode(InputMode);
+	m_PauseUIInstance->AddToViewport(2);
+	UGameplayStatics::SetGamePaused(GetWorld(), true);
 }
 
 #pragma endregion
@@ -646,7 +646,7 @@ void APlayerCharacter::OnHit(UPrimitiveComponent* a_overlappedComponent, AActor*
 		UGameplayStatics::ApplyDamage(a_otherActor, finalAttackDamage, GetController(), this, nullptr);
 		if (AEnemyCharacter* hitEnemy = Cast<AEnemyCharacter>(a_otherActor))
 		{
-			hitEnemy->TakeKnockback(m_KnockbackStrenght, (hitEnemy->GetActorLocation() - GetActorLocation()).GetSafeNormal());
+			hitEnemy->TakeKnockback(m_KnockbackStrenght, hitEnemy->GetActorLocation() - GetActorLocation());
 		}
 	}
 }

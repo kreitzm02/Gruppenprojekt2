@@ -118,10 +118,12 @@ private:
 	void UpdatePlayerSpeed();
 	void UpdatePlayerStamina(float a_DeltaTime, float a_Speed, float a_MovementThreshold);
 
+	UPROPERTY()
 	TSet<AActor*> m_AlreadyHitActors;
 
 	TArray<float> m_AbilityCooldownTimes;
 
+	UPROPERTY()
 	TArray<UTexture2D*> m_AbilityIcons;
 
 	TArray<FText> m_AbilityNames;

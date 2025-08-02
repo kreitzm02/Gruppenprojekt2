@@ -87,7 +87,7 @@ void UDamageCircleAbilityAction::PerformDamageTick(AActor* a_AbilityUser)
 				UGameplayStatics::ApplyDamage(hitActor, finalAttackDamage, nullptr, a_AbilityUser, nullptr);
 				if (AEnemyCharacter* hitEnemy = Cast<AEnemyCharacter>(hitActor))
 				{
-					hitEnemy->TakeKnockback(m_KnockbackStrenght, (hitEnemy->GetActorLocation() - location).GetSafeNormal());
+					hitEnemy->TakeKnockback(m_KnockbackStrenght, hitEnemy->GetActorLocation() - location);
 				}
 			}
 		}

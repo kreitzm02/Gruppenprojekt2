@@ -8,6 +8,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/Character.h"
+#include "Components/AudioComponent.h"
 #include "EnemyCharacter.generated.h"
 
 class UGame_GameInstance;
@@ -72,6 +73,13 @@ public:
 	float GetAttackDamage() { return m_attackDamage; }
 
 	float GetKnockback() { return m_knockback; }
+
+	UFUNCTION()
+	void PlayOwnSound(float a_startPoint);
+
+	void PlayBasicAttackSound(bool a_shouldLoop = false, float a_startPoint = 0.0f, float a_soundDuration = 0.0f);
+
+	void StopOwnSound();
 
 protected:
 	void UpdateHealthBar();
@@ -168,6 +176,11 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
 	TSubclassOf<AExpOrb> m_expOrbClass = nullptr;
 
+	FTimerHandle m_ownSoundPlayTimer;
+
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
 	USoundWave* m_hitSound = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
+	USoundWave* m_basicAttackSound = nullptr;
 };
