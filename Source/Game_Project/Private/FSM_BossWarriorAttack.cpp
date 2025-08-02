@@ -19,13 +19,31 @@ void UFSM_BossWarriorAttack::OnEnter()
 		character->GetCharacterMovement()->StopMovementImmediately();
 	}
 	Super::OnEnter();
-	m_ownerSkeletalMesh->PlayAnimation(m_attackAnimation, true);
+	m_animationDuration = m_attackAnimation->GetPlayLength();
 	m_thisEnemy->GetWeaponHitbox()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 }
 
 void UFSM_BossWarriorAttack::OnUpdate(float a_deltaTime)
 {
 	Super::OnUpdate(a_deltaTime);
+
+	m_passedTime += a_deltaTime;
+
+	if (!m_animationStarted)
+	{
+		m_ownerSkeletalMesh->PlayAnimation(m_attackAnimation, false);
+
+		m_thisEnemy->PlayBasicAttackSound(false);
+
+		m_passedTime = 0.0f;
+
+		m_animationStarted = true;
+	}
+
+	if (m_animationStarted && m_passedTime >= m_animationDuration)
+	{
+		m_animationStarted = false;
+	}
 }
 
 void UFSM_BossWarriorAttack::OnExit()

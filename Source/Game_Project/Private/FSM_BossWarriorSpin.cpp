@@ -61,6 +61,7 @@ void UFSM_BossWarriorSpin::OnEnter()
 
 	m_spinDirectionNormal = (m_player->GetActorLocation() - m_ownerCharacter->GetActorLocation()).GetSafeNormal();
 
+	m_owner->PlaySpinAttackSound(true);
 }
 
 void UFSM_BossWarriorSpin::OnUpdate(float a_deltatime)
@@ -123,6 +124,6 @@ void UFSM_BossWarriorSpin::OnUpdate(float a_deltatime)
 void UFSM_BossWarriorSpin::OnExit()
 {
 	Super::OnExit();
-
+	m_owner->StopOwnSound();
 	m_owner->SetSpinReady(false);
 }

@@ -151,7 +151,7 @@ void UDamageBallAbilityAction::PlayDamageBall(AActor* a_AbilityUser)
 						UGameplayStatics::ApplyDamage(hitActor, finalAttackDamage, nullptr, a_AbilityUser, nullptr);
 						if (AEnemyCharacter* hitEnemy = Cast<AEnemyCharacter>(hitActor))
 						{
-							hitEnemy->TakeKnockback(m_KnockbackStrenght, (hitEnemy->GetActorLocation() - ballInstance->m_CurrPosition).GetSafeNormal());
+							hitEnemy->TakeKnockback(m_KnockbackStrenght, hitEnemy->GetActorLocation() - ballInstance->m_CurrPosition);
 						}
 
 						if (ballInstance->m_HitCount >= m_CollisionsBeforeDestruction)

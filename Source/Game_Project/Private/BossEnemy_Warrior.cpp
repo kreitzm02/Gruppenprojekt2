@@ -68,6 +68,9 @@ float ABossEnemy_Warrior::TakeDamage(float a_damageAmount, FDamageEvent const& a
 
 	UpdateHealthBar();
 
+	m_receivingActionSoundComp->Sound = m_hitSound;
+	m_receivingActionSoundComp->Play(0.0f);
+
 	if (m_currentHealth <= 0.0f && !m_isDead)
 	{
 		GetWorld()->SpawnActor<ADungeonExitPortal>(m_dungeonExitBP, GetActorLocation(), FRotator::ZeroRotator);
@@ -75,4 +78,34 @@ float ABossEnemy_Warrior::TakeDamage(float a_damageAmount, FDamageEvent const& a
 	}
 
 	return a_damageAmount;
+}
+
+void ABossEnemy_Warrior::PlayChargingSound(bool a_shouldLoop, float a_startPoint, float a_soundDuration)
+{
+	if (a_soundDuration == 0.0f)
+	{
+		a_soundDuration = m_chargingSound->Duration - a_startPoint;
+	}
+	m_basicAttackSound->bLooping = false;
+	m_ownActionSoundComp->Sound = m_basicAttackSound;
+
+	GetWorld()->GetTimerManager().SetTimer(m_ownSoundPlayTimer, [this, a_startPoint]()
+		{
+			PlayOwnSound(a_startPoint);
+		}, a_soundDuration, a_shouldLoop);
+}
+
+void ABossEnemy_Warrior::PlaySpinAttackSound(bool a_shouldLoop, float a_startPoint, float a_soundDuration)
+{
+	if (a_soundDuration == 0.0f)
+	{
+		a_soundDuration = m_spinAttackSound->Duration - a_startPoint;
+	}
+	m_basicAttackSound->bLooping = false;
+	m_ownActionSoundComp->Sound = m_basicAttackSound;
+
+	GetWorld()->GetTimerManager().SetTimer(m_ownSoundPlayTimer, [this, a_startPoint]()
+		{
+			PlayOwnSound(a_startPoint);
+		}, a_soundDuration, a_shouldLoop);
 }
