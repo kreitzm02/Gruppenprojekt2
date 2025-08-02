@@ -13,6 +13,25 @@
 #include "NavMesh/NavMeshBoundsVolume.h"
 #include "OverworldGeneration.generated.h"
 
+USTRUCT()
+struct FTileRoadWithRotationData
+{
+	GENERATED_BODY()
+
+
+	
+	UPROPERTY()
+	UStaticMesh* m_tileMesh = nullptr;
+	FRotator m_rotation = FRotator::ZeroRotator;
+	TArray<bool> m_edgeHasRoad = {};
+	FTileRoadWithRotationData() = default;
+	FTileRoadWithRotationData(UStaticMesh* a_staticMesh, FRotator a_rotation, TArray<bool> a_edgeHasRoad)
+	{
+		m_tileMesh = a_staticMesh;
+		m_rotation = a_rotation;
+		m_edgeHasRoad = a_edgeHasRoad;
+	}
+};
 
 UCLASS()
 class GAME_PROJECT_API AOverworldGeneration : public AActor
@@ -47,22 +66,24 @@ private:
 		RoadAllEdges
 	};
 
-	struct TileRoadWithRotationData
-	{
-	private:
-		TileRoadWithRotationData();
-	public:
-		UStaticMesh* m_tileMesh = nullptr;
-		FRotator m_rotation = FRotator::ZeroRotator;
-		TArray<bool> m_edgeHasRoad = {};
-
-		TileRoadWithRotationData(UStaticMesh* a_staticMesh, FRotator a_rotation, TArray<bool> a_edgeHasRoad)
-		{
-			m_tileMesh = a_staticMesh;
-			m_rotation = a_rotation;
-			m_edgeHasRoad = a_edgeHasRoad;
-		}
-	};
+	
+	//struct FTileRoadWithRotationData
+	//{
+	//private:
+	//	FTileRoadWithRotationData();
+	//public:
+	//	UPROPERTY()
+	//	UStaticMesh* m_tileMesh = nullptr;
+	//	FRotator m_rotation = FRotator::ZeroRotator;
+	//	TArray<bool> m_edgeHasRoad = {};
+	//
+	//	FTileRoadWithRotationData(UStaticMesh* a_staticMesh, FRotator a_rotation, TArray<bool> a_edgeHasRoad)
+	//	{
+	//		m_tileMesh = a_staticMesh;
+	//		m_rotation = a_rotation;
+	//		m_edgeHasRoad = a_edgeHasRoad;
+	//	}
+	//};
 
 	struct PositionAndEdgeData
 	{
@@ -153,12 +174,12 @@ private:
 	TArray<FVector> m_emptyTiles = {};
 
 	//map for each tile with each m_rotation and associated road data ordered after road count of roads on each edge
-	TMap<int, TArray<TArray<TileRoadWithRotationData>>>* m_possibleTilesMap = new TMap<int, TArray<TArray<TileRoadWithRotationData>>>();
+	TMap<int, TArray<TArray<FTileRoadWithRotationData>>>* m_possibleTilesMap = new TMap<int, TArray<TArray<FTileRoadWithRotationData>>>();
 
 
 	void InitializeTMap();
 
-	TArray<TileRoadWithRotationData> GetRotatedTileAndEdges(UOverworldTileData* a_tileData, int& a_roadCount);
+	TArray<FTileRoadWithRotationData> GetRotatedTileAndEdges(UOverworldTileData* a_tileData, int& a_roadCount);
 
 	FVector TilePosition(int a_width, int a_height);
 
@@ -170,7 +191,7 @@ private:
 
 	void GetPossibleRoadCount(TArray<TOptional<bool>> a_neededEdgeData, int& a_minRoadCount, int& a_maxRoadCount);
 
-	//bool IsTilePossible(TArray<TileRoadWithRotationData>);
+	//bool IsTilePossible(TArray<FTileRoadWithRotationData>);
 
-	bool IsTileTileType(TileRoadWithRotationData a_tile, TileType a_tiletype);
+	bool IsTileTileType(FTileRoadWithRotationData a_tile, TileType a_tiletype);
 };
