@@ -293,12 +293,12 @@ void APlayerCharacter::ActivatePauseMenu()
 	}
 
 	ActivateMouseCursor(true);
-	m_PauseUIInstance->AddToViewport(2);
-	UGameplayStatics::SetGamePaused(GetWorld(), false);
 	FInputModeUIOnly InputMode;
 	InputMode.SetWidgetToFocus(m_PauseUIInstance->TakeWidget());
 	APlayerController* pc = GetWorld()->GetFirstPlayerController();
 	pc->SetInputMode(InputMode);
+	m_PauseUIInstance->AddToViewport(2);
+	UGameplayStatics::SetGamePaused(GetWorld(), true);
 }
 
 #pragma endregion

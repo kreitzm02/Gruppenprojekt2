@@ -22,13 +22,7 @@ class GAME_PROJECT_API UOverworldTileData : public UDataAsset
 	TArray<bool> m_edgeHasRoad;
 
 public:
-	UStaticMesh* GetTileMeshPtr()
-	{
-		return m_tileMesh;
-	}
+	UStaticMesh* GetTileMeshPtr() { return m_tileMesh; }
 
-	TArray<bool> GetEdgeData()
-	{
-		return m_edgeHasRoad;
-	}
+	TArray<bool> GetEdgeData() { return m_edgeHasRoad; }
 };
