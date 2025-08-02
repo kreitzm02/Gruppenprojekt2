@@ -73,6 +73,8 @@ public:
 
 	void AddGameTimerToViewport();
 
+	float m_AdditionalDamage = 0.0f;
+
 private:
 	void TickTimer();
 	void OnTimerEnd();
