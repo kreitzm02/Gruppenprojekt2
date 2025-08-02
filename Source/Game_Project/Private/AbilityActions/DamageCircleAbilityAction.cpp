@@ -82,7 +82,8 @@ void UDamageCircleAbilityAction::PerformDamageTick(AActor* a_AbilityUser)
 			{
 				if (m_AlreadyHitActors.Contains(hitActor)) continue;
 				m_AlreadyHitActors.Add(hitActor);
-				float finalAttackDamage = m_DamagePerHit * Cast<UGame_GameInstance>(a_AbilityUser->GetWorld()->GetGameInstance())->m_playerSave->GetPlayerDmgMultiplier();
+				UGame_GameInstance* gameInstance = Cast<UGame_GameInstance>(a_AbilityUser->GetWorld()->GetGameInstance());
+				float finalAttackDamage = m_DamagePerHit * gameInstance->m_playerSave->GetPlayerDmgMultiplier() + gameInstance->m_AdditionalDamage;
 				UGameplayStatics::ApplyDamage(hitActor, finalAttackDamage, nullptr, a_AbilityUser, nullptr);
 				if (AEnemyCharacter* hitEnemy = Cast<AEnemyCharacter>(hitActor))
 				{
