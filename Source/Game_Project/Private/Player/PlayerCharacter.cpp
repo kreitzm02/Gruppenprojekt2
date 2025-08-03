@@ -437,7 +437,7 @@ void APlayerCharacter::SetupMeleeHitbox()
 {
 	m_MeleeHitBox = NewObject<UBoxComponent>(this, TEXT("MeleeHitBox"));
 	m_MeleeHitBox->SetupAttachment(GetMesh(), TEXT("handslot_r"));
-	m_MeleeHitBox->SetBoxExtent(FVector(0.4f, 0.4f, 0.4f));
+	m_MeleeHitBox->SetBoxExtent(FVector(2.5f, 5.0f, 2.5f));
 	m_MeleeHitBox->SetRelativeLocation(FVector(0.0f, -0.57f, -0.1f));
 	m_MeleeHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	m_MeleeHitBox->SetCollisionObjectType(ECollisionChannel::ECC_Pawn);
@@ -735,6 +735,9 @@ void APlayerCharacter::ToggleLvlUpReplaceUI(bool a_SetActive)
 		m_lvlUpReplaceUIInstance->SetButtonTexts(
 			m_PlayerAbilities->GetAbilityName(0), m_PlayerAbilities->GetAbilityName(1),
 			m_PlayerAbilities->GetAbilityName(2), m_PlayerAbilities->GetAbilityName(3));
+		m_lvlUpReplaceUIInstance->SetButtonImages(
+			m_PlayerAbilities->GetAbilityIcon(0), m_PlayerAbilities->GetAbilityIcon(1),
+			m_PlayerAbilities->GetAbilityIcon(2), m_PlayerAbilities->GetAbilityIcon(3));
 		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.0f);
 	}
 }
