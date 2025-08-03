@@ -6,7 +6,9 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
+#include <Components/Image.h>
 #include "WLvlUpAbilitySelect.generated.h"
+
 
 /**
  * 
@@ -38,9 +40,19 @@ public:
     UTextBlock* Text_Ability3;
 
     UPROPERTY(meta = (BindWidget))
+    UImage* Image_Ability1;
+
+    UPROPERTY(meta = (BindWidget))
+    UImage* Image_Ability2;
+
+    UPROPERTY(meta = (BindWidget))
+    UImage* Image_Ability3;
+
+    UPROPERTY(meta = (BindWidget))
     UTextBlock* Text_LevelMsg;
 
     void SetButtonTexts(const FText& a_T1, const FText& a_T2, const FText& a_T3);
+    void SetButtonImages(UTexture2D* a_I1, UTexture2D* a_I2, UTexture2D* a_I3);
     void SetLevelUpText(const FText& a_LvlUpMessage);
 
     UFUNCTION()

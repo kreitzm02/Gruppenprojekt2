@@ -706,6 +706,10 @@ void APlayerCharacter::ToggleLvlUpUI(bool a_SetActive)
 			FText::FromString(m_LvlUpAbilitySelection[0]->m_DisplayName),
 			FText::FromString(m_LvlUpAbilitySelection[1]->m_DisplayName),
 			FText::FromString(m_LvlUpAbilitySelection[2]->m_DisplayName));
+		m_lvlUpUIInstance->SetButtonImages(
+			m_LvlUpAbilitySelection[0]->m_Icon,
+			m_LvlUpAbilitySelection[1]->m_Icon,
+			m_LvlUpAbilitySelection[2]->m_Icon);
 		m_lvlUpUIInstance->SetLevelUpText(FText::FromString(FString::Printf(TEXT("You have reached Level %i!"), m_PlayerLvl)));
 		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.0f);
 	}
