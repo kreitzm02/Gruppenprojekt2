@@ -134,7 +134,7 @@ void UDamageBallAbilityAction::PlayDamageBall(AActor* a_AbilityUser)
 
 			// enemy hit
 			TArray<FOverlapResult> overlaps;
-			FCollisionShape shape = FCollisionShape::MakeSphere(m_BallSize * 1.33f);
+			FCollisionShape shape = FCollisionShape::MakeSphere(m_BallSize * 1.99f);
 			bool overlap = a_AbilityUser->GetWorld()->OverlapMultiByChannel(overlaps, nextPos, FQuat::Identity, ECC_Pawn, shape);
 
 			if (overlap)
