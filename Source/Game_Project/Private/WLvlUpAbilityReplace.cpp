@@ -44,6 +44,14 @@ void UWLvlUpAbilityReplace::SetButtonTexts(const FText& a_T1, const FText& a_T2,
 	if (Text_Ability4) Text_Ability4->SetText(a_T4);
 }
 
+void UWLvlUpAbilityReplace::SetButtonImages(UTexture2D* a_I1, UTexture2D* a_I2, UTexture2D* a_I3, UTexture2D* a_I4)
+{
+	if (Image_Ability1) Image_Ability1->Brush.SetResourceObject(a_I1);
+	if (Image_Ability2) Image_Ability2->Brush.SetResourceObject(a_I2);
+	if (Image_Ability3) Image_Ability3->Brush.SetResourceObject(a_I3);
+	if (Image_Ability4) Image_Ability4->Brush.SetResourceObject(a_I4);
+}
+
 void UWLvlUpAbilityReplace::OnButton1Clicked()
 {
 	if (APlayerController* pc = GetOwningPlayer())
