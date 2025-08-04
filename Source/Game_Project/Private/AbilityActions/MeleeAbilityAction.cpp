@@ -35,12 +35,17 @@ void UMeleeAbilityAction::PlayAbilityAction(AActor* a_AbilityUser)
 		player->ClearAlreadyHitActors();
 		player->m_AnimInstance->Montage_Play(m_AttackMontage);
 		// sound
+		FTimerHandle endTimerHandle;
 		player->ShowMeleeHitbox();
+		player->GetWorld()->GetTimerManager().SetTimer(endTimerHandle, FTimerDelegate::CreateUObject(this, &UMeleeAbilityAction::EndAbilityAction, a_AbilityUser), m_AttackMontage->GetPlayLength(), false);
 		UE_LOG(LogTemp, Warning, TEXT("Player just used an ability that included melee ability action!"))
 	}
 }
 
 void UMeleeAbilityAction::EndAbilityAction(AActor* a_AbilityUser)
 {
-
+	if (APlayerCharacter* player = Cast<APlayerCharacter>(a_AbilityUser))
+	{
+		player->HideMeleeHitbox();
+	}
 }

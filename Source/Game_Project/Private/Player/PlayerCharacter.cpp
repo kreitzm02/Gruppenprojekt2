@@ -28,6 +28,7 @@ APlayerCharacter::APlayerCharacter()
 
 	SetupCamera();
 	SetupAbilityComp();
+	SetupMeleeHitbox();
 }
 
 // Called when the game starts or when spawned
@@ -72,7 +73,6 @@ void APlayerCharacter::BeginPlay()
 	m_PreviousLocation = GetActorLocation();
 
 	SetupWeapons();
-	SetupMeleeHitbox();
 	HideAllWeapons();
 	ChangeToAbilitySlot0(); // the char equips his default ability
 	SetupMovement();
@@ -91,7 +91,7 @@ void APlayerCharacter::BeginPlay()
 	}
 
 	m_PlayerTotalExp = m_PlayerLevelExp = 0;
-	m_ExpForLevelUp = m_ExpLevelBarrier = 150;
+	m_ExpForLevelUp = m_ExpLevelBarrier = 250;
 	m_PlayerLvl = 1;
 
 
@@ -127,16 +127,6 @@ void APlayerCharacter::Tick(float DeltaTime)
 	}
 
 	CheckForDeath();
-
-	if (UAnimMontage* activeMontage = m_AnimInstance->GetCurrentActiveMontage())
-	{
-		float progress = m_AnimInstance->Montage_GetPosition(activeMontage) / activeMontage->GetPlayLength();
-
-		if (progress > 0.9f)
-		{
-			HideMeleeHitbox();
-		}
-	}
 
 	for (int i = 0; i < m_AbilityMax; i++)
 	{
@@ -320,9 +310,6 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction("EquipAbilityD", IE_Pressed, this, &APlayerCharacter::ChangeToAbilitySlot3);
 	PlayerInputComponent->BindAction("AbilityIncrease", IE_Pressed, this, &APlayerCharacter::AbilitySlotIncrease);
 	PlayerInputComponent->BindAction("AbilityDecrease", IE_Pressed, this, &APlayerCharacter::AbilitySlotDecrease);
-	//PlayerInputComponent->BindAction("PlayerClassA", IE_Pressed, this, &APlayerCharacter::ChangeToPlayerClassA);
-	//PlayerInputComponent->BindAction("PlayerClassB", IE_Pressed, this, &APlayerCharacter::ChangeToPlayerClassB);
-	//PlayerInputComponent->BindAction("PlayerClassC", IE_Pressed, this, &APlayerCharacter::ChangeToPlayerClassC);
 	PlayerInputComponent->BindAction("PlayerClassD", IE_Pressed, this, &APlayerCharacter::ChangeToPlayerClassD);
 	PlayerInputComponent->BindAction("Pause", IE_Pressed, this, &APlayerCharacter::ActivatePauseMenu);
 }
@@ -331,15 +318,22 @@ void APlayerCharacter::SetupChangedPlayerClass()
 {
 	GetMesh()->SetSkeletalMesh(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_Mesh);
 	GetMesh()->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
+
+	if (m_MeleeHitBox)
+	{
+		m_MeleeHitBox->SetupAttachment(GetMesh(), TEXT("hand_r"));
+		m_MeleeHitBox->SetBoxExtent({ 1.5f,0.4f,0.4f });
+		m_MeleeHitBox->SetRelativeLocation({ -0.8f, 0.0f, 0.0f });
+		m_MeleeHitBox->SetVisibility(false);
+		m_MeleeHitBox->SetHiddenInGame(true);
+	}
+
+	m_AnimInstance = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
+
 	m_PlayerAbilities->RemoveAllAbilities();
 	AddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility);
 	m_CurrentAbilitySlot = 0;
 	Cast<UGame_GameInstance>(GetGameInstance())->m_playerSave->m_CurrentPlayerClass = m_CurrentPlayerClass; 
-
-	// only for debug purposes. the player would normally start with just 1 ability ( the m_StartingAbility)
-	//AddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility1Debug);
-	//AddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility2Debug);
-	//AddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility3Debug);
 
 	// setup the player stats with the default values from the given data asset
 	ResetStatsToDefault();
@@ -350,16 +344,9 @@ void APlayerCharacter::SetupCamera()
 {
 	m_CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	m_CameraBoom->SetupAttachment(RootComponent);
-	//m_CameraBoom->TargetArmLength = 300.0f;
-	//m_CameraBoom->bUsePawnControlRotation = false;
-	//m_CameraBoom->bDoCollisionTest = false;
-	//m_CameraBoom->bInheritYaw = false;
-	//m_CameraBoom->bInheritPitch = false;
-	//m_CameraBoom->bInheritRoll = false;
 
 	m_PlayerCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("PlayerCamera"));
 	m_PlayerCamera->SetupAttachment(m_CameraBoom, USpringArmComponent::SocketName);
-	//m_PlayerCamera->bUsePawnControlRotation = false;
 }
 
 void APlayerCharacter::SetupMovement()
@@ -387,10 +374,16 @@ void APlayerCharacter::SetupPlayer()
 	GetMesh()->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
 	AddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility);
 
-	// only for debug purposes. the player would normally start with just 1 ability ( the m_StartingAbility)
-	//AddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility1Debug);
-	//AddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility2Debug);
-	//AddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility3Debug);
+	if (m_MeleeHitBox)
+	{
+		m_MeleeHitBox->SetupAttachment(GetMesh(), TEXT("hand_r"));
+		m_MeleeHitBox->SetBoxExtent({ 1.5f,0.4f,0.4f });
+		m_MeleeHitBox->SetRelativeLocation({ -0.8f, 0.0f, 0.0f });
+		m_MeleeHitBox->SetVisibility(false);
+		m_MeleeHitBox->SetHiddenInGame(true);
+	}
+
+	m_AnimInstance = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 
 	// setup the player stats with the default values from the given data asset
 	ResetStatsToDefault();
@@ -422,29 +415,20 @@ void APlayerCharacter::SetupWeapons()
 		else continue;
 
 		UStaticMeshComponent* meshComponent = AttachWeaponComponentToBone(boneName, meshAsset);
-		//meshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		//meshComponent->SetCanEverAffectNavigation(false);
-		//if (meshComponent)
-		//{
-		//	meshComponent->SetVisibility(false, true);
-		//	meshComponent->SetHiddenInGame(true, true);
-		//	meshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		//}
 	}
 }
 
 void APlayerCharacter::SetupMeleeHitbox()
 {
-	m_MeleeHitBox = NewObject<UBoxComponent>(this, TEXT("MeleeHitBox"));
-	m_MeleeHitBox->SetupAttachment(GetMesh(), TEXT("handslot_r"));
-	m_MeleeHitBox->SetBoxExtent(FVector(2.5f, 5.0f, 2.5f));
-	m_MeleeHitBox->SetRelativeLocation(FVector(0.0f, -0.57f, -0.1f));
-	m_MeleeHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	m_MeleeHitBox->SetCollisionObjectType(ECollisionChannel::ECC_Pawn);
-	m_MeleeHitBox->SetCollisionResponseToAllChannels(ECR_Ignore);
-	m_MeleeHitBox->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-	m_MeleeHitBox->RegisterComponent();
-
+	m_MeleeHitBox = CreateDefaultSubobject<UBoxComponent>(TEXT("MeleeHitBox"));
+	m_MeleeHitBox->SetupAttachment(GetMesh(), TEXT("hand_r"));
+	m_MeleeHitBox->SetBoxExtent({ 1.5f,0.4f,0.4f });
+	m_MeleeHitBox->SetRelativeLocation({ -0.8f, 0.0f, 0.0f });
+	m_MeleeHitBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	m_MeleeHitBox->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel1);
+	m_MeleeHitBox->SetCollisionResponseToAllChannels(ECR_Overlap);
+	m_MeleeHitBox->SetVisibility(false);
+	m_MeleeHitBox->SetHiddenInGame(true);
 	m_MeleeHitBox->OnComponentBeginOverlap.AddDynamic(this, &APlayerCharacter::OnHit);
 }
 
@@ -593,12 +577,14 @@ void APlayerCharacter::HideAllWeaponsExcept(FName a_BoneName)
 
 void APlayerCharacter::HideMeleeHitbox()
 {
-	m_MeleeHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	m_CurrentAttackDamage = 0.0f;
+	UE_LOG(LogTemp, Error, TEXT("AAAAAAAAAAAAAAA"))
 }
 
 void APlayerCharacter::ShowMeleeHitbox()
 {
-	m_MeleeHitBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	m_CurrentAttackDamage = m_AttackDamage * Cast<UGame_GameInstance>(GetGameInstance())->m_playerSave->m_damageMultiplier + Cast<UGame_GameInstance>(GetGameInstance())->m_AdditionalDamage;
+	UE_LOG(LogTemp, Error, TEXT("BBBBBBBBBBBBBB"))
 }
 
 #pragma endregion
@@ -641,9 +627,8 @@ void APlayerCharacter::OnHit(UPrimitiveComponent* a_overlappedComponent, AActor*
 	if (a_otherActor && a_otherActor != this && a_otherComp)
 	{
 		if (m_AlreadyHitActors.Contains(a_otherActor)) return;
-		float finalAttackDamage = m_AttackDamage * Cast<UGame_GameInstance>(GetGameInstance())->m_playerSave->m_damageMultiplier;
 		m_AlreadyHitActors.Add(a_otherActor);
-		UGameplayStatics::ApplyDamage(a_otherActor, finalAttackDamage, GetController(), this, nullptr);
+		UGameplayStatics::ApplyDamage(a_otherActor, m_CurrentAttackDamage, GetController(), this, nullptr);
 		if (AEnemyCharacter* hitEnemy = Cast<AEnemyCharacter>(a_otherActor))
 		{
 			hitEnemy->TakeKnockback(m_KnockbackStrenght, hitEnemy->GetActorLocation() - GetActorLocation());
@@ -736,8 +721,8 @@ void APlayerCharacter::ToggleLvlUpReplaceUI(bool a_SetActive)
 			m_PlayerAbilities->GetAbilityName(0), m_PlayerAbilities->GetAbilityName(1),
 			m_PlayerAbilities->GetAbilityName(2), m_PlayerAbilities->GetAbilityName(3));
 		m_lvlUpReplaceUIInstance->SetButtonImages(
-			m_PlayerAbilities->GetAbilityIcon(0), m_PlayerAbilities->GetAbilityIcon(1),
-			m_PlayerAbilities->GetAbilityIcon(2), m_PlayerAbilities->GetAbilityIcon(3));
+			m_PlayerAbilities->GetAbilityIcon(0), m_PlayerAbilities->GetAbilityIcon(2),
+			m_PlayerAbilities->GetAbilityIcon(1), m_PlayerAbilities->GetAbilityIcon(3));
 		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.0f);
 	}
 }
@@ -840,10 +825,6 @@ void APlayerCharacter::AddAbility(UMainAbilityContainerDataAsset* a_Ability, boo
 	}
 	m_PlayerAbilities->TryAddAbility(ability);
 	if (a_IncreaseAbilityCount) m_AbilityNum++;
-
-
-	//m_PlayerAbilities->m_Abilities.
-
 	
 	GetWorld()->GetTimerManager().SetTimer(m_setAbilityOneIconTimer, this, &APlayerCharacter::SetAbilityOneIcon, 0.2f, false);
 	GetWorld()->GetTimerManager().SetTimer(m_setAbilityTwoIconTimer, this, &APlayerCharacter::SetAbilityTwoIcon, 0.2f, false);
