@@ -191,6 +191,7 @@ void AEnemyCharacter::OnDeath()
 	SetActorEnableCollision(false);
 	m_weaponHitbox->SetCollisionResponseToAllChannels(ECR_Ignore);
 	m_characterHitbox->SetCollisionResponseToAllChannels(ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Ignore);
 	GetCharacterMovement()->GravityScale = 0.1f;
 	m_widgetHealthBar->SetVisibility(ESlateVisibility::Collapsed);
 	SetLifeSpan(4);
