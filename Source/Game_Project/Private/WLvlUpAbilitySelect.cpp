@@ -33,6 +33,13 @@ void UWLvlUpAbilitySelect::SetButtonTexts(const FText& a_T1, const FText& a_T2, 
 	if (Text_Ability3) Text_Ability3->SetText(a_T3);
 }
 
+void UWLvlUpAbilitySelect::SetButtonImages(UTexture2D* a_I1, UTexture2D* a_I2, UTexture2D* a_I3)
+{
+	if (Image_Ability1) Image_Ability1->Brush.SetResourceObject(a_I1);
+	if (Image_Ability2) Image_Ability2->Brush.SetResourceObject(a_I2);
+	if (Image_Ability3) Image_Ability3->Brush.SetResourceObject(a_I3);
+}
+
 void UWLvlUpAbilitySelect::SetLevelUpText(const FText& a_LvlUpMessage)
 {
 	if (Text_LevelMsg) Text_LevelMsg->SetText(a_LvlUpMessage);

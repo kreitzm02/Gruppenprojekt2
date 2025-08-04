@@ -78,10 +78,19 @@ private:
 	UPROPERTY()
 	UDungeonBuilder* m_Builder;
 	FRandomStream m_DungeonRng;
+
+	UPROPERTY()
 	ULevel* m_ThisLevel;
 
+	UFUNCTION()
 	void GenerateRooms();
+
+	UFUNCTION()
 	void GenerateCorridors();
+
+	UFUNCTION()
 	void GenerateDungeon();
+
+	UFUNCTION()
 	void BuildNavMeshForDungeon();
 };

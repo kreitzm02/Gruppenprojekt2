@@ -33,11 +33,21 @@ public:
 	virtual void EndAbilityAction(AActor* a_AbilityUser) override;
 
 private:
-
+	UPROPERTY()
 	FTimerHandle m_StartTimerHandle;
+
+	UPROPERTY()
 	FTimerHandle m_MoveTimerHandle;
+
+	UPROPERTY()
 	UAnimMontage* m_AttackMontage;
+
+	UPROPERTY()
 	UNiagaraComponent* m_VFXComp;
+
+	UFUNCTION()
 	void PlayStamina(AActor* a_AbilityUser);
+
+	UFUNCTION()
 	void MoveStamina(AActor* a_AbilityUser);
 };
