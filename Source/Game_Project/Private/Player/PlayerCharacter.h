@@ -130,7 +130,7 @@ private:
 
 	TArray<float> m_AbilityMaxCooldownTimes;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY()
 	UBoxComponent* m_MeleeHitBox;
 
 	// Player Settings

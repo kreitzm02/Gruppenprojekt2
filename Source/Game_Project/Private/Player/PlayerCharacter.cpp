@@ -28,7 +28,6 @@ APlayerCharacter::APlayerCharacter()
 
 	SetupCamera();
 	SetupAbilityComp();
-	SetupMeleeHitbox();
 }
 
 // Called when the game starts or when spawned
@@ -73,6 +72,7 @@ void APlayerCharacter::BeginPlay()
 	m_PreviousLocation = GetActorLocation();
 
 	SetupWeapons();
+	SetupMeleeHitbox();
 	HideAllWeapons();
 	ChangeToAbilitySlot0(); // the char equips his default ability
 	SetupMovement();
@@ -331,18 +331,6 @@ void APlayerCharacter::SetupChangedPlayerClass()
 {
 	GetMesh()->SetSkeletalMesh(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_Mesh);
 	GetMesh()->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
-
-	if (m_MeleeHitBox)
-	{
-		m_MeleeHitBox->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("hand_r"));
-		m_MeleeHitBox->SetBoxExtent({ 1.2f,0.4f,0.4f });
-		m_MeleeHitBox->SetRelativeLocation({ -1.4f, 0.0f, 0.0f });
-		m_MeleeHitBox->SetHiddenInGame(false);
-		m_MeleeHitBox->bDrawOnlyIfSelected = false;
-		m_MeleeHitBox->OnComponentBeginOverlap.RemoveDynamic(this, &APlayerCharacter::OnHit);
-		m_MeleeHitBox->OnComponentBeginOverlap.AddDynamic(this, &APlayerCharacter::OnHit);
-	}
-
 	m_PlayerAbilities->RemoveAllAbilities();
 	AddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility);
 	m_CurrentAbilitySlot = 0;
@@ -399,21 +387,6 @@ void APlayerCharacter::SetupPlayer()
 	GetMesh()->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
 	AddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility);
 
-	if (m_MeleeHitBox)
-	{
-		m_MeleeHitBox->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("hand_r"));
-		m_MeleeHitBox->SetBoxExtent({ 1.2f,0.4f,0.4f });
-		m_MeleeHitBox->SetRelativeLocation({ -1.4f, 0.0f, 0.0f });
-		m_MeleeHitBox->SetHiddenInGame(false);        
-		m_MeleeHitBox->bDrawOnlyIfSelected = false;  
-		m_MeleeHitBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-		m_MeleeHitBox->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel1);
-		m_MeleeHitBox->SetCollisionResponseToAllChannels(ECR_Overlap);
-		m_MeleeHitBox->OnComponentBeginOverlap.RemoveDynamic(this, &APlayerCharacter::OnHit);
-		m_MeleeHitBox->OnComponentBeginOverlap.AddDynamic(this, &APlayerCharacter::OnHit);
-		m_MeleeHitBox->UpdateOverlaps();
-	}
-
 	// only for debug purposes. the player would normally start with just 1 ability ( the m_StartingAbility)
 	//AddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility1Debug);
 	//AddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility2Debug);
@@ -462,17 +435,16 @@ void APlayerCharacter::SetupWeapons()
 
 void APlayerCharacter::SetupMeleeHitbox()
 {
-	m_MeleeHitBox = CreateDefaultSubobject<UBoxComponent>(TEXT("MeleeHitBox"));
-	m_MeleeHitBox->SetupAttachment(GetMesh(), TEXT("hand_r"));
-	m_MeleeHitBox->SetBoxExtent({ 1.2f,0.4f,0.4f });
-	m_MeleeHitBox->SetRelativeLocation({ -1.4f, 0.0f, 0.0f });
-	m_MeleeHitBox->SetHiddenInGame(false);          
-	m_MeleeHitBox->bDrawOnlyIfSelected = false;     
+	m_MeleeHitBox = NewObject<UBoxComponent>(this, TEXT("MeleeHitBox"));
+	m_MeleeHitBox->SetupAttachment(GetMesh(), TEXT("handslot_r"));
+	m_MeleeHitBox->SetBoxExtent(FVector(2.5f, 5.0f, 2.5f));
+	m_MeleeHitBox->SetRelativeLocation(FVector(0.0f, -0.57f, -0.1f));
 	m_MeleeHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	m_MeleeHitBox->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel1);
-	m_MeleeHitBox->SetCollisionResponseToAllChannels(ECR_Overlap);
+	m_MeleeHitBox->SetCollisionObjectType(ECollisionChannel::ECC_Pawn);
+	m_MeleeHitBox->SetCollisionResponseToAllChannels(ECR_Ignore);
+	m_MeleeHitBox->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	m_MeleeHitBox->RegisterComponent();
 
-	m_MeleeHitBox->OnComponentBeginOverlap.RemoveDynamic(this, &APlayerCharacter::OnHit);
 	m_MeleeHitBox->OnComponentBeginOverlap.AddDynamic(this, &APlayerCharacter::OnHit);
 }
 
@@ -621,25 +593,12 @@ void APlayerCharacter::HideAllWeaponsExcept(FName a_BoneName)
 
 void APlayerCharacter::HideMeleeHitbox()
 {
-	m_MeleeHitBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	m_MeleeHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void APlayerCharacter::ShowMeleeHitbox()
 {
 	m_MeleeHitBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-
-	// workaround -> enemy may already be inside collider after collider will be activated (set to query)
-	TArray<AActor*> overlappingActors;
-	m_MeleeHitBox->GetOverlappingActors(overlappingActors, AEnemyCharacter::StaticClass());
-	
-	for (AActor* actor : overlappingActors)
-	{
-		UPrimitiveComponent* primitiveComp = Cast<UPrimitiveComponent>(actor->GetRootComponent());
-		if (primitiveComp && !m_AlreadyHitActors.Contains(actor))
-		{
-			OnHit(m_MeleeHitBox, actor, primitiveComp, 0, false, FHitResult());
-		}
-	}
 }
 
 #pragma endregion
@@ -679,7 +638,7 @@ void APlayerCharacter::HandleKnockback(FVector a_knockbackDirection, float a_kno
 
 void APlayerCharacter::OnHit(UPrimitiveComponent* a_overlappedComponent, AActor* a_otherActor, UPrimitiveComponent* a_otherComp, int32 a_otherBodyIndex, bool a_bFromSweep, const FHitResult& a_sweepResult)
 {
-	if (a_otherActor && a_otherActor != this)
+	if (a_otherActor && a_otherActor != this && a_otherComp)
 	{
 		if (m_AlreadyHitActors.Contains(a_otherActor)) return;
 		float finalAttackDamage = m_AttackDamage * Cast<UGame_GameInstance>(GetGameInstance())->m_playerSave->m_damageMultiplier;

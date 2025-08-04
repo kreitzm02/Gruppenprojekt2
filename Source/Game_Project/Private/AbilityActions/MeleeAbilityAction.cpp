@@ -33,9 +33,9 @@ void UMeleeAbilityAction::PlayAbilityAction(AActor* a_AbilityUser)
 	if (APlayerCharacter* player = Cast<APlayerCharacter>(a_AbilityUser))
 	{
 		player->ClearAlreadyHitActors();
-		player->ShowMeleeHitbox();
 		player->m_AnimInstance->Montage_Play(m_AttackMontage);
 		// sound
+		player->ShowMeleeHitbox();
 		UE_LOG(LogTemp, Warning, TEXT("Player just used an ability that included melee ability action!"))
 	}
 }
