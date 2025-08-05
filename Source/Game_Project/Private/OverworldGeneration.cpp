@@ -2,10 +2,7 @@
 
 
 #include "OverworldGeneration.h"
-#include "IContentBrowserSingleton.h"
 #include "Engine/StaticMeshActor.h"
-#include <Eigen/Core>
-#include <Eigen/Geometry>
 #include "NavigationSystem.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -14,7 +11,6 @@ AOverworldGeneration::AOverworldGeneration()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
-
 }
 
 // Called when the game starts or when spawned

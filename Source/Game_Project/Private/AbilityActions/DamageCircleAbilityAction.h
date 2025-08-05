@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AbilityActions/BaseAbilityAction.h"
+#include "Engine/StaticMeshActor.h"
 #include "DamageCircleAbilityAction.generated.h"
 
 UCLASS(Blueprintable, EditInlineNew)
