@@ -164,6 +164,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Overworld settings")
 	TSubclassOf<AActor> m_torch = nullptr;
 
+	UPROPERTY(EditAnywhere, Category = "Overworld settings")
+	TSubclassOf<AActor> m_musicActor = nullptr;
+
 	FRandomStream m_randomNumber;
 
 	TArray<PositionAndEdgeData> m_lastGeneratedTiles = {};

@@ -44,6 +44,23 @@ void AEnemy_Mage::Tick(float DeltaTime)
 	}
 }
 
+void AEnemy_Mage::PlayCastFireballSound(bool a_shouldLoop, float a_startPoint, float a_soundDuration)
+{
+	if (a_soundDuration == 0.0f)
+	{
+		a_soundDuration = m_castFireballSound->Duration - a_startPoint;
+	}
+	m_basicAttackSound->bLooping = false;
+	m_ownActionSoundComp->Sound = m_castFireballSound;
+	m_ownActionSoundComp->Play(a_startPoint);
+
+	if (a_shouldLoop)
+	GetWorld()->GetTimerManager().SetTimer(m_ownSoundPlayTimer, [this, a_startPoint]()
+		{
+			PlayOwnSound(a_startPoint);
+		}, a_soundDuration, a_shouldLoop);
+}
+
 void AEnemy_Mage::FireProjectile(AActor* a_target)
 {
 	FTransform transform = FTransform(FRotator(0.0f, 0.0f, 0.0f), m_projectileSpawnPoint->GetComponentLocation(), FVector(1.0f, 1.0f, 1.0f));

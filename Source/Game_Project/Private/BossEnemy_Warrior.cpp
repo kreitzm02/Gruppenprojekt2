@@ -88,7 +88,9 @@ void ABossEnemy_Warrior::PlayChargingSound(bool a_shouldLoop, float a_startPoint
 	}
 	m_basicAttackSound->bLooping = false;
 	m_ownActionSoundComp->Sound = m_basicAttackSound;
+	m_ownActionSoundComp->Play(a_startPoint);
 
+	if (a_shouldLoop)
 	GetWorld()->GetTimerManager().SetTimer(m_ownSoundPlayTimer, [this, a_startPoint]()
 		{
 			PlayOwnSound(a_startPoint);
@@ -103,7 +105,9 @@ void ABossEnemy_Warrior::PlaySpinAttackSound(bool a_shouldLoop, float a_startPoi
 	}
 	m_basicAttackSound->bLooping = false;
 	m_ownActionSoundComp->Sound = m_basicAttackSound;
+	m_ownActionSoundComp->Play(a_startPoint);
 
+	if (a_shouldLoop)
 	GetWorld()->GetTimerManager().SetTimer(m_ownSoundPlayTimer, [this, a_startPoint]()
 		{
 			PlayOwnSound(a_startPoint);

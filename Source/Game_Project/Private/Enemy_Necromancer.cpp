@@ -89,3 +89,20 @@ void AEnemy_Necromancer::SubstractSummon()
 {
 	m_currentSummons -= 1;
 }
+
+void AEnemy_Necromancer::PlaySummonSound(bool a_shouldLoop, float a_startPoint, float a_soundDuration)
+{
+	if (a_soundDuration == 0.0f)
+	{
+		a_soundDuration = m_summonSound->Duration - a_startPoint;
+	}
+	m_basicAttackSound->bLooping = false;
+	m_ownActionSoundComp->Sound = m_summonSound;
+	m_ownActionSoundComp->Play(a_startPoint);
+
+	if (a_shouldLoop)
+	GetWorld()->GetTimerManager().SetTimer(m_ownSoundPlayTimer, [this, a_startPoint]()
+		{
+			PlayOwnSound(a_startPoint);
+		}, a_soundDuration, a_shouldLoop);
+}

@@ -77,6 +77,9 @@ float ABossEnemy_Rogue::TakeDamage(float a_damageAmount, FDamageEvent const& a_d
 
 	UpdateHealthBar();
 
+	m_receivingActionSoundComp->Sound = m_hitSound;
+	m_receivingActionSoundComp->Play(0.0f);
+
 	if (m_currentHealth <= 0.0f && !m_isDead)
 	{
 		GetWorld()->SpawnActor<ADungeonExitPortal>(m_dungeonExitBP, GetActorLocation(), FRotator::ZeroRotator);

@@ -20,6 +20,9 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UFUNCTION()
+	void HandleVolumeChanged(float a_newVolume);
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -41,6 +44,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Settings")
 	USphereComponent* m_hitbox = nullptr;
+
+	UPROPERTY(VisibleAnywhere)
+	UAudioComponent* m_soundComp;
 	
 	float m_maxRadius = 200.0f;
 	
@@ -48,9 +54,13 @@ private:
 
 	float m_currentRadius = 0.0f;
 
+	UPROPERTY(EditAnywhere, Category = "Settings")
+	USoundWave* m_shockwaveStartSound = nullptr;
+
 	UPROPERTY()
 	AEnemyCharacter* m_enemyCharacter = nullptr;
 
 	UFUNCTION()
 	virtual void OnHit(UPrimitiveComponent* a_overlappedComponent, AActor* a_otherActor, UPrimitiveComponent* a_otherComp, int32 a_otherBodyIndex, bool a_bFromSweep, const FHitResult& a_sweepResult);
+
 };

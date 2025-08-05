@@ -83,6 +83,7 @@ void UFSM_BossMageAttack::OnUpdate(float a_deltaTime)
 
 	if (!m_shotFired && m_passedTime >= m_shootAtAnimStartOffset)
 	{
+		m_thisEnemy->PlayBasicAttackSound(false);
 		m_thisEnemy->FireProjectile(m_player);
 		m_shotFired = true;
 	}
@@ -91,4 +92,5 @@ void UFSM_BossMageAttack::OnUpdate(float a_deltaTime)
 void UFSM_BossMageAttack::OnExit()
 {
 	Super::OnExit();
+	m_thisEnemy->StopOwnSound();
 }

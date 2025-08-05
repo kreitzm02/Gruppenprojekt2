@@ -2,7 +2,7 @@
 
 
 #include "Enemy_GolemBoulder.h"
-
+#include "Game_GameInstance.h"
 #include "Enemy_GolemShockwave.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
@@ -23,6 +23,8 @@ AEnemy_GolemBoulder::AEnemy_GolemBoulder()
 	m_underBoulderHitbox = CreateDefaultSubobject<UBoxComponent>(TEXT("Hitbox"));
 	m_underBoulderHitbox->SetupAttachment(RootComponent);
 	m_underBoulderHitbox->SetCollisionResponseToAllChannels(ECR_Overlap);
+
+	m_soundComp = CreateDefaultSubobject<UAudioComponent>(TEXT("Own Sounds"));
 }
 
 void AEnemy_GolemBoulder::OnConstruction(const FTransform& Transform)
@@ -38,6 +40,15 @@ void AEnemy_GolemBoulder::BeginPlay()
 	Super::BeginPlay();
 	m_underBoulderHitbox->OnComponentBeginOverlap.AddDynamic(this, &AEnemy_GolemBoulder::OnHit);
 	m_meshComponent->OnComponentHit.AddDynamic(this, &AEnemy_GolemBoulder::OnHitPhysically);
+
+	UGame_GameInstance* gameInstance = Cast<UGame_GameInstance>(GetGameInstance());
+
+	m_soundComp->SetVolumeMultiplier(gameInstance->GetSFXVolume());
+
+	gameInstance->OnSFXVolumeChanged.AddDynamic(this, &AEnemy_GolemBoulder::HandleVolumeChanged);
+
+	m_boulderBreakSound->bLooping = false;
+	m_soundComp->Sound = m_boulderBreakSound;
 }
 
 // Called every frame
@@ -77,9 +88,18 @@ void AEnemy_GolemBoulder::OnHitPhysically(UPrimitiveComponent* a_hitComponent, A
 	}
 }
 
+void AEnemy_GolemBoulder::HandleVolumeChanged(float a_newVolume)
+{
+	if (m_soundComp)
+	{
+		m_soundComp->SetVolumeMultiplier(a_newVolume);
+	}
+}
 
 void AEnemy_GolemBoulder::DestroyBoulder()
 {
+	PlayBoulderDestroySound();
+
 	if (m_boulderDestroyNiagara)
 	{
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
@@ -98,6 +118,8 @@ void AEnemy_GolemBoulder::DestroyBoulder()
 
 void AEnemy_GolemBoulder::DestroyBoulderWithShockwave()
 {
+	PlayBoulderDestroySound();
+
 	if (m_boulderDestroyNiagara)
 	{
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
@@ -121,4 +143,11 @@ void AEnemy_GolemBoulder::DestroyBoulderWithShockwave()
 	UGameplayStatics::FinishSpawningActor(shockwave, transform);
 
 	Destroy();
+}
+
+void AEnemy_GolemBoulder::PlayBoulderDestroySound()
+{
+	m_soundComp->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+	m_soundComp->bAutoDestroy = true;
+	m_soundComp->Play();
 }

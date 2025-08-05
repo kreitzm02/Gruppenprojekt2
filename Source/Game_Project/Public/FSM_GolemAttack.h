@@ -33,4 +33,15 @@ private:
 
 	UPROPERTY()
 	AActor* m_player = nullptr;
+
+	float m_passedTime = 0.0f;
+
+	float m_animationDuration = 0.0f;
+
+	bool m_animationStarted = false;
+
+	bool m_soundStarted = false;
+
+	UPROPERTY(EditAnywhere, Category = "Settings")
+	float m_playSoundAtAnimOffset = 0.45f;
 };

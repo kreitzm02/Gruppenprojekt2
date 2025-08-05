@@ -23,6 +23,9 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UFUNCTION()
+	void HandleVolumeChanged(float a_newVolume);
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -40,11 +43,16 @@ private:
 
 	void DestroyBoulderWithShockwave();
 
+	void PlayBoulderDestroySound();
+
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* m_meshComponent = nullptr;
 
 	UPROPERTY(VisibleAnywhere)
 	UBoxComponent* m_underBoulderHitbox = nullptr;
+
+	UPROPERTY(VisibleAnywhere)
+	UAudioComponent* m_soundComp;
 
 	UPROPERTY()
 	AEnemyCharacter* m_owner;
@@ -66,4 +74,7 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Settings")
 	FVector m_hitboxScale = FVector::OneVector;
+
+	UPROPERTY(EditAnywhere, Category = "Settings")
+	USoundWave* m_boulderBreakSound = nullptr;
 };

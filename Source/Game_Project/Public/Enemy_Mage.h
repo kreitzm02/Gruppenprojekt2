@@ -25,6 +25,8 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 
+	void PlayCastFireballSound(bool a_shouldLoop = false, float a_startPoint = 0.0f, float a_soundDuration = 0.0f);
+
 	void FireProjectile(AActor* a_target);
 
 	void FireFireball(AActor* a_target);
@@ -82,4 +84,7 @@ private:
 	bool m_abilityReady = true;
 
 	float m_fireballCastTime = 0.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
+	USoundWave* m_castFireballSound = nullptr;
 };

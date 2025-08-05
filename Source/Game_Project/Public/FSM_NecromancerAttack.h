@@ -33,4 +33,10 @@ private:
 
 	UPROPERTY()
 	AActor* m_player = nullptr;
+
+	float m_passedTime = 0.0f;
+
+	float m_animationDuration = 0.0f;
+
+	bool m_animationStarted = false;
 };
