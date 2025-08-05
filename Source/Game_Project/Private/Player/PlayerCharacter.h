@@ -182,6 +182,9 @@ private:
 	float m_AttackDamage;
 
 	UPROPERTY(VisibleAnywhere)
+	float m_CurrentAttackDamage;
+
+	UPROPERTY(VisibleAnywhere)
 	float m_PlayerStamina;
 
 	// leveling

@@ -31,6 +31,8 @@ public:
 private:
 
 	UAnimMontage* m_AttackMontage;
+
+	FTimerHandle m_EndTimerHandle;
 };
 
 

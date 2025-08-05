@@ -38,7 +38,6 @@ void UBerserkAbilityAction::PlayAbilityAction(AActor* a_AbilityUser)
 		m_SavedPlayerAP = player->GetPlayerAttackDamage();
 		m_SavedPlayerDP = player->GetPlayerDefense();
 
-		player->ChangeAttackDamage(m_SavedPlayerAP + m_APAmount);
 		player->ChangeDefense(m_SavedPlayerDP - m_DPAmount);
 	}
 
@@ -60,7 +59,6 @@ void UBerserkAbilityAction::EndAbilityAction(AActor* a_AbilityUser)
 
 	if (APlayerCharacter* player = Cast<APlayerCharacter>(a_AbilityUser))
 	{
-		player->ChangeAttackDamage(m_SavedPlayerAP);
 		player->ChangeDefense(m_SavedPlayerDP);
 	}
 	Cast<UGame_GameInstance>(a_AbilityUser->GetWorld()->GetGameInstance())->m_AdditionalDamage = 0;
