@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
+#include "Engine/StaticMeshActor.h"
 #include "DungeonMeshEntry.h"
 #include "EnemyCharacter.h"
 #include <DungeonMesh.h>
