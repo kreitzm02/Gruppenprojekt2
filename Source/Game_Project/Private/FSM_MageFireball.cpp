@@ -86,6 +86,7 @@ void UFSM_MageFireball::OnUpdate(float a_deltaTime)
 
 	if (!m_fireballFired && m_passedTime >= m_castDuration + m_shootAtAnimStartOffset)
 	{
+		m_thisEnemy->PlayCastFireballSound(false);
 		m_thisEnemy->FireFireball(m_player);
 		m_fireballFired = true;
 	}
@@ -94,6 +95,7 @@ void UFSM_MageFireball::OnUpdate(float a_deltaTime)
 void UFSM_MageFireball::OnExit()
 {
 	Super::OnExit();
+	m_thisEnemy->StopOwnSound();
 	m_thisEnemy->SetAbilityReady(false);
 }
 

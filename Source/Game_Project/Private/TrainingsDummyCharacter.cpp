@@ -62,17 +62,10 @@ float ATrainingsDummyCharacter::TakeDamage(float DamageAmount, FDamageEvent cons
 
 	m_passedCombatTime = 0.0f;
 
-	if (DamageCauser)
-	{
-		FVector knockbackDirection = GetActorLocation() - DamageCauser->GetActorLocation();
-		knockbackDirection.Z = 0;
-		knockbackDirection.Normalize();
-		HandleKnockback(knockbackDirection, 300.0f /*get knockback strengh from damage causer*/);
-		//ACharacter* damagingUnit = Cast<ACharacter>(DamageCauser);
-		//damagingUnit->GetKnockback();
-	}
-
 	UpdateHealthBar();
+
+	m_receivingActionSoundComp->Sound = m_hitSound;
+	m_receivingActionSoundComp->Play(0.0f);
 
 	if (m_currentHealth <= 0.0f)
 	{

@@ -89,6 +89,7 @@ void UFSM_BossRogueSpray::OnUpdate(float a_deltaTime)
 
 	if (!m_shotFired && m_passedTime >= m_shootAtAnimStartOffset)
 	{
+		m_thisEnemy->PlayBasicAttackSound(false);
 		m_thisEnemy->FireArrow(m_player);
 		m_shotFired = true;
 	}
@@ -97,5 +98,6 @@ void UFSM_BossRogueSpray::OnUpdate(float a_deltaTime)
 void UFSM_BossRogueSpray::OnExit()
 {
 	m_thisEnemy->SetArrowSprayReady(false);
+	m_thisEnemy->StopOwnSound();
 	Super::OnExit();
 }

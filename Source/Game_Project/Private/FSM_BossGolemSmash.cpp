@@ -58,6 +58,8 @@ void UFSM_BossGolemSmash::OnEnter()
 
 	m_ownerSkeletalMesh->PlayAnimation(m_smashAnimation, false);
 
+	m_owner->PlaySmashAttackSound(false);
+
 	if (UAnimSingleNodeInstance* node = m_ownerSkeletalMesh->GetSingleNodeInstance())
 	{
 		node->SetPlayRate(m_currentMultiplier);
@@ -79,6 +81,8 @@ void UFSM_BossGolemSmash::OnUpdate(float a_deltaTime)
 	if (m_passedTime >= m_animationLength)
 	{
 		m_passedTime = 0.0f;
+
+		m_owner->PlaySmashAttackSound(false);
 
 		m_ownerSkeletalMesh->PlayAnimation(m_smashAnimation, false);
 

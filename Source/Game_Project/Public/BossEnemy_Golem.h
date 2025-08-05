@@ -29,6 +29,10 @@ public:
 
 	virtual float TakeDamage(float a_damageAmount, FDamageEvent const& a_damageEvent, AController* a_eventInstigator, AActor* a_damageCauser) override;
 
+	void PlaySmashAttackSound(bool a_shouldLoop = false, float a_startPoint = 0.0f, float a_soundDuration = 0.0f);
+
+	void PlayJumpSound(bool a_shouldLoop = false, float a_startPoint = 0.0f, float a_soundDuration = 0.0f);
+
 	float GetMultiplier() { return m_currentDoStuffMultiplier; }
 
 	int GetMaxJumpsPerAbility() { return m_jumpsPerChargeAbility; }
@@ -133,4 +137,10 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
 	TSubclassOf<ADungeonExitPortal> m_dungeonExitBP = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
+	USoundWave* m_smashAttackSound = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
+	USoundWave* m_jumpSound = nullptr;
 };

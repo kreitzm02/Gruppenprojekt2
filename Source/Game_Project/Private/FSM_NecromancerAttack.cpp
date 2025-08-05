@@ -53,7 +53,6 @@ void UFSM_NecromancerAttack::OnEnter()
 		}
 	}
 	m_thisEnemy->GetWeaponHitbox()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	m_ownerSkeletalMesh->PlayAnimation(m_attackAnimation, true);
 }
 
 void UFSM_NecromancerAttack::OnUpdate(float a_deltaTime)
@@ -65,6 +64,24 @@ void UFSM_NecromancerAttack::OnUpdate(float a_deltaTime)
 		FVector playerDirection = m_player->GetActorLocation() - m_ownerCharacter->GetActorLocation();
 		playerDirection.Z = 0.0f;
 		m_ownerCharacter->SetActorRotation(playerDirection.Rotation());
+	}
+
+	m_passedTime += a_deltaTime;
+
+	if (!m_animationStarted)
+	{
+		m_ownerSkeletalMesh->PlayAnimation(m_attackAnimation, false);
+
+		m_thisEnemy->PlayBasicAttackSound(false);
+
+		m_passedTime = 0.0f;
+
+		m_animationStarted = true;
+	}
+
+	if (m_animationStarted && m_passedTime >= m_animationDuration)
+	{
+		m_animationStarted = false;
 	}
 }
 

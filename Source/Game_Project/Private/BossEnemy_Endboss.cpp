@@ -113,10 +113,10 @@ void ABossEnemy_Endboss::Tick(float DeltaTime)
 		SetCorners();
 	}
 
-	UE_LOG(LogTemp, Error, TEXT("Xmin: %f"), m_xSizeMin)
-	UE_LOG(LogTemp, Error, TEXT("Xmax: %f"), m_xSizeMax)
-	UE_LOG(LogTemp, Error, TEXT("Ymin: %f"), m_ySizeMin)
-	UE_LOG(LogTemp, Error, TEXT("Ymax: %f"), m_ySizeMax)
+	//UE_LOG(LogTemp, Error, TEXT("Xmin: %f"), m_xSizeMin)
+	//UE_LOG(LogTemp, Error, TEXT("Xmax: %f"), m_xSizeMax)
+	//UE_LOG(LogTemp, Error, TEXT("Ymin: %f"), m_ySizeMin)
+	//UE_LOG(LogTemp, Error, TEXT("Ymax: %f"), m_ySizeMax)
 
 
 	if (m_isDoingSpecialAtk && !m_isDead)
@@ -267,6 +267,9 @@ float ABossEnemy_Endboss::TakeDamage(float a_damageAmount, FDamageEvent const& a
 	}
 
 	UpdateHealthBar();
+
+	m_receivingActionSoundComp->Sound = m_hitSound;
+	m_receivingActionSoundComp->Play(0.0f);
 
 	if (m_currentHealth <= 0.0f)
 	{

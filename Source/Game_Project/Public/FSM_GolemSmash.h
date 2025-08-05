@@ -37,4 +37,9 @@ private:
 	bool m_shockwaveStarted = false;
 
 	float m_passedTime = 0.0f;
+
+	bool m_soundStarted = false;
+
+	UPROPERTY(EditAnywhere, Category = "Settings")
+	float m_playSoundAtAnimOffset = 0.6f;
 };

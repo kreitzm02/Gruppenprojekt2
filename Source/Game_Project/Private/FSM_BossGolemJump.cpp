@@ -69,6 +69,8 @@ void UFSM_BossGolemJump::OnEnter()
 
 	m_ellapsedTime = 0.0f;
 
+	m_owner->PlayJumpSound(false);
+
 	m_owner->SetActorRotation((m_player->GetActorLocation() - m_owner->GetActorLocation()).Rotation());
 }
 
@@ -112,6 +114,8 @@ void UFSM_BossGolemJump::OnUpdate(float a_deltatime)
 
 		m_ellapsedTime = 0.0f;
 
+		m_owner->PlayJumpSound(false);
+
 		m_owner->SetActorRotation((m_player->GetActorLocation() - m_owner->GetActorLocation()).Rotation());
 	}
 	
@@ -123,6 +127,6 @@ void UFSM_BossGolemJump::OnExit()
 	Super::OnExit();
 
 	m_owner->ResetUsedJump();
-
+	m_owner->StopOwnSound();
 	m_owner->SetJumpReady(false);
 }
