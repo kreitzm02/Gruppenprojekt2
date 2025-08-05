@@ -470,30 +470,37 @@ void UDungeonBuilder::BuildBossRoom()
 	for (int i = 0; i < m_Data->m_AllRooms.Num(); i++)
 	{
 		ERoomType curType = m_Data->m_AllRooms[i].m_RoomType;
+		FInt32Vector2 roomOrigin = m_Data->m_AllRooms[i].m_RoomOrigin;
+		int32 roomCellLength = m_Data->m_AllRooms[i].m_RoomCellLength;
+		int32 roomCellWidth = m_Data->m_AllRooms[i].m_RoomCellWidth;
 
-		if (curType == ERoomType::EXIT)
+		if (curType != ERoomType::EXIT) continue;
+
+		for (int x = roomOrigin.X - 1; x < roomOrigin.X + roomCellLength + 1; x++)
 		{
-			for (int x = m_Data->m_AllRooms[i].m_RoomOrigin.X; x < m_Data->m_AllRooms[i].m_RoomOrigin.X + m_Data->m_AllRooms[i].m_RoomCellLength; x++)
+			for (int y = roomOrigin.Y - 1; y < roomOrigin.Y + roomCellWidth + 1; y++)
 			{
-				for (int y = m_Data->m_AllRooms[i].m_RoomOrigin.Y; y < m_Data->m_AllRooms[i].m_RoomOrigin.Y + m_Data->m_AllRooms[i].m_RoomCellWidth; y++)
+				if (x == roomOrigin.X - 1 || x == roomOrigin.X + roomCellLength|| y == roomOrigin.Y - 1 || y == roomOrigin.Y + roomCellWidth)
 				{
-					FVector pos = { static_cast<float>(x * m_UnitSize), static_cast<float>(y * m_UnitSize), 0.0f };
-					FInt32Vector posOffset = m_DungeonTheme->m_FloorPosOffset;
-					TArray<TArray<ECellType>> grid = m_Data->m_DungeonGrid;
-					pos.X += (float)posOffset.X;
-					pos.Y += (float)posOffset.Y;
-					pos.Z += (float)posOffset.Z + m_DungeonTheme->m_BossFloorZOffset;
-					FActorSpawnParameters params;
-					params.OverrideLevel = m_Level;
-					ACustomChunkManager* chunkManager = Cast<ACustomChunkManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACustomChunkManager::StaticClass()));
-					AStaticMeshActor* meshActor = Cast<AStaticMeshActor>(chunkManager->SpawnActorInChunk(AStaticMeshActor::StaticClass(), pos, {0, 90, 0}, params));
-					if (meshActor)
-					{
-						meshActor->SetMobility(EComponentMobility::Movable);
-						meshActor->GetStaticMeshComponent()->SetStaticMesh(m_DungeonTheme->m_BossFloorMesh);
-						meshActor->SetMobility(EComponentMobility::Static);
-					}
-					TryPlaceDoor(x, y);
+					TryPlaceDoor(x, y, m_Data->m_AllRooms[i]);
+					continue;
+				}
+
+				FVector pos = { static_cast<float>(x * m_UnitSize), static_cast<float>(y * m_UnitSize), 0.0f };
+				FInt32Vector posOffset = m_DungeonTheme->m_FloorPosOffset;
+				TArray<TArray<ECellType>> grid = m_Data->m_DungeonGrid;
+				pos.X += (float)posOffset.X;
+				pos.Y += (float)posOffset.Y;
+				pos.Z += (float)posOffset.Z + m_DungeonTheme->m_BossFloorZOffset;
+				FActorSpawnParameters params;
+				params.OverrideLevel = m_Level;
+				ACustomChunkManager* chunkManager = Cast<ACustomChunkManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACustomChunkManager::StaticClass()));
+				AStaticMeshActor* meshActor = Cast<AStaticMeshActor>(chunkManager->SpawnActorInChunk(AStaticMeshActor::StaticClass(), pos, {0, 90, 0}, params));
+				if (meshActor)
+				{
+					meshActor->SetMobility(EComponentMobility::Movable);
+					meshActor->GetStaticMeshComponent()->SetStaticMesh(m_DungeonTheme->m_BossFloorMesh);
+					meshActor->SetMobility(EComponentMobility::Static);
 				}
 			}
 		}
@@ -586,53 +593,24 @@ void UDungeonBuilder::TryPlaceWall(int32 a_GridX, int32 a_GridY, const FVector& 
 	}
 }
 
-void UDungeonBuilder::TryPlaceDoor(int32 a_GridX, int32 a_GridY) const
+void UDungeonBuilder::TryPlaceDoor(int32 a_GridX, int32 a_GridY, const FDungeonRoom& a_Room) const
 {
 	if (!IsWithinBounds(a_GridX, a_GridY)) return;
+	UE_LOG(LogTemp, Error, TEXT("Door tries to spawn"));
+	TArray<TArray<ECellType>> grid = m_Data->m_DungeonGrid;
 
+	if (grid[a_GridX][a_GridY] != ECellType::FLOOR && grid[a_GridX][a_GridY] != ECellType::FLOORCORRIDOR) return;
+	UE_LOG(LogTemp, Error, TEXT("Door has been spawned"));
 	bool canBePlaced = false;
-	FVector pos;
-	FRotator rot;
+	FVector pos = { a_GridX * m_UnitSize, (float)a_GridY * m_UnitSize, -400.0f };
+	FInt32Vector2 roomCenter = a_Room.GetRoomCenter();
+	int32 rotationY = UDungeonGenUtils::GetOrthogonalRotationBasedOnCenter(pos, FVector(roomCenter.X, roomCenter.Y, 0) * m_UnitSize);
+	FRotator rot = { 0, (float)rotationY, 0 };
 	FActorSpawnParameters params;
 	params.OverrideLevel = m_Level;
 
-	if (m_Data->m_DungeonGrid[a_GridX + 1][a_GridY] == ECellType::FLOOR && m_Data->m_DungeonGrid[a_GridX + 1][a_GridY - 1] != ECellType::FLOOR && 
-		m_Data->m_DungeonGrid[a_GridX + 1][a_GridY + 1] != ECellType::FLOOR && (m_Data->m_DungeonGrid[a_GridX][a_GridY - 1] == ECellType::FLOOR || 
-		m_Data->m_DungeonGrid[a_GridX][a_GridY + 1] == ECellType::FLOOR) && m_Data->m_DungeonGrid[a_GridX - 1][a_GridY] == ECellType::FLOOR)
-	{
-		pos = { static_cast<float>(a_GridX + 1 * m_UnitSize), static_cast<float>(a_GridY * m_UnitSize), 0.0f };
-		rot = { 0, 90, 0 };
-		canBePlaced = true;
-	}
-	else if (m_Data->m_DungeonGrid[a_GridX - 1][a_GridY] == ECellType::FLOOR && m_Data->m_DungeonGrid[a_GridX - 1][a_GridY - 1] != ECellType::FLOOR &&
-		m_Data->m_DungeonGrid[a_GridX - 1][a_GridY + 1] != ECellType::FLOOR && (m_Data->m_DungeonGrid[a_GridX][a_GridY - 1] == ECellType::FLOOR ||
-		m_Data->m_DungeonGrid[a_GridX][a_GridY + 1] == ECellType::FLOOR) && m_Data->m_DungeonGrid[a_GridX + 1][a_GridY] == ECellType::FLOOR)
-	{
-		pos = { static_cast<float>(a_GridX - 1 * m_UnitSize), static_cast<float>(a_GridY * m_UnitSize), 0.0f };
-		rot = { 0, -90, 0 };
-		canBePlaced = true;
-	}
-	else if (m_Data->m_DungeonGrid[a_GridX][a_GridY + 1] == ECellType::FLOOR && m_Data->m_DungeonGrid[a_GridX + 1][a_GridY + 1] != ECellType::FLOOR &&
-		m_Data->m_DungeonGrid[a_GridX - 1][a_GridY + 1] != ECellType::FLOOR && (m_Data->m_DungeonGrid[a_GridX - 1][a_GridY] == ECellType::FLOOR ||
-		m_Data->m_DungeonGrid[a_GridX + 1][a_GridY] == ECellType::FLOOR) && m_Data->m_DungeonGrid[a_GridX][a_GridY - 1] == ECellType::FLOOR)
-	{
-		pos = { static_cast<float>(a_GridX * m_UnitSize), static_cast<float>(a_GridY + 1 * m_UnitSize), 0.0f };
-		rot = { 0, 0, 0 };
-		canBePlaced = true;
-	}
-	else if (m_Data->m_DungeonGrid[a_GridX][a_GridY - 1] == ECellType::FLOOR && m_Data->m_DungeonGrid[a_GridX - 1][a_GridY - 1] != ECellType::FLOOR &&
-		m_Data->m_DungeonGrid[a_GridX + 1][a_GridY - 1] != ECellType::FLOOR && (m_Data->m_DungeonGrid[a_GridX - 1][a_GridY] == ECellType::FLOOR ||
-		m_Data->m_DungeonGrid[a_GridX + 1][a_GridY] == ECellType::FLOOR) && m_Data->m_DungeonGrid[a_GridX][a_GridY + 1] == ECellType::FLOOR)
-	{
-		pos = { static_cast<float>(a_GridX * m_UnitSize), static_cast<float>(a_GridY - 1 * m_UnitSize), 0.0f };
-		rot = { 0, 180, 0 };
-		canBePlaced = true;
-	}
-
-	if (!canBePlaced) return;
-
 	ACustomChunkManager* chunkManager = Cast<ACustomChunkManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACustomChunkManager::StaticClass()));
-	AActor* actor = Cast<AStaticMeshActor>(chunkManager->SpawnActorInChunk(AStaticMeshActor::StaticClass(), pos, rot, params));
+	chunkManager->SpawnActorInChunk(m_DungeonTheme->m_DoorMesh, pos, rot, params);
 }
 
 bool UDungeonBuilder::IsWithinBounds(int32 a_GridX, int32 a_GridY) const
