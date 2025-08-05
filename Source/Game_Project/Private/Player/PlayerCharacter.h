@@ -141,6 +141,11 @@ private:
 	UPROPERTY(EditAnywhere, Category = "General Player Settings")
 	int32 m_AbilityMax = 4;
 
+	UPROPERTY(EditAnywhere, Category = "General Player Settings")
+	float m_invulnarabilityTime = 0.5f;
+
+	float m_passedInvulnarabilityTime = 0.0f;
+
 	int32 m_AbilityNum = 0;
 
 	int32 m_CurrentAbilitySlot = 0;
@@ -154,6 +159,8 @@ private:
 	bool m_PlayerIsInMainhub = false;
 
 	void SetCurrentPlayerClass(int a_ClassIndex);
+
+	bool m_playerIsHittable = true;
 
 	// player stats
 

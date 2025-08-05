@@ -166,6 +166,15 @@ void APlayerCharacter::Tick(float DeltaTime)
 	UE_LOG(LogTemp, Warning, TEXT("Player Abilities: %i"), m_AbilityNum)
 
 	m_PlayerMaxHealth = m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_BaseHealthPoints * Cast<UGame_GameInstance>(GetGameInstance())->m_playerSave->GetPlayerHPMultiplier();
+
+	if (!m_playerIsHittable)
+	{
+		m_passedInvulnarabilityTime += DeltaTime;
+		if (m_passedInvulnarabilityTime >= m_invulnarabilityTime)
+		{
+			m_playerIsHittable = true;
+		}
+	}
 }
 #pragma endregion
 
@@ -425,7 +434,7 @@ void APlayerCharacter::SetupMeleeHitbox()
 	m_MeleeHitBox->SetBoxExtent({ 1.5f,0.4f,0.4f });
 	m_MeleeHitBox->SetRelativeLocation({ -0.8f, 0.0f, 0.0f });
 	m_MeleeHitBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	m_MeleeHitBox->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel1);
+	m_MeleeHitBox->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel2);
 	m_MeleeHitBox->SetCollisionResponseToAllChannels(ECR_Overlap);
 	m_MeleeHitBox->SetVisibility(false);
 	m_MeleeHitBox->SetHiddenInGame(true);
@@ -601,9 +610,14 @@ void APlayerCharacter::ClearAlreadyHitActors()
 float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	float totalDmg = DamageAmount * (100 - m_PlayerDefense) / 100;
-	UE_LOG(LogTemp, Warning, TEXT("player got damage: %f"), totalDmg)
-	UE_LOG(LogTemp, Warning, TEXT("Player health: %f"), m_PlayerHealth)
-	TryAddPlayerHealth(totalDmg * -1); // "adds" negative health 
+	if (m_playerIsHittable)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("player got damage: %f"), totalDmg)
+		UE_LOG(LogTemp, Warning, TEXT("Player health: %f"), m_PlayerHealth)
+		TryAddPlayerHealth(totalDmg * -1); // "adds" negative health
+		m_passedInvulnarabilityTime = 0.0f;
+		m_playerIsHittable = false;
+	}
 	if (DamageCauser)
 	{
 		FVector knockbackDirection = GetActorLocation() - DamageCauser->GetActorLocation();
