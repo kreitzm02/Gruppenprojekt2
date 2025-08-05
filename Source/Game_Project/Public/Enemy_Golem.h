@@ -24,6 +24,8 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	void PlaySmashAttackSound(bool a_shouldLoop = false, float a_startPoint = 0.0f, float a_soundDuration = 0.0f);
+
 	void CreateShockwave();
 
 	bool GetSmashReady() { return m_smashReady; }
@@ -68,4 +70,7 @@ private:
 	float m_smashDuration = 0.0f;
 
 	bool m_smashReady = true;
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
+	USoundWave* m_smashAttackSound = nullptr;
 };

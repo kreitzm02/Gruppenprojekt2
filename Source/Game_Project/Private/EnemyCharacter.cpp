@@ -128,11 +128,15 @@ void AEnemyCharacter::PlayBasicAttackSound(bool a_shouldLoop, float a_startPoint
 	}
 	m_basicAttackSound->bLooping = false;
 	m_ownActionSoundComp->Sound = m_basicAttackSound;
+	m_ownActionSoundComp->Play(a_startPoint);
 
-	GetWorld()->GetTimerManager().SetTimer(m_ownSoundPlayTimer, [this, a_startPoint]()
+	if (a_shouldLoop)
 	{
-		PlayOwnSound(a_startPoint);
-	}, a_soundDuration,a_shouldLoop);
+		GetWorld()->GetTimerManager().SetTimer(m_ownSoundPlayTimer, [this, a_startPoint]()
+			{
+				PlayOwnSound(a_startPoint);
+			}, a_soundDuration, a_shouldLoop);
+	}
 }
 
 void AEnemyCharacter::StopOwnSound()

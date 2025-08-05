@@ -78,6 +78,7 @@ void UFSM_BossMageBurnGround::OnUpdate(float a_deltaTime)
 	if (m_passedTime >= m_burnGroundAtAnimStartOffset && !m_burnGroundFired)
 	{
 		//fire burn ground
+		m_owner->PlayCastBurnGroundSound(false);
 		m_owner->FireBurnGround(m_player);
 
 		m_burnGroundFired = true;
@@ -103,8 +104,9 @@ void UFSM_BossMageBurnGround::OnUpdate(float a_deltaTime)
 void UFSM_BossMageBurnGround::OnExit()
 {
 	Super::OnExit();
+	m_owner->StopOwnSound();
 
 	m_owner->ResetUsedBurnGrounds();
-
+	
 	m_owner->SetBurnGroundReady(false);
 }

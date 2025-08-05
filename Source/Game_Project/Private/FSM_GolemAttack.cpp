@@ -53,7 +53,6 @@ void UFSM_GolemAttack::OnEnter()
 		}
 	}
 	m_thisEnemy->GetWeaponHitbox()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	m_ownerSkeletalMesh->PlayAnimation(m_attackAnimation, true);
 }
 
 void UFSM_GolemAttack::OnUpdate(float a_deltaTime)
@@ -66,11 +65,34 @@ void UFSM_GolemAttack::OnUpdate(float a_deltaTime)
 		playerDirection.Z = 0.0f;
 		m_ownerCharacter->SetActorRotation(playerDirection.Rotation());
 	}
+
+	m_passedTime += a_deltaTime;
+
+	if (!m_animationStarted)
+	{
+		m_ownerSkeletalMesh->PlayAnimation(m_attackAnimation, false);
+
+		m_passedTime = 0.0f;
+
+		m_animationStarted = true;
+	}
+
+	if (!m_soundStarted && m_passedTime >= m_playSoundAtAnimOffset)
+	{
+		m_thisEnemy->PlayBasicAttackSound(false);
+		m_soundStarted = true;
+	}
+
+	if (m_animationStarted && m_passedTime >= m_animationDuration)
+	{
+		m_animationStarted = false;
+		m_soundStarted = false;
+	}
 }
 
 void UFSM_GolemAttack::OnExit()
 {
 	Super::OnExit();
-
+	m_thisEnemy->StopOwnSound();
 	m_thisEnemy->GetWeaponHitbox()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }

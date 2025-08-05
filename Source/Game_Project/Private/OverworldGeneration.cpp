@@ -36,7 +36,9 @@ void AOverworldGeneration::BeginPlay()
     AStaticMeshActor* tileActor = nullptr;
 
     TArray<FVector> offset = {};
-    
+
+    GetWorld()->SpawnActor<AActor>(m_musicActor, FVector::ZeroVector + m_worldOffsetVector, FRotator::ZeroRotator);
+
     for (int i = 0; i <= m_worldSize + 10; i++)
     {
         if (i == 0)
@@ -351,7 +353,7 @@ void AOverworldGeneration::BeginPlay()
         FVector position = m_emptyTiles[i];
         float currentDistToSpawn = FVector::Dist(TilePosition(position.X, position.Y) + m_worldOffsetVector, FVector::ZeroVector + m_worldOffsetVector);
 
-        UE_LOG(LogTemp,Error, TEXT("currentDistance: %f"), currentDistToSpawn)
+        //UE_LOG(LogTemp,Error, TEXT("currentDistance: %f"), currentDistToSpawn)
 
         if (currentDistToSpawn >= m_enemyFreeRangeFromSpawn)
         {

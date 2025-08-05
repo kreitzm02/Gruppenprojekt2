@@ -80,6 +80,9 @@ float ABossEnemy_Mage::TakeDamage(float a_damageAmount, FDamageEvent const& a_da
 
 	UpdateHealthBar();
 
+	m_receivingActionSoundComp->Sound = m_hitSound;
+	m_receivingActionSoundComp->Play(0.0f);
+
 	if (m_currentHealth <= 0.0f && !m_isDead)
 	{
 		GetWorld()->SpawnActor<ADungeonExitPortal>(m_dungeonExitBP, GetActorLocation(), FRotator::ZeroRotator);
@@ -87,6 +90,40 @@ float ABossEnemy_Mage::TakeDamage(float a_damageAmount, FDamageEvent const& a_da
 	}
 
 	return a_damageAmount;
+}
+
+void ABossEnemy_Mage::PlayCastFireballSound(bool a_shouldLoop, float a_startPoint, float a_soundDuration)
+{
+	if (a_soundDuration == 0.0f)
+	{
+		a_soundDuration = m_castFireballSound->Duration - a_startPoint;
+	}
+	m_basicAttackSound->bLooping = false;
+	m_ownActionSoundComp->Sound = m_castFireballSound;
+	m_ownActionSoundComp->Play(a_startPoint);
+
+	if (a_shouldLoop)
+	GetWorld()->GetTimerManager().SetTimer(m_ownSoundPlayTimer, [this, a_startPoint]()
+		{
+			PlayOwnSound(a_startPoint);
+		}, a_soundDuration, a_shouldLoop);
+}
+
+void ABossEnemy_Mage::PlayCastBurnGroundSound(bool a_shouldLoop, float a_startPoint, float a_soundDuration)
+{
+	if (a_soundDuration == 0.0f)
+	{
+		a_soundDuration = m_castBurnGroundSound->Duration - a_startPoint;
+	}
+	m_basicAttackSound->bLooping = false;
+	m_ownActionSoundComp->Sound = m_castBurnGroundSound;
+	m_ownActionSoundComp->Play(a_startPoint);
+
+	if (a_shouldLoop)
+	GetWorld()->GetTimerManager().SetTimer(m_ownSoundPlayTimer, [this, a_startPoint]()
+		{
+			PlayOwnSound(a_startPoint);
+		}, a_soundDuration, a_shouldLoop);
 }
 
 void ABossEnemy_Mage::FireProjectile(AActor* a_target)

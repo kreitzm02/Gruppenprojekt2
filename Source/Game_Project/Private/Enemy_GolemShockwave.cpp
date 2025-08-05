@@ -2,6 +2,8 @@
 
 
 #include "Enemy_GolemShockwave.h"
+
+#include "Game_GameInstance.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -21,6 +23,8 @@ AEnemy_GolemShockwave::AEnemy_GolemShockwave()
     
     m_shockwaveVFX = CreateDefaultSubobject<UNiagaraComponent>(TEXT("ShockwaveEffect"));
     m_shockwaveVFX->SetupAttachment(RootComponent);
+
+	m_soundComp = CreateDefaultSubobject<UAudioComponent>(TEXT("Own Sounds"));
 }
 
 // Called when the game starts or when spawned
@@ -32,6 +36,16 @@ void AEnemy_GolemShockwave::BeginPlay()
 	{
 		m_shockwaveVFX->Activate();
 	}
+
+	UGame_GameInstance* gameInstance = Cast<UGame_GameInstance>(GetGameInstance());
+
+	m_soundComp->SetVolumeMultiplier(gameInstance->GetSFXVolume());
+
+	gameInstance->OnSFXVolumeChanged.AddDynamic(this, &AEnemy_GolemShockwave::HandleVolumeChanged);
+
+	m_shockwaveStartSound->bLooping = false;
+	m_soundComp->Sound = m_shockwaveStartSound;
+	m_soundComp->Play();
 }
 
 // Called every frame
@@ -76,5 +90,13 @@ void AEnemy_GolemShockwave::OnHit(UPrimitiveComponent* a_overlappedComponent, AA
 			UGameplayStatics::ApplyDamage(a_otherActor, m_enemyCharacter->GetAttackDamage(), m_enemyCharacter->GetController(), this, nullptr);
 			
 		}
+	}
+}
+
+void AEnemy_GolemShockwave::HandleVolumeChanged(float a_newVolume)
+{
+	if (m_soundComp)
+	{
+		m_soundComp->SetVolumeMultiplier(a_newVolume);
 	}
 }

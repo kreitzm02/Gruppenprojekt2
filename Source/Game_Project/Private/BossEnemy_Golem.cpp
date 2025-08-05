@@ -74,6 +74,40 @@ void ABossEnemy_Golem::Tick(float DeltaTime)
 	}
 }
 
+void ABossEnemy_Golem::PlaySmashAttackSound(bool a_shouldLoop, float a_startPoint, float a_soundDuration)
+{
+	if (a_soundDuration == 0.0f)
+	{
+		a_soundDuration = m_smashAttackSound->Duration - a_startPoint;
+	}
+	m_basicAttackSound->bLooping = false;
+	m_ownActionSoundComp->Sound = m_smashAttackSound;
+	m_ownActionSoundComp->Play(a_startPoint);
+
+	if (a_shouldLoop)
+	GetWorld()->GetTimerManager().SetTimer(m_ownSoundPlayTimer, [this, a_startPoint]()
+		{
+			PlayOwnSound(a_startPoint);
+		}, a_soundDuration, a_shouldLoop);
+}
+
+void ABossEnemy_Golem::PlayJumpSound(bool a_shouldLoop, float a_startPoint, float a_soundDuration)
+{
+	if (a_soundDuration == 0.0f)
+	{
+		a_soundDuration = m_jumpSound->Duration - a_startPoint;
+	}
+	m_basicAttackSound->bLooping = false;
+	m_ownActionSoundComp->Sound = m_jumpSound;
+	m_ownActionSoundComp->Play(a_startPoint);
+
+	if (a_shouldLoop)
+	GetWorld()->GetTimerManager().SetTimer(m_ownSoundPlayTimer, [this, a_startPoint]()
+		{
+			PlayOwnSound(a_startPoint);
+		}, a_soundDuration, a_shouldLoop);
+}
+
 float ABossEnemy_Golem::TakeDamage(float a_damageAmount, FDamageEvent const& a_damageEvent, AController* a_eventInstigator, AActor* a_damageCauser)
 {
 	m_currentHealth = FMath::Clamp(m_currentHealth - a_damageAmount, 0.0f, m_maxHealth);
@@ -83,6 +117,9 @@ float ABossEnemy_Golem::TakeDamage(float a_damageAmount, FDamageEvent const& a_d
 
 
 	UpdateHealthBar();
+
+	m_receivingActionSoundComp->Sound = m_hitSound;
+	m_receivingActionSoundComp->Play(0.0f);
 
 	if (m_currentHealth <= 0.0f && !m_isDead)
 	{

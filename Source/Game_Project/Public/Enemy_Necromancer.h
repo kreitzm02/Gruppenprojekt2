@@ -26,6 +26,8 @@ public:
 
 	void FireProjectile(FVector a_direction);
 
+	void PlaySummonSound(bool a_shouldLoop = false, float a_startPoint = 0.0f, float a_soundDuration = 0.0f);
+
 	void Summon();
 
 	void SubstractSummon();
@@ -72,4 +74,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	ACustomChunkManager* m_chunkManager = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
+	USoundWave* m_summonSound = nullptr;
 };

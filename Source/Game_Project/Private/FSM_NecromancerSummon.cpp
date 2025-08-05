@@ -20,6 +20,7 @@ void UFSM_NecromancerSummon::OnEnter()
 
 	m_thisEnemy->GetCharacterMovement()->StopMovementImmediately();
 	m_ownerSkeletalMesh->PlayAnimation(m_summonAnimation, true);
+	m_thisEnemy->PlaySummonSound(false);
 	m_thisEnemy->Summon();
 }
 
