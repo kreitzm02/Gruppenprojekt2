@@ -64,7 +64,7 @@ private:
 	void TryPlaceWall(int32 a_GridX, int32 a_GridY, const FVector& a_Position, const FRotator& a_Rotation, int32 a_WallIndex) const;
 
 	UFUNCTION()
-	void TryPlaceDoor(int32 a_GridX, int32 a_GridY) const;
+	void TryPlaceDoor(int32 a_GridX, int32 a_GridY, const FDungeonRoom& a_Room) const;
 
 	UFUNCTION()
 	bool IsWithinBounds(int32 a_GridX, int32 a_GridY) const;

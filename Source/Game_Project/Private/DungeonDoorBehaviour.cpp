@@ -18,7 +18,7 @@ ADungeonDoorBehaviour::ADungeonDoorBehaviour()
     m_TriggerBox->SetBoxExtent(FVector(100.f, 100.f, 50.f));
     m_TriggerBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
     m_TriggerBox->SetCollisionResponseToAllChannels(ECR_Ignore);
-    m_TriggerBox->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+    m_TriggerBox->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Overlap);
     m_TriggerBox->SetRelativeLocation(FVector(0.f, 0.f, -100.f)); // Auf Bodenniveau vor der Tür
 
     m_TriggerBox->OnComponentBeginOverlap.AddDynamic(this, &ADungeonDoorBehaviour::OnTriggerOverlap);
@@ -38,7 +38,7 @@ void ADungeonDoorBehaviour::Tick(float DeltaTime)
     if (m_ShouldOpen)
     {
         FVector current = GetActorLocation();
-        FVector newLocation = FMath::VInterpConstantTo(current, m_ClosedPosition + FVector(0.f, 0.f, 300.f), DeltaTime, m_MoveSpeed);
+        FVector newLocation = FMath::VInterpConstantTo(current, m_ClosedPosition + FVector(0.f, 0.f, 400.f), DeltaTime, m_MoveSpeed);
         SetActorLocation(newLocation);
     }
 }
