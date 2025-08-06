@@ -175,6 +175,9 @@ void APlayerCharacter::Tick(float DeltaTime)
 			m_playerIsHittable = true;
 		}
 	}
+
+	UGame_GameInstance* gameInstance = Cast<UGame_GameInstance>(GetGameInstance());
+	gameInstance->PrintStackInfo();
 }
 #pragma endregion
 

@@ -20,6 +20,8 @@ class GAME_PROJECT_API UGame_GameInstance : public UGameInstance
 public:
 	virtual void Init() override;
 
+	void PrintStackInfo();
+
 	UPROPERTY(BlueprintAssignable, Category = "Audio")
 	FOnMusicVolumeChanged OnMusicVolumeChanged;
 

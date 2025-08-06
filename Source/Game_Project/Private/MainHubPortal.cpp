@@ -56,7 +56,22 @@ void AMainHubPortal::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor*
         ULoadingScreenManager::Get(Player->GetWorld())->StartLoading(Player->GetWorld());
         UGameplayStatics::OpenLevel(this, "temp");
 
+        //bool temp;
+        //NewLevel = ULevelStreamingDynamic::LoadLevelInstance(this, "temp", FVector::ZeroVector, FRotator::ZeroRotator,  temp);
+        //NewLevel->SetShouldBeVisible(false);
+        //NewLevel->SetShouldBeLoaded(true);
+        //
+        //FTimerHandle temp2;
+        //
+        //GetWorld()->GetTimerManager().SetTimer(temp2 , this, &AMainHubPortal::Load, 2.0f, false);
+        
+
         UGame_GameInstance* gameInstance = Cast<UGame_GameInstance>(GetGameInstance());
         gameInstance->StartGameTimer();
     }
+}
+
+void AMainHubPortal::Load()
+{
+    NewLevel->SetShouldBeVisible(true);
 }

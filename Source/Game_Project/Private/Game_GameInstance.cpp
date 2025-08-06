@@ -6,6 +6,7 @@
 #include "LoadingScreenManager.h"
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
+#include "Microsoft/AllowMicrosoftPlatformTypes.h"
 #include "Player/PlayerCharacter.h"
 
 
@@ -17,6 +18,21 @@ void UGame_GameInstance::Init()
 	UE_LOG(LogTemp, Error, TEXT("music volume save:%f"), m_playerSave->m_musicVol)
 	m_musicVolume = m_playerSave->m_musicVol;
 	m_sfxVolume = m_playerSave->m_sfxVol;
+}
+
+void UGame_GameInstance::PrintStackInfo()
+{
+	int dummy;
+	void* currentStackPtr = &dummy;
+
+	NT_TIB* tib = (NT_TIB*)NtCurrentTeb();
+	void* stackBase = tib->StackBase;
+	void* stackLimit = tib->StackLimit;
+
+	SIZE_T used = (SIZE_T)stackBase - (SIZE_T)currentStackPtr;
+	SIZE_T total = (SIZE_T)stackBase - (SIZE_T)stackLimit;
+
+	UE_LOG(LogTemp, Error, TEXT("Stack total: %llu bytes, used: %llu bytes"), total, used);
 }
 
 
