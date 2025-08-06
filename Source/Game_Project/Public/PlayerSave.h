@@ -100,4 +100,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player Saves")
 	TArray<TSubclassOf<UBaseAbility>> m_AbilityClasses;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player Saves")
+	float m_musicVol = 0.5f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player Saves")
+	float m_sfxVol = 0.5f;
 };

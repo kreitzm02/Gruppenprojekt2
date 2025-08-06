@@ -22,7 +22,8 @@ ABossEnemy_Endboss::ABossEnemy_Endboss()
 
 	m_projectileSpawnLeftWeapon = CreateDefaultSubobject<UArrowComponent>(TEXT("ProjectileSpawnPointLeftWeapon"));
 	m_projectileSpawnRightWeapon = CreateDefaultSubobject<UArrowComponent>(TEXT("ProjectileSpawnPointRightWeapon"));
-	
+
+	m_burnGroundAudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("BurnGroundAudioComp"));
 }
 
 void ABossEnemy_Endboss::OnConstruction(const FTransform& Transform)
@@ -93,6 +94,8 @@ void ABossEnemy_Endboss::BeginPlay()
 
 	m_skeletalMesh->PlayAnimation(m_idleAnimation, true);
 
+	m_burnGroundAudioComp->Sound = m_fireBurnGroundSound;
+
 	m_atkTimer = 999.0f;
 }
 
@@ -100,9 +103,6 @@ void ABossEnemy_Endboss::BeginPlay()
 void ABossEnemy_Endboss::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	//FireProjectileWithCount(m_player->GetActorLocation() - GetActorLocation(), m_projectileSpawnLeftWeapon->GetComponentLocation(), m_multipleProjectileAtkCount);
-	//FireRandomBurnGroundWithCount(m_projectileSpawnLeftWeapon->GetComponentLocation(), m_burnGroundProjectileCount);
 
 	if (!m_cornersSet)
 	{
@@ -112,11 +112,6 @@ void ABossEnemy_Endboss::Tick(float DeltaTime)
 		}
 		SetCorners();
 	}
-
-	//UE_LOG(LogTemp, Error, TEXT("Xmin: %f"), m_xSizeMin)
-	//UE_LOG(LogTemp, Error, TEXT("Xmax: %f"), m_xSizeMax)
-	//UE_LOG(LogTemp, Error, TEXT("Ymin: %f"), m_ySizeMin)
-	//UE_LOG(LogTemp, Error, TEXT("Ymax: %f"), m_ySizeMax)
 
 
 	if (m_isDoingSpecialAtk && !m_isDead)
@@ -160,6 +155,8 @@ void ABossEnemy_Endboss::Tick(float DeltaTime)
 
 		if (m_atkTimer >= m_shootAtAnimOffset && !m_shotFired)
 		{
+			m_ownActionSoundComp->Sound = m_basicAttackSound;
+			m_ownActionSoundComp->Play();
 			FireProjectileWithCount(m_player->GetActorLocation() - GetActorLocation(), m_currentProjectileSpawnPoint, m_multipleProjectileAtkCount);
 			m_shotFired = true;
 		}
@@ -175,9 +172,14 @@ void ABossEnemy_Endboss::Tick(float DeltaTime)
 	}
 	else if (!m_movingToEdge && !m_isDead)
 	{
-		if (PlayerInRange())
+		if (m_doBasicAttack)
 		{
 			m_atkTimer += DeltaTime;
+
+			if (!PlayerInRange() && m_atkTimer >= m_bothHandsAtkAnimLength)
+			{
+				m_doBasicAttack = false;
+			}
 
 			if (m_needAtkInit)
 			{
@@ -207,30 +209,25 @@ void ABossEnemy_Endboss::Tick(float DeltaTime)
 			if (m_atkTimer >= m_shootAtAnimOffset && !m_shotFired)
 			{
 				FireFireball(m_player, GetActorLocation());
+				m_ownActionSoundComp->Sound = m_basicAttackSound;
+				m_ownActionSoundComp->Play();
 				m_shotFired = true;
 			}
 		}
 		else
 		{
-			if (!m_shotFired && m_atkTimer <= m_bothHandsAtkAnimLength)
+			if (PlayerInRange())
 			{
-				m_atkTimer += DeltaTime;
-				if (m_atkTimer >= m_shootAtAnimOffset && !m_shotFired)
-				{
-					FireFireball(m_player, GetActorLocation());
-					m_shotFired = true;
-				}
+				m_doBasicAttack = true;
 			}
-			else
+
+			if (!m_needAtkInit)
 			{
-				if (!m_needAtkInit)
-				{
-					m_needAtkInit = true;
-				}
-				m_skeletalMesh->PlayAnimation(m_chaseAnimation, true);
-				AddMovementInput(GetDirToPlayerNormalized());
-				SetActorRotation(GetDirToPlayerNormalized().Rotation());
+				m_needAtkInit = true;
 			}
+			m_skeletalMesh->PlayAnimation(m_chaseAnimation, true);
+			AddMovementInput(GetDirToPlayerNormalized());
+			SetActorRotation(GetDirToPlayerNormalized().Rotation());
 			
 		}
 	}
@@ -358,6 +355,7 @@ void ABossEnemy_Endboss::CheckIfMovedToEdge()
 		ResetMoveSpeed();
 		m_movingToEdge = false;
 		m_isDoingSpecialAtk = true;
+		m_needAtkInit = true;
 	}
 }
 
@@ -456,4 +454,5 @@ void ABossEnemy_Endboss::FireRandomBurnGround()
 	{
 		FireBurnGround(RandomVectorInBoundaries(), GetActorLocation());
 	}
+	m_burnGroundAudioComp->Play();
 }

@@ -49,7 +49,7 @@ void AEnemy_BurnGroundProjectile::BeginPlay()
 void AEnemy_BurnGroundProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	
 	m_ellapsedTime += DeltaTime;
 	m_passedTimeLastDmgInterval += DeltaTime;
 	

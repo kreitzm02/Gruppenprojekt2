@@ -150,6 +150,7 @@ private:
 	float m_fireballLifetime = 8.0f;
 
 
+
 	//boulder
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
 	UClass* m_boulderBP = nullptr;
@@ -182,6 +183,11 @@ private:
 
 	bool m_periodicBurnGroundStarted = false;
 
+	UPROPERTY()
+	UAudioComponent* m_burnGroundAudioComp = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
+	USoundWave* m_fireBurnGroundSound = nullptr;
 
 
 	float m_baseMaxMoveSpeed;
@@ -209,6 +215,8 @@ private:
 	bool m_movingToEdge = false;
 
 	bool m_isDoingSpecialAtk = false;
+
+	bool m_doBasicAttack = false;
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
 	float m_specialAtkDuration = 12.0f;

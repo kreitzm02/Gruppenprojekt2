@@ -2,6 +2,8 @@
 
 
 #include "Widget_PauseMenu.h"
+
+#include "Game_GameInstance.h"
 #include "Widget_OptionsMenu.h"
 #include "Kismet/GameplayStatics.h"
 
