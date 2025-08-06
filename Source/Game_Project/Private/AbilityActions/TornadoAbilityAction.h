@@ -16,6 +16,7 @@ struct FTornadoInstance
 	UNiagaraComponent* m_VFXComp = nullptr;
 	FTimerHandle m_MoveHandle;
 	FTimerHandle m_EndHandle;
+	FTimerHandle m_ClearHitListHandle;
 };
 
 UCLASS()
@@ -30,6 +31,15 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Tornado Settings", meta = (DisplayName = "Spawn Radius"))
 	float m_SpawnRadius = 600.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Tornado Settings", meta = (DisplayName = "Damage"))
+	float m_Damage = 20.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Tornado Settings", meta = (DisplayName = "Attraction Radius"))
+	float m_AttractionRadius = 1500.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Tornado Settings", meta = (DisplayName = "Attraction Strength"))
+	float m_AttractionStrength = 1000.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Tornado Settings", meta = (DisplayName = "Speed"))
 	float m_Speed = 250.0f;
@@ -60,6 +70,7 @@ private:
 
 	void PlayTornado(AActor* a_AbilityUser);
 	void MoveTornadoTick(TSharedPtr<FTornadoInstance> a_Instance);
+	void UpdateHitActors(TSharedPtr<FTornadoInstance> a_Instance);
 	void EndTornado(TSharedPtr<FTornadoInstance> a_Instance);
 	UAnimMontage* m_AttackMontage;
 	FTimerHandle m_StartTimerHandle;

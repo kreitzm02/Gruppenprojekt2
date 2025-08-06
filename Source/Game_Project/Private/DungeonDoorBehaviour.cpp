@@ -47,7 +47,7 @@ void ADungeonDoorBehaviour::OnTriggerOverlap(UPrimitiveComponent* OverlappedComp
 {
 	if (Cast<APlayerCharacter>(OtherActor))
     {
-		m_ShouldOpen = true;
+		
 	}
 }
 

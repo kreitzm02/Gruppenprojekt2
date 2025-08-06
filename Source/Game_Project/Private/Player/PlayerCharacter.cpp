@@ -424,6 +424,8 @@ void APlayerCharacter::SetupWeapons()
 		else continue;
 
 		UStaticMeshComponent* meshComponent = AttachWeaponComponentToBone(boneName, meshAsset);
+		if (!meshComponent) continue;
+		meshComponent->SetCanEverAffectNavigation(false);
 	}
 }
 

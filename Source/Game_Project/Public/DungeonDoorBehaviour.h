@@ -24,7 +24,7 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
+    bool m_ShouldOpen = false;
 private:
     UPROPERTY(EditAnywhere)
     UStaticMeshComponent* m_DoorMesh;
@@ -34,7 +34,6 @@ private:
 
     FVector m_ClosedPosition;
 
-    bool m_ShouldOpen = false;
     float m_MoveSpeed = 200.0f;
 
     UFUNCTION()
