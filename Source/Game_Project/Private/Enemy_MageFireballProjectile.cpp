@@ -45,6 +45,8 @@ void AEnemy_MageFireballProjectile::Tick(float DeltaTime)
 	m_targetDirection.Normalize();
 	this->SetActorRotation(m_targetDirection.Rotation());
 	MoveInDirection(DeltaTime);
+
+	
 }
 
 void AEnemy_MageFireballProjectile::MoveInDirection(float a_deltaTime)

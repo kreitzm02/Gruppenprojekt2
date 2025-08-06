@@ -20,6 +20,8 @@ class GAME_PROJECT_API UGame_GameInstance : public UGameInstance
 public:
 	virtual void Init() override;
 
+	void PrintStackInfo();
+
 	UPROPERTY(BlueprintAssignable, Category = "Audio")
 	FOnMusicVolumeChanged OnMusicVolumeChanged;
 
@@ -93,15 +95,18 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Game Timer Settings")
 	int m_gameTimerDuration = 3000;
 
+	UPROPERTY(EditAnywhere, Category = "Timer End Sound")
+	USoundBase* m_timerFinishingSound;
+
 	UPROPERTY()
 	class UWidget_GameTimer* m_timerWidgetInstance = nullptr;
 
 	UPROPERTY()
 	UWidget_PlayerUI* m_playerUI = nullptr;
 
-	float m_musicVolume = 1.0f;
+	float m_musicVolume = 0.5f;
 
-	float m_sfxVolume = 1.0f;
+	float m_sfxVolume = 0.5f;
 
 	bool m_isInLevel = false;
 

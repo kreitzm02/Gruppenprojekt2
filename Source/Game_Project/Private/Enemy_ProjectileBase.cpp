@@ -3,6 +3,7 @@
 
 #include "Enemy_ProjectileBase.h"
 
+#include "GeometryTypes.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -21,8 +22,12 @@ void AEnemy_ProjectileBase::OnConstruction(const FTransform& Transform)
 	Super::OnConstruction(Transform);
 
 	m_projectileMesh->SetRelativeRotation(m_arrowRotation);
-	m_projectileHitbox->SetRelativeScale3D(m_hitboxBoxSize);
+	if (Cast<UBoxComponent>(m_projectileHitbox))
+	{
+		m_projectileHitbox->SetRelativeScale3D(m_hitboxBoxSize);
+	}
 	m_projectileMesh->SetRelativeScale3D(m_arrowSize);
+	//m_destroySelfHitbox->SetSphereRadius(m_destroySelfHitboxSize);
 }
 
 // Called when the game starts or when spawned
@@ -47,6 +52,11 @@ void AEnemy_ProjectileBase::BeginPlay()
 void AEnemy_ProjectileBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (CheckForWallCollide())
+	{
+		Destroy();
+	}
 }
 
 void AEnemy_ProjectileBase::MoveInDirection(float a_deltaTime)
@@ -54,21 +64,57 @@ void AEnemy_ProjectileBase::MoveInDirection(float a_deltaTime)
 	SetActorLocation(GetActorLocation() + m_targetDirection * m_projectileSpeed * a_deltaTime);
 }
 
+bool AEnemy_ProjectileBase::CheckForWallCollide()
+{
+	FHitResult hitResult;
+	FVector start = GetActorLocation();
+	FVector end = GetActorLocation() + (m_targetDirection * m_lineTraceLenght);
+
+	FCollisionQueryParams traceParams;
+	traceParams.AddIgnoredActor(this);
+
+	bool hit = GetWorld()->LineTraceSingleByChannel(
+		hitResult,
+		start,
+		end,
+		ECC_Visibility,
+		traceParams
+	);
+
+	if (m_enableDebug)
+	{
+		DrawDebugLine(
+			GetWorld(),
+			start,
+			end,
+			hit ? FColor::Red : FColor::Green,
+			false,
+			0.1f,
+			0,
+			1.0f
+		);
+	}
+
+	if (hit)
+	{
+		return true;
+	}
+
+	return false;
+}
+
 void AEnemy_ProjectileBase::OnHit(UPrimitiveComponent* a_overlappedComponent, AActor* a_otherActor, UPrimitiveComponent* a_otherComp, int32 a_otherBodyIndex, bool a_bFromSweep, const FHitResult& a_sweepResult)
 {
-	UE_LOG(LogTemp, Warning, TEXT("projectile hit something"));
+	//UE_LOG(LogTemp, Warning, TEXT("projectile hit something"));
 	if (a_otherActor && a_otherActor != this && a_otherComp)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("projectile hit something"));
+		//UE_LOG(LogTemp, Warning, TEXT("projectile hit something"));
 		if (a_otherComp->GetCollisionObjectType() == ECC_GameTraceChannel1)
 		{
-			UE_LOG(LogTemp,Warning,TEXT("projectile hit player"));
+			//UE_LOG(LogTemp,Warning,TEXT("projectile hit player"));
 			UGameplayStatics::ApplyDamage(a_otherActor, m_enemyCharacter->GetAttackDamage(), m_enemyCharacter->GetController(), this, nullptr);
 			this->Destroy();
 		}
-		else
-		{
-			//Destroy();
-		}
 	}
 }
+
