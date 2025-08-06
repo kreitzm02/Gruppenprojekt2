@@ -41,7 +41,13 @@ public:
 	UFUNCTION()
 	virtual void OnHit(UPrimitiveComponent* a_overlappedComponent, AActor* a_otherActor, UPrimitiveComponent* a_otherComp, int32 a_otherBodyIndex, bool a_bFromSweep, const FHitResult& a_sweepResult);
 
+
 protected:
+	bool CheckForWallCollide();
+
+	UPROPERTY(EditAnywhere, Category = "Debug")
+	float m_enableDebug = false;
+
 	UPROPERTY(EditAnywhere, Category = "Projectile Settings")
 	UShapeComponent* m_projectileHitbox = nullptr;
 
@@ -56,6 +62,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Projectile Settings")
 	float m_hitboxSphereSize = 1.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Projectile Settings")
+	float m_lineTraceLenght = 1.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Projectile Settings")
 	FVector m_arrowSize = FVector::OneVector;
