@@ -29,6 +29,7 @@ APlayerCharacter::APlayerCharacter()
 	SetupCamera();
 	SetupAbilityComp();
 	SetupMeleeHitbox();
+	SetupAudioComp();
 }
 
 // Called when the game starts or when spawned
@@ -99,6 +100,9 @@ void APlayerCharacter::BeginPlay()
 	{
 		gameInstance->AddGameTimerToViewport();
 	}
+
+	gameInstance = Cast<UGame_GameInstance>(GetGameInstance());
+	gameInstance->OnSFXVolumeChanged.AddDynamic(this, &APlayerCharacter::HandleVolumeChanged);
 }
 
 // Called every frame
@@ -264,7 +268,7 @@ void APlayerCharacter::ChangeToPlayerClassC()
 void APlayerCharacter::ChangeToPlayerClassD()
 {
 	//testing only!!
-	AddExperiencePoints(200);
+	//AddExperiencePoints(200);
 	//m_CurrentPlayerClass = 3;
 	//SetupChangedPlayerClass();
 }
@@ -443,6 +447,15 @@ void APlayerCharacter::SetupMeleeHitbox()
 	m_MeleeHitBox->OnComponentBeginOverlap.AddDynamic(this, &APlayerCharacter::OnHit);
 }
 
+void APlayerCharacter::SetupAudioComp()
+{
+	m_AudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComponent"));
+	if (m_AudioComp)
+	{
+		m_AudioComp->SetSound(Cast<USoundBase>(m_HitSound));
+	}
+}
+
 #pragma endregion
 
 #pragma region LEVEL
@@ -619,6 +632,7 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 		TryAddPlayerHealth(totalDmg * -1); // "adds" negative health
 		m_passedInvulnarabilityTime = 0.0f;
 		m_playerIsHittable = false;
+		m_AudioComp->Play();
 	}
 	if (DamageCauser)
 	{
@@ -656,6 +670,11 @@ void APlayerCharacter::CheckForDeath()
 {
 	if (m_PlayerHealth <= 0)
 	{
+		if (m_AudioComp)
+		{
+			m_AudioComp->SetSound(Cast<USoundBase>(m_DeathSound));
+			m_AudioComp->Play();
+		}
 		m_IsPlayerAlive = false;
 		DisableInput(Cast<APlayerController>(GetController()));
 		FTimerHandle deathDelayTimer;
@@ -1033,11 +1052,11 @@ void APlayerCharacter::UpdatePlayerStamina(float a_DeltaTime, float a_Speed, flo
 {
 	if (a_Speed > m_PlayerMovementSpeed + a_MovementThreshold)
 	{
-		ChangePlayerStamina(-12.5f * a_DeltaTime);
+		ChangePlayerStamina(-6.5f * a_DeltaTime);
 	}
 	else
 	{
-		ChangePlayerStamina(8.0f * Cast<UGame_GameInstance>(GetGameInstance())->m_playerSave->GetPlayerStaminaRegenMultiplier() * a_DeltaTime);
+		ChangePlayerStamina(5.5f * Cast<UGame_GameInstance>(GetGameInstance())->m_playerSave->GetPlayerStaminaRegenMultiplier() * a_DeltaTime);
 	}
 }
 
@@ -1064,5 +1083,13 @@ void APlayerCharacter::InteractWithNearbyNPC()
 			NPC->Interact();
 			return;
 		}
+	}
+}
+
+void APlayerCharacter::HandleVolumeChanged(float a_newVolume)
+{
+	if (m_AudioComp)
+	{
+		m_AudioComp->SetVolumeMultiplier(a_newVolume);
 	}
 }
