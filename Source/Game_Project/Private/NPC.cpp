@@ -70,29 +70,29 @@ void ANPC::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 
 void ANPC::TryPlayRandomAnim()
 {
-	if (!m_Mesh || m_RandomAnims.Num() == 0) return;
-
-	if (FMath::RandRange(0, 100) > 33) return;
-
-	m_Mesh->Stop();
-
-	int32 index = FMath::RandRange(0, m_RandomAnims.Num() - 1);
-	UAnimSequence* selectedAnim = m_RandomAnims[index];
-
-	if (selectedAnim)
-	{
-		m_Mesh->PlayAnimation(selectedAnim, false);
-
-		FTimerHandle resumeIdleHandle;
-		float duration = selectedAnim->GetPlayLength();
-
-		GetWorld()->GetTimerManager().SetTimer(resumeIdleHandle, [this]()
-			{
-				if (m_IdleAnimation && m_Mesh)
-				{
-					m_Mesh->PlayAnimation(m_IdleAnimation, true);
-				}
-			}, duration, false);
-	}
+	//if (!m_Mesh || m_RandomAnims.Num() == 0) return;
+	//
+	//if (FMath::RandRange(0, 100) > 33) return;
+	//
+	//m_Mesh->Stop();
+	//
+	//int32 index = FMath::RandRange(0, m_RandomAnims.Num() - 1);
+	//UAnimSequence* selectedAnim = m_RandomAnims[index];
+	//
+	//if (selectedAnim)
+	//{
+	//	m_Mesh->PlayAnimation(selectedAnim, false);
+	//
+	//	FTimerHandle resumeIdleHandle;
+	//	float duration = selectedAnim->GetPlayLength();
+	//
+	//	GetWorld()->GetTimerManager().SetTimer(resumeIdleHandle, [this]()
+	//		{
+	//			if (m_IdleAnimation && m_Mesh)
+	//			{
+	//				m_Mesh->PlayAnimation(m_IdleAnimation, true);
+	//			}
+	//		}, duration, false);
+	//}
 }
 

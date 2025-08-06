@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include <Components/BoxComponent.h>
+
+#include "Engine/LevelStreamingDynamic.h"
 #include "MainHubPortal.generated.h"
 
 
@@ -35,4 +37,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* m_Mesh;
+
+
+	ULevelStreamingDynamic* NewLevel;
+	void Load();
 };
