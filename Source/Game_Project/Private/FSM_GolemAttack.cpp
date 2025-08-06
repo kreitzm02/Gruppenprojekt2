@@ -52,6 +52,7 @@ void UFSM_GolemAttack::OnEnter()
 			break;
 		}
 	}
+	m_animationDuration = m_attackAnimation->GetPlayLength();
 	m_thisEnemy->GetWeaponHitbox()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 }
 

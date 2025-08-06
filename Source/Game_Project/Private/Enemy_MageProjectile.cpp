@@ -31,6 +31,7 @@ void AEnemy_MageProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	MoveInDirection(DeltaTime);
+	
 }
 
 void AEnemy_MageProjectile::MoveInDirection(float a_deltaTime)

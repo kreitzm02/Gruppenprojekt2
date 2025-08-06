@@ -14,6 +14,9 @@ void UGame_GameInstance::Init()
 	Super::Init();
 
 	LoadOrCreateSaveGame();
+	UE_LOG(LogTemp, Error, TEXT("music volume save:%f"), m_playerSave->m_musicVol)
+	m_musicVolume = m_playerSave->m_musicVol;
+	m_sfxVolume = m_playerSave->m_sfxVol;
 }
 
 
@@ -103,12 +106,18 @@ bool UGame_GameInstance::TryBuyHPRegen()
 void UGame_GameInstance::SetMusicVolume(float a_volume)
 {
 	m_musicVolume = a_volume;
+	m_playerSave->m_musicVol = m_musicVolume;
+	UE_LOG(LogTemp,Error,TEXT("music volume gi:%f"), m_musicVolume)
+	UGameplayStatics::SaveGameToSlot(m_playerSave, TEXT("PlayerSaveSlot"), 0);
+	UE_LOG(LogTemp, Error, TEXT("music volume save:%f"), m_playerSave->m_musicVol)
 	OnMusicVolumeChanged.Broadcast(a_volume);
 }
 
 void UGame_GameInstance::SetSFXVolume(float a_volume)
 {
 	m_sfxVolume = a_volume;
+	m_playerSave->m_sfxVol = m_sfxVolume;
+	UGameplayStatics::SaveGameToSlot(m_playerSave, TEXT("PlayerSaveSlot"), 0);
 	OnSFXVolumeChanged.Broadcast(a_volume);
 }
 
@@ -148,6 +157,11 @@ void UGame_GameInstance::TickTimer()
 	if (m_timerWidgetInstance)
 	{
 		m_timerWidgetInstance->UpdateGameTime(m_remainingTime);
+	}
+
+	if (m_remainingTime <= 5 && m_remainingTime > 0)
+	{
+		UGameplayStatics::PlaySound2D(this, m_timerFinishingSound);
 	}
 
 	if (m_remainingTime <= 0)
