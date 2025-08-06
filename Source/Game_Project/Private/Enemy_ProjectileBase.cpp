@@ -34,6 +34,9 @@ void AEnemy_ProjectileBase::OnConstruction(const FTransform& Transform)
 void AEnemy_ProjectileBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	m_damage = m_enemyCharacter->GetAttackDamage();
+
 	UE_LOG(LogTemp,Warning,TEXT("arrow beginplay"))
 
 	SetLifeSpan(m_lifeSpan);
@@ -112,7 +115,7 @@ void AEnemy_ProjectileBase::OnHit(UPrimitiveComponent* a_overlappedComponent, AA
 		if (a_otherComp->GetCollisionObjectType() == ECC_GameTraceChannel1)
 		{
 			//UE_LOG(LogTemp,Warning,TEXT("projectile hit player"));
-			UGameplayStatics::ApplyDamage(a_otherActor, m_enemyCharacter->GetAttackDamage(), m_enemyCharacter->GetController(), this, nullptr);
+			UGameplayStatics::ApplyDamage(a_otherActor, m_damage, nullptr, this, nullptr);
 			this->Destroy();
 		}
 	}

@@ -70,6 +70,7 @@ public:
 	UWidget_PlayerUI* GetPlayerUI() { return m_playerUI; }
 
 	void StartGameTimer();
+	void StopTimer();
 
 	bool TimerWidgetNotNullptr() { if (m_timerWidgetInstance) return true; return false; }
 
