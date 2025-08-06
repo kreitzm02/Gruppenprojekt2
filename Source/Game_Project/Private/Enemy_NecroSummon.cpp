@@ -29,6 +29,9 @@ void AEnemy_NecroSummon::Tick(float DeltaTime)
 
 void AEnemy_NecroSummon::OnDeath()
 {
-	m_ownerNecro->SubstractSummon();
+	if (m_ownerNecro)
+	{
+		m_ownerNecro->SubstractSummon();
+	}
 	Super::OnDeath();
 }
