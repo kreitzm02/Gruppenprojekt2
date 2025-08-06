@@ -67,6 +67,11 @@ private:
 
 	void FireRandomBurnGround();
 
+	void ShowPlayerVictory();
+
+	UFUNCTION()
+	void ResetGame();
+
 	FTimerHandle m_periodicBoulderTimer;
 	FTimerHandle m_periodicBurnGroundTimer;
 

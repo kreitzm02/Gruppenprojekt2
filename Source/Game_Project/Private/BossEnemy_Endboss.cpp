@@ -268,12 +268,13 @@ float ABossEnemy_Endboss::TakeDamage(float a_damageAmount, FDamageEvent const& a
 	m_receivingActionSoundComp->Sound = m_hitSound;
 	m_receivingActionSoundComp->Play(0.0f);
 
-	if (m_currentHealth <= 0.0f)
+	if (m_currentHealth <= 0.0f && !m_isDead)
 	{
 		GetWorld()->GetTimerManager().ClearTimer(m_periodicBoulderTimer);
 		GetWorld()->GetTimerManager().ClearTimer(m_periodicBurnGroundTimer);
 		m_isDead = true;
 		OnDeath();
+		ShowPlayerVictory();
 	}
 
 	return a_damageAmount;
@@ -281,6 +282,20 @@ float ABossEnemy_Endboss::TakeDamage(float a_damageAmount, FDamageEvent const& a
 
 
 
+
+
+void ABossEnemy_Endboss::ShowPlayerVictory()
+{
+	FTimerHandle resetGame;
+	GetWorld()->GetTimerManager().SetTimer(resetGame, this, &ABossEnemy_Endboss::ResetGame, 5.0f, false);
+
+	//victory stuff
+}
+
+void ABossEnemy_Endboss::ResetGame()
+{
+	UGameplayStatics::OpenLevel(this,"MainHub1");
+}
 
 
 FVector ABossEnemy_Endboss::RandomVectorInBoundaries()
