@@ -161,6 +161,17 @@ void UGame_GameInstance::StartGameTimer()
 	}
 }
 
+void UGame_GameInstance::StopTimer()
+{
+	if (m_timerWidgetInstance)
+	{
+		m_timerWidgetInstance->RemoveFromParent();
+		m_timerWidgetInstance = nullptr;
+	}
+	GetWorld()->GetTimerManager().ClearTimer(m_gameTimerHandle);
+}
+
+
 void UGame_GameInstance::AddGameTimerToViewport()
 {
 	m_timerWidgetInstance->AddToViewport();

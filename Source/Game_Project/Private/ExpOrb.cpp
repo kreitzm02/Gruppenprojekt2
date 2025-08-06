@@ -41,6 +41,7 @@ void AExpOrb::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherA
 	if (APlayerCharacter* player = Cast<APlayerCharacter>(OtherActor))
 	{
 		player->AddExperiencePoints(m_ExpAmount);
+        UE_LOG(LogTemp, Error, TEXT("Added XP"))
 		Destroy();
 	}
 }

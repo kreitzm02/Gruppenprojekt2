@@ -38,6 +38,8 @@ public:
 
 	void SetOwnerEnemy(AEnemyCharacter* a_enemyCharacter){ m_enemyCharacter = a_enemyCharacter; }
 
+	float GetKnockback() { return m_knockback; }
+
 	UFUNCTION()
 	virtual void OnHit(UPrimitiveComponent* a_overlappedComponent, AActor* a_otherActor, UPrimitiveComponent* a_otherComp, int32 a_otherBodyIndex, bool a_bFromSweep, const FHitResult& a_sweepResult);
 
@@ -62,6 +64,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Projectile Settings")
 	float m_hitboxSphereSize = 1.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Projectile Settings")
+	float m_knockback = 400.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Projectile Settings")
+	float m_damage = 1.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Projectile Settings")
 	float m_lineTraceLenght = 1.0f;
