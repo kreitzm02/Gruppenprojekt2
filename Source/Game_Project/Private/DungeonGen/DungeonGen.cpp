@@ -39,7 +39,7 @@ void ADungeonGen::BeginPlay()
 		APlayerCharacter* PC = *It;
 		if (PC)
 		{
-			FInt32Vector2 startPos = m_Data.m_StartRoom.GetRoomCenter();
+			FInt32Vector2 startPos = m_Data.m_EndRoom.GetRoomCenter();
 			PC->SetActorLocation(FVector((float)startPos.X * m_UnitSize, (float)startPos.Y * m_UnitSize, 100.0f));
 			PC->SetActorRotation(FRotator::ZeroRotator);
 			UE_LOG(LogTemp, Log, TEXT("PlayerCharacter (Iterator) auf Startraum gesetzt."));

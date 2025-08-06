@@ -26,5 +26,7 @@ enum class EAllAbilities : uint8
 	MELEESWORD,
 	RANGEDBOW,
 	BERSERK,
+	SHIELD,
+	INVINCIBLE,
 	ENUMLENGTH UMETA(Hidden)
 };

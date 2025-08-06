@@ -1,10 +1,15 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "AbilityActions/TornadoAbilityAction.h"
 #include "NiagaraFunctionLibrary.h"
 #include <Player/PlayerCharacter.h>
 #include <Kismet/KismetMathLibrary.h>
+#include <Kismet/GameplayStatics.h>
+#include <Game_GameInstance.h>
+#include "Engine/StaticMeshActor.h"
+#include "Engine/OverlapResult.h"
+#include <EnemyCharacter.h>
 
 void UTornadoAbilityAction::PrepareAbilityAction(AActor* a_AbilityUser)
 {
@@ -60,6 +65,9 @@ void UTornadoAbilityAction::PlayTornado(AActor* a_AbilityUser)
 	// movement
 	a_AbilityUser->GetWorld()->GetTimerManager().SetTimer(inst->m_MoveHandle, FTimerDelegate::CreateUObject(this, &UTornadoAbilityAction::MoveTornadoTick, inst), 0.01f, true);
 
+	// clear hit list
+	a_AbilityUser->GetWorld()->GetTimerManager().SetTimer(inst->m_ClearHitListHandle, FTimerDelegate::CreateUObject(this, &UTornadoAbilityAction::UpdateHitActors, inst), 1.0f, true);
+
 	// end
 	a_AbilityUser->GetWorld()->GetTimerManager().SetTimer(inst->m_EndHandle, FTimerDelegate::CreateUObject(this, &UTornadoAbilityAction::EndTornado, inst), m_Duration, false);
 
@@ -70,27 +78,92 @@ void UTornadoAbilityAction::MoveTornadoTick(TSharedPtr<FTornadoInstance> a_Insta
 {
 	FVector start = a_Instance->m_CurrPosition;
 	FVector movePerTick = a_Instance->m_Direction * m_Speed * 0.01f;
+
+	// wall bounce
 	FHitResult hit;
+	FCollisionObjectQueryParams objParams;
+	objParams.AddObjectTypesToQuery(ECC_WorldStatic);
 
-	bool wallHit = GetWorld()->SweepSingleByChannel(hit, start, start + movePerTick, FQuat::Identity, ECC_WorldStatic, FCollisionShape::MakeSphere(m_CollisionRadius));
+	bool wallHit = GetWorld()->SweepSingleByObjectType(hit, start, start + movePerTick, FQuat::Identity, objParams, FCollisionShape::MakeSphere(m_CollisionRadius));
 
-	if (wallHit)
+	if (wallHit && Cast<AStaticMeshActor>(hit.GetActor()))
 	{
-		a_Instance->m_Direction = a_Instance->m_Direction.MirrorByVector(hit.Normal).GetSafeNormal();
-		a_Instance->m_CurrPosition = hit.ImpactPoint + a_Instance->m_Direction * m_CollisionRadius;
+		a_Instance->m_Direction = a_Instance->m_Direction.MirrorByPlane(FPlane(hit.Normal, 0)).GetSafeNormal();
+		a_Instance->m_Direction.Z = 0.0f;
+		a_Instance->m_CurrPosition = hit.ImpactPoint + hit.Normal * (m_CollisionRadius + 0.1f);
 	}
-	else a_Instance->m_CurrPosition = start + movePerTick;
+	else
+	{
+		a_Instance->m_CurrPosition = start + movePerTick;
+	}
 
-	FVector randDir = UKismetMathLibrary::RandomUnitVector();
-	randDir.Z = 0.0f;
-	randDir.Normalize();
-	a_Instance->m_Direction = (a_Instance->m_Direction + randDir * m_Randomness * 0.01f).GetSafeNormal();
+	// change direction randomly
+	const float maxDriftAngle = 10.0f;
+	const float driftAngle = FMath::RandRange(-maxDriftAngle, maxDriftAngle);
+	FVector2D dir2D(a_Instance->m_Direction.X, a_Instance->m_Direction.Y);
+	dir2D = dir2D.GetRotated(driftAngle);
+	a_Instance->m_Direction = FVector(dir2D.X, dir2D.Y, 0.0f).GetSafeNormal();
 
+	// enemy damage
+	TArray<FOverlapResult> overlaps;
+	const FCollisionShape dmgShape = FCollisionShape::MakeSphere(m_CollisionRadius);
+	bool anyOverlap = GetWorld()->OverlapMultiByChannel(overlaps, a_Instance->m_CurrPosition, FQuat::Identity, ECC_Pawn, dmgShape);
+
+	if (anyOverlap)
+	{
+		for (const FOverlapResult& res : overlaps)
+		{
+			AActor* hitActor = res.GetActor();
+			if (!hitActor || a_Instance->m_AlreadyHitActors.Contains(hitActor)) continue;
+
+			a_Instance->m_AlreadyHitActors.Add(hitActor);
+
+			UGame_GameInstance* gi = Cast<UGame_GameInstance>(GetWorld()->GetGameInstance());
+			float dmg = m_Damage * gi->m_playerSave->GetPlayerDmgMultiplier() + gi->m_AdditionalDamage;
+			UGameplayStatics::ApplyDamage(hitActor, dmg, nullptr, nullptr, nullptr);
+		}
+	}
+
+	// enemy attraction
+
+	TArray<FOverlapResult> pullOverlaps;
+	FCollisionShape pullShape = FCollisionShape::MakeSphere(m_AttractionRadius);
+
+	bool anyPulls = GetWorld()->OverlapMultiByChannel(pullOverlaps, a_Instance->m_CurrPosition, FQuat::Identity, ECC_Pawn, pullShape);
+	if (anyPulls)
+	{
+		for (const FOverlapResult& pullRes : pullOverlaps)
+		{
+			AActor* actor = pullRes.GetActor();
+			if (!actor || actor == nullptr) continue;
+
+			if (AEnemyCharacter* enemy = Cast<AEnemyCharacter>(actor))
+			{
+				if (UPrimitiveComponent* root = Cast<UPrimitiveComponent>(enemy->GetRootComponent()))
+				{
+					FVector toCenter = (a_Instance->m_CurrPosition - enemy->GetActorLocation());
+					float dist = toCenter.Size();
+					toCenter.Normalize();
+
+					float speed = m_AttractionStrength * (1.0f - FMath::Clamp(dist / m_AttractionRadius, 0.0f, 1.0f));
+					enemy->SetActorLocation(enemy->GetActorLocation() + toCenter * speed * 0.01f);
+				}
+			}
+		}
+	}
+
+	// vfx
 	if (a_Instance->m_VFXComp)
 	{
 		a_Instance->m_VFXComp->SetWorldLocation(a_Instance->m_CurrPosition);
 		a_Instance->m_VFXComp->SetWorldRotation(a_Instance->m_Direction.Rotation());
 	}
+
+}
+
+void UTornadoAbilityAction::UpdateHitActors(TSharedPtr<FTornadoInstance> a_Instance)
+{
+	a_Instance->m_AlreadyHitActors.Empty();
 }
 
 void UTornadoAbilityAction::EndTornado(TSharedPtr<FTornadoInstance> a_Instance)
@@ -102,4 +175,5 @@ void UTornadoAbilityAction::EndTornado(TSharedPtr<FTornadoInstance> a_Instance)
 	}
 
 	GetWorld()->GetTimerManager().ClearTimer(a_Instance->m_MoveHandle);
+	GetWorld()->GetTimerManager().ClearTimer(a_Instance->m_ClearHitListHandle);
 }

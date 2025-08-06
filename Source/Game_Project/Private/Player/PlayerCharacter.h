@@ -407,4 +407,20 @@ public:
 
 	UPROPERTY()
 	UPlayerAnimInstance* m_AnimInstance;
+
+	// audio
+	UPROPERTY()
+	UAudioComponent* m_AudioComp;
+
+	UPROPERTY(EditAnywhere, Category = "Sounds")
+	USoundWave* m_HitSound;
+
+	UPROPERTY(EditAnywhere, Category = "Sounds")
+	USoundWave* m_DeathSound;
+
+	UFUNCTION()
+	void HandleVolumeChanged(float a_newVolume);
+
+	UFUNCTION()
+	void SetupAudioComp();
 };

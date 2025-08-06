@@ -27,6 +27,7 @@ public:
 	virtual void PrepareAbilityAction(AActor* a_AbilityUser) override;
 	virtual void PlayAbilityAction(AActor* a_AbilityUser) override;
 	virtual void EndAbilityAction(AActor* a_AbilityUser) override;
+	void SetMeleeDamage(AActor* a_AbilityUser);
 
 private:
 
