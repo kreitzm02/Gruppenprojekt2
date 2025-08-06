@@ -443,7 +443,7 @@ void APlayerCharacter::SetupMeleeHitbox()
 	m_MeleeHitBox->SetBoxExtent({ 2.5f,0.9f,0.8f });
 	m_MeleeHitBox->SetRelativeLocation({ -1.3f, 0.0f, -0.5f });
 	m_MeleeHitBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	m_MeleeHitBox->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel2);
+	m_MeleeHitBox->SetCollisionObjectType(ECC_GameTraceChannel2);
 	m_MeleeHitBox->SetCollisionResponseToAllChannels(ECR_Overlap);
 	m_MeleeHitBox->SetVisibility(false);
 	m_MeleeHitBox->SetHiddenInGame(true);
