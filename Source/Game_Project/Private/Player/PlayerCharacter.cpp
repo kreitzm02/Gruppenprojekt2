@@ -338,10 +338,10 @@ void APlayerCharacter::SetupChangedPlayerClass()
 	if (m_MeleeHitBox)
 	{
 		m_MeleeHitBox->SetupAttachment(GetMesh(), TEXT("hand_r"));
-		m_MeleeHitBox->SetBoxExtent({ 1.6f,0.9f,0.8f });
-		m_MeleeHitBox->SetRelativeLocation({ -1.1f, 0.0f, -0.5f });
-		m_MeleeHitBox->SetVisibility(true);
-		m_MeleeHitBox->SetHiddenInGame(false);
+		m_MeleeHitBox->SetBoxExtent({ 2.5f,0.9f,0.8f });
+		m_MeleeHitBox->SetRelativeLocation({ -1.3f, 0.0f, -0.5f });
+		m_MeleeHitBox->SetVisibility(false);
+		m_MeleeHitBox->SetHiddenInGame(true);
 	}
 
 	m_AnimInstance = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
@@ -393,10 +393,10 @@ void APlayerCharacter::SetupPlayer()
 	if (m_MeleeHitBox)
 	{
 		m_MeleeHitBox->SetupAttachment(GetMesh(), TEXT("hand_r"));
-		m_MeleeHitBox->SetBoxExtent({ 1.6f,0.9f,0.8f });
-		m_MeleeHitBox->SetRelativeLocation({ -1.1f, 0.0f, -0.5f });
-		m_MeleeHitBox->SetVisibility(true);
-		m_MeleeHitBox->SetHiddenInGame(false);
+		m_MeleeHitBox->SetBoxExtent({ 2.5f,0.9f,0.8f });;
+		m_MeleeHitBox->SetRelativeLocation({ -1.3f, 0.0f, -0.5f });
+		m_MeleeHitBox->SetVisibility(false);
+		m_MeleeHitBox->SetHiddenInGame(true);
 	}
 
 	m_AnimInstance = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
@@ -440,13 +440,13 @@ void APlayerCharacter::SetupMeleeHitbox()
 {
 	m_MeleeHitBox = CreateDefaultSubobject<UBoxComponent>(TEXT("MeleeHitBox"));
 	m_MeleeHitBox->SetupAttachment(GetMesh(), TEXT("hand_r"));
-	m_MeleeHitBox->SetBoxExtent({ 1.6f,0.9f,0.8f });
-	m_MeleeHitBox->SetRelativeLocation({ -1.1f, 0.0f, -0.5f });
+	m_MeleeHitBox->SetBoxExtent({ 2.5f,0.9f,0.8f });
+	m_MeleeHitBox->SetRelativeLocation({ -1.3f, 0.0f, -0.5f });
 	m_MeleeHitBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	m_MeleeHitBox->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel2);
 	m_MeleeHitBox->SetCollisionResponseToAllChannels(ECR_Overlap);
-	m_MeleeHitBox->SetVisibility(true);
-	m_MeleeHitBox->SetHiddenInGame(false);
+	m_MeleeHitBox->SetVisibility(false);
+	m_MeleeHitBox->SetHiddenInGame(true);
 	m_MeleeHitBox->OnComponentBeginOverlap.AddDynamic(this, &APlayerCharacter::OnHit);
 }
 
@@ -636,16 +636,17 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 		m_passedInvulnarabilityTime = 0.0f;
 		m_playerIsHittable = false;
 		m_AudioComp->Play();
-	}
-	if (DamageCauser)
-	{
-		FVector knockbackDirection = GetActorLocation() - DamageCauser->GetActorLocation();
-		knockbackDirection.Z = 0;
-		knockbackDirection.Normalize();
+		if (DamageCauser)
+		{
+			FVector knockbackDirection = GetActorLocation() - DamageCauser->GetActorLocation();
+			knockbackDirection.Z = 0;
+			knockbackDirection.Normalize();
 
-		AEnemyCharacter* enemy = Cast<AEnemyCharacter>(EventInstigator->GetCharacter());
-		HandleKnockback(knockbackDirection, enemy->GetKnockback());
+			AEnemyCharacter* enemy = Cast<AEnemyCharacter>(EventInstigator->GetCharacter());
+			HandleKnockback(knockbackDirection, enemy->GetKnockback());
+		}
 	}
+	
 
 	return totalDmg;
 }
