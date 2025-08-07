@@ -2,7 +2,7 @@
 
 
 #include "Enemy_GolemShockwave.h"
-
+#include "Components/CapsuleComponent.h"
 #include "Game_GameInstance.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
@@ -17,7 +17,7 @@ AEnemy_GolemShockwave::AEnemy_GolemShockwave()
     m_hitbox->SetSphereRadius(0.f);
     m_hitbox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
     m_hitbox->SetCollisionResponseToAllChannels(ECR_Ignore);
-    m_hitbox->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+    m_hitbox->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Overlap);
     m_hitbox->OnComponentBeginOverlap.AddDynamic(this, &AEnemy_GolemShockwave::OnHit);
     RootComponent = m_hitbox;
     
@@ -78,17 +78,36 @@ void AEnemy_GolemShockwave::Tick(float DeltaTime)
 		0,
 		1.0f
 	);
+
+	TArray<AActor*> overlappingActors;
+	m_hitbox->GetOverlappingActors(overlappingActors, ACharacter::StaticClass());
+	for (AActor* actor : overlappingActors)
+	{
+		
+		if (Cast<ACharacter>(actor)->GetCapsuleComponent()->GetCollisionObjectType() == ECC_GameTraceChannel1)
+		{
+			if (!m_hitPlayer)
+			{
+				UGameplayStatics::ApplyDamage(actor, m_enemyCharacter->GetAttackDamage(), m_enemyCharacter->GetController(), this, nullptr);
+				m_hitPlayer = true;
+			}
+			break;
+		}
+	}
 }
 
 void AEnemy_GolemShockwave::OnHit(UPrimitiveComponent* a_overlappedComponent, AActor* a_otherActor, UPrimitiveComponent* a_otherComp, int32 a_otherBodyIndex, bool a_bFromSweep, const FHitResult& a_sweepResult)
 {
 	if (a_otherActor && a_otherActor != this && a_otherComp)
 	{
+		
 		if (a_otherComp->GetCollisionObjectType() == ECC_GameTraceChannel1)
 		{
-			UE_LOG(LogTemp,Warning,TEXT("projectile hit player"));
-			UGameplayStatics::ApplyDamage(a_otherActor, m_enemyCharacter->GetAttackDamage(), m_enemyCharacter->GetController(), this, nullptr);
-			
+			if (!m_hitPlayer)
+			{
+				UGameplayStatics::ApplyDamage(a_otherActor, m_enemyCharacter->GetAttackDamage(), m_enemyCharacter->GetController(), this, nullptr);
+				m_hitPlayer = true;
+			}
 		}
 	}
 }
