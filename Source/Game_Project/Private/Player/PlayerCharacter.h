@@ -51,6 +51,8 @@ protected:
 	void AbilitySlotIncrease();
 	void AbilitySlotDecrease();
 	void ActivatePauseMenu();
+	void ActivateBackwardWalking();
+	void DeactivateBackwardWalking();
 
 public:	
 	// Called every frame
@@ -161,6 +163,8 @@ private:
 	void SetCurrentPlayerClass(int a_ClassIndex);
 
 	bool m_playerIsHittable = true;
+
+	bool m_ShouldWalkBackwards = false;
 
 	// player stats
 
@@ -290,6 +294,8 @@ private:
 	void SetAbilityThreeIcon();
 
 	void SetAbilityFourIcon();
+
+	void UpdateSelectedAbilityUI();
 
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<UUserWidget> m_playerUI = nullptr;

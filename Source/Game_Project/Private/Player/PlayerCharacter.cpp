@@ -58,9 +58,10 @@ void APlayerCharacter::BeginPlay()
 	UGame_GameInstance* gameInstance = Cast<UGame_GameInstance>(GetGameInstance());
 	m_CurrentPlayerClass = gameInstance->m_playerSave->m_CurrentPlayerClass;
 	
+
 	FillAbilityLevelMap();
 
-	if (LevelName == "EndbossArena" || LevelName == "MainHub1" || LevelName == "TutorialArea1") // keep abilities when entering these levels
+	if (LevelName == "EndbossArena") // keep abilities when entering these levels
 	{
 		for (int i = 0; i < gameInstance->m_playerSave->m_AbilityClasses.Num(); i++)
 		{
@@ -68,9 +69,9 @@ void APlayerCharacter::BeginPlay()
 		}
 		m_AbilityLevels = gameInstance->m_playerSave->m_AbilityLevels;
 	}
-	
-	SetupPlayer();
 
+	SetupPlayer();
+	
 	m_AnimInstance = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 	   
 	m_PreviousLocation = GetActorLocation();
@@ -186,6 +187,27 @@ void APlayerCharacter::Tick(float DeltaTime)
 	gameInstance->PrintStackInfo();
 
 	UE_LOG(LogTemp,Error,TEXT("Needed Player XP: %i"), m_ExpLevelBarrier)
+
+	if (Controller && Controller->IsPlayerController())
+	{
+		FVector velocity = GetVelocity();
+		if (!velocity.IsNearlyZero())
+		{
+			FRotator targetRot;
+
+			if (m_ShouldWalkBackwards)
+			{
+				targetRot = velocity.Rotation() + FRotator(0.0f, 180.0f, 0.0f);
+			}
+			else
+			{
+				targetRot = velocity.Rotation();
+			}
+
+			FRotator newRot = FMath::RInterpTo(GetActorRotation(), targetRot, DeltaTime, 100.0f);
+			SetActorRotation(newRot);
+		}
+	}
 }
 #pragma endregion
 
@@ -205,7 +227,7 @@ void APlayerCharacter::MoveRight(float a_Value)
 	if (Controller && (a_Value != 0.0f))
 	{
 		const FVector direction = FVector(0.0f, 1.0f, 0.0f);
-		AddMovementInput(direction, a_Value);
+		AddMovementInput(direction, a_Value );
 	}
 }
 
@@ -221,53 +243,53 @@ void APlayerCharacter::StopSprint()
 
 void APlayerCharacter::UseAbility()
 {
-	if (m_PlayerIsInMainhub)
-	{
-		InteractWithNearbyNPC();
-	}
-	else
-	{
-		m_PlayerAbilities->ActivateAbility(m_CurrentAbilitySlot);
-	}
+	if (m_PlayerIsInMainhub) return;
+	m_PlayerAbilities->ActivateAbility(m_CurrentAbilitySlot);
+}
+
+void APlayerCharacter::AbilitySlotIncrease()
+{
+	if (m_CurrentAbilitySlot == m_AbilityMax - 1) m_CurrentAbilitySlot = 0;
+	else if (m_CurrentAbilitySlot >= m_AbilityMax || m_CurrentAbilitySlot <= -1) m_CurrentAbilitySlot = 0;
+	else m_CurrentAbilitySlot++;
+	m_PlayerAbilities->EquipAbility(m_CurrentAbilitySlot);
+	UpdateSelectedAbilityUI();
+}
+
+void APlayerCharacter::AbilitySlotDecrease()
+{
+	if (m_CurrentAbilitySlot == 0) m_CurrentAbilitySlot = m_AbilityMax - 1;
+	else if (m_CurrentAbilitySlot >= m_AbilityMax || m_CurrentAbilitySlot <= -1) m_CurrentAbilitySlot = 0;
+	else m_CurrentAbilitySlot--;
+	m_PlayerAbilities->EquipAbility(m_CurrentAbilitySlot);
+	UpdateSelectedAbilityUI();
 }
 
 void APlayerCharacter::ChangeToAbilitySlot0()
 {
 	ChangeToAbilitySlot(0);
-	if (m_playerUIInstance)
-	{
-		m_playerUIInstance->ShowAbilityOneSelected();
-	}
+	UpdateSelectedAbilityUI();
 }
 
 void APlayerCharacter::ChangeToAbilitySlot1()
 {
 	if (m_AbilityNum < 2) return;
 	ChangeToAbilitySlot(1);
-	if (m_playerUIInstance)
-	{
-		m_playerUIInstance->ShowAbilityTwoSelected();
-	}
+	UpdateSelectedAbilityUI();
 }
 
 void APlayerCharacter::ChangeToAbilitySlot2()
 {
 	if (m_AbilityNum < 3) return;
 	ChangeToAbilitySlot(2);
-	if (m_playerUIInstance)
-	{
-		m_playerUIInstance->ShowAbilityThreeSelected();
-	}
+	UpdateSelectedAbilityUI();
 }
 
 void APlayerCharacter::ChangeToAbilitySlot3()
 {
 	if (m_AbilityNum < 4) return;
 	ChangeToAbilitySlot(3);
-	if (m_playerUIInstance)
-	{
-		m_playerUIInstance->ShowAbilityFourSelected();
-	}
+	UpdateSelectedAbilityUI();
 }
 
 void APlayerCharacter::ChangeToPlayerClassA()
@@ -327,6 +349,16 @@ void APlayerCharacter::ActivatePauseMenu()
 	UGameplayStatics::SetGamePaused(GetWorld(), true);
 }
 
+void APlayerCharacter::ActivateBackwardWalking()
+{
+	m_ShouldWalkBackwards = true;
+}
+
+void APlayerCharacter::DeactivateBackwardWalking()
+{
+	m_ShouldWalkBackwards = false;
+}
+
 #pragma endregion
 
 #pragma region SETUP
@@ -348,6 +380,9 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction("AbilityDecrease", IE_Pressed, this, &APlayerCharacter::AbilitySlotDecrease);
 	PlayerInputComponent->BindAction("PlayerClassD", IE_Pressed, this, &APlayerCharacter::ChangeToPlayerClassD);
 	PlayerInputComponent->BindAction("Pause", IE_Pressed, this, &APlayerCharacter::ActivatePauseMenu);
+	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &APlayerCharacter::InteractWithNearbyNPC);
+	PlayerInputComponent->BindAction("Backwards", IE_Pressed, this, &APlayerCharacter::ActivateBackwardWalking);
+	PlayerInputComponent->BindAction("Backwards", IE_Released, this, &APlayerCharacter::DeactivateBackwardWalking);
 }
 
 void APlayerCharacter::SetupChangedPlayerClass()
@@ -824,6 +859,30 @@ void APlayerCharacter::SetAbilityFourIcon()
 	GetWorld()->GetTimerManager().ClearTimer(m_setAbilityFourIconTimer);
 }
 
+void APlayerCharacter::UpdateSelectedAbilityUI()
+{
+	if (m_playerUIInstance)
+	{
+		switch (m_CurrentAbilitySlot)
+		{
+			case 0: 
+				m_playerUIInstance->ShowAbilityOneSelected();
+				break;
+			case 1:
+				m_playerUIInstance->ShowAbilityTwoSelected();
+				break;
+			case 2:
+				m_playerUIInstance->ShowAbilityThreeSelected();
+				break;
+			case 3:
+				m_playerUIInstance->ShowAbilityFourSelected();
+				break;
+			default:
+				break;
+		}
+	}
+}
+
 
 
 void APlayerCharacter::FillAbilityLevelMap()
@@ -940,22 +999,6 @@ void APlayerCharacter::ChangeToAbilitySlot(int32 a_Index)
 	m_CurrentAbilitySlot = a_Index;
 	m_AttackDamage = m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_BaseAttackPoints; // reset current attack damage
 	m_PlayerAbilities->EquipAbility(a_Index); // new damage will be set here if needed
-}
-
-void APlayerCharacter::AbilitySlotIncrease()
-{
-	if (m_CurrentAbilitySlot == m_AbilityMax - 1) m_CurrentAbilitySlot = 0;
-	else if (m_CurrentAbilitySlot >= m_AbilityMax || m_CurrentAbilitySlot <= -1) m_CurrentAbilitySlot = 0;
-	else m_CurrentAbilitySlot++;
-	m_PlayerAbilities->EquipAbility(m_CurrentAbilitySlot);
-}
-
-void APlayerCharacter::AbilitySlotDecrease()
-{
-	if (m_CurrentAbilitySlot == 0) m_CurrentAbilitySlot = m_AbilityMax - 1;
-	else if (m_CurrentAbilitySlot >= m_AbilityMax || m_CurrentAbilitySlot <= -1) m_CurrentAbilitySlot = 0;
-	else m_CurrentAbilitySlot--;
-	m_PlayerAbilities->EquipAbility(m_CurrentAbilitySlot);
 }
 
 void APlayerCharacter::AddAbilityFromUI(int a_Index)
