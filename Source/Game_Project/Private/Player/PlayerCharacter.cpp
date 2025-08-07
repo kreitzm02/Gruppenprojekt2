@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Player/PlayerCharacter.h"
@@ -55,19 +55,27 @@ void APlayerCharacter::BeginPlay()
 	m_PlayerIsInMainhub = LevelName == "MainHub1";
 
 	// TODO: Create LoadFromSaveFile()
-	UGame_GameInstance* gameInstance = Cast<UGame_GameInstance>(GetGameInstance());
+	UGame_GameInstance* gameInstance = Cast<UGame_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	m_CurrentPlayerClass = gameInstance->m_playerSave->m_CurrentPlayerClass;
 	
 
 	FillAbilityLevelMap();
 
+	
+
 	if (LevelName == "EndbossArena") // keep abilities when entering these levels
 	{
-		for (int i = 0; i < gameInstance->m_playerSave->m_AbilityClasses.Num(); i++)
+		TArray<TSubclassOf<UBaseAbility>> abs = gameInstance->m_playerSave->m_AbilityClasses;
+		for (int i = 0; i < abs.Num(); i++)
 		{
-			AddAbilityDirect(gameInstance->m_playerSave->m_AbilityClasses[i]);
+			AddAbilityDirect(abs[i]);
 		}
 		m_AbilityLevels = gameInstance->m_playerSave->m_AbilityLevels;
+		UE_LOG(LogTemp, Warning, TEXT("Getting Abilities from save file"))
+	}
+	else
+	{
+		AddAbilityDirect(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility->GetAbility(1));
 	}
 
 	SetupPlayer();
@@ -191,19 +199,9 @@ void APlayerCharacter::Tick(float DeltaTime)
 	if (Controller && Controller->IsPlayerController())
 	{
 		FVector velocity = GetVelocity();
-		if (!velocity.IsNearlyZero())
+		if (!velocity.IsNearlyZero() && m_ShouldWalkBackwards)
 		{
-			FRotator targetRot;
-
-			if (m_ShouldWalkBackwards)
-			{
-				targetRot = velocity.Rotation() + FRotator(0.0f, 180.0f, 0.0f);
-			}
-			else
-			{
-				targetRot = velocity.Rotation();
-			}
-
+			FRotator targetRot = velocity.Rotation() + FRotator(0.0f, 180.0f, 0.0f);
 			FRotator newRot = FMath::RInterpTo(GetActorRotation(), targetRot, DeltaTime, 100.0f);
 			SetActorRotation(newRot);
 		}
@@ -443,7 +441,6 @@ void APlayerCharacter::SetupPlayer()
 {
 	GetMesh()->SetSkeletalMesh(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_Mesh);
 	GetMesh()->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
-	AddAbility(m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_StartingAbility);
 
 	if (m_MeleeHitBox)
 	{
@@ -930,6 +927,11 @@ void APlayerCharacter::AddAbilityDirect(TSubclassOf<UBaseAbility> a_Ability)
 	if (m_AbilityNum >= m_AbilityMax) return;
 	m_PlayerAbilities->TryAddAbility(a_Ability);
 	m_AbilityNum++;
+
+	GetWorld()->GetTimerManager().SetTimer(m_setAbilityOneIconTimer, this, &APlayerCharacter::SetAbilityOneIcon, 0.2f, false);
+	GetWorld()->GetTimerManager().SetTimer(m_setAbilityTwoIconTimer, this, &APlayerCharacter::SetAbilityTwoIcon, 0.2f, false);
+	GetWorld()->GetTimerManager().SetTimer(m_setAbilityThreeIconTimer, this, &APlayerCharacter::SetAbilityThreeIcon, 0.2f, false);
+	GetWorld()->GetTimerManager().SetTimer(m_setAbilityFourIconTimer, this, &APlayerCharacter::SetAbilityFourIcon, 0.2f, false);
 }
 
 void APlayerCharacter::AddAbility(UMainAbilityContainerDataAsset* a_Ability, bool a_IncreaseAbilityCount)
@@ -947,21 +949,18 @@ void APlayerCharacter::AddAbility(UMainAbilityContainerDataAsset* a_Ability, boo
 		if (index == abilityLvl) return; // ability is already lvl3
 		m_PlayerAbilities->RemoveAbility(ability); // removing the lower lvl ability
 		AddAbility(a_Ability, false); // adding the new ability
-		Cast<UGame_GameInstance>(GetGameInstance())->m_playerSave->m_Abilities = m_PlayerAbilities->m_Abilities;
-		Cast<UGame_GameInstance>(GetGameInstance())->m_playerSave->m_AbilityClasses = m_PlayerAbilities->m_AbilityClasses;
 		return;
 	}
 	m_PlayerAbilities->TryAddAbility(ability);
 	if (a_IncreaseAbilityCount) m_AbilityNum++;
-	
+
+	UGame_GameInstance* gameInstance = Cast<UGame_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	gameInstance->m_playerSave->m_AbilityClasses = m_PlayerAbilities->m_AbilityClasses;
+
 	GetWorld()->GetTimerManager().SetTimer(m_setAbilityOneIconTimer, this, &APlayerCharacter::SetAbilityOneIcon, 0.2f, false);
 	GetWorld()->GetTimerManager().SetTimer(m_setAbilityTwoIconTimer, this, &APlayerCharacter::SetAbilityTwoIcon, 0.2f, false);
 	GetWorld()->GetTimerManager().SetTimer(m_setAbilityThreeIconTimer, this, &APlayerCharacter::SetAbilityThreeIcon, 0.2f, false);
 	GetWorld()->GetTimerManager().SetTimer(m_setAbilityFourIconTimer, this, &APlayerCharacter::SetAbilityFourIcon, 0.2f, false);
-
-
-	Cast<UGame_GameInstance>(GetGameInstance())->m_playerSave->m_Abilities = m_PlayerAbilities->m_Abilities;
-	Cast<UGame_GameInstance>(GetGameInstance())->m_playerSave->m_AbilityClasses = m_PlayerAbilities->m_AbilityClasses;
 	return;
 }
 
