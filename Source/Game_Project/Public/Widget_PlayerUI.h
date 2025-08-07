@@ -28,10 +28,16 @@ public:
 	void SetAbilityOneCooldownPercent(float a_cooldownPercent);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "UI")
+	void ShowAbilityOneSelected();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "UI")
 	void SetAbilityOneIcon(UTexture2D* a_abilityIcon);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "UI")
 	void SetAbilityTwoCooldownPercent(float a_cooldownPercent);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "UI")
+	void ShowAbilityTwoSelected();
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "UI")
 	void SetAbilityTwoIcon(UTexture2D* a_abilityIcon);
@@ -40,10 +46,16 @@ public:
 	void SetAbilityThreeCooldownPercent(float a_cooldownPercent);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "UI")
+	void ShowAbilityThreeSelected();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "UI")
 	void SetAbilityThreeIcon(UTexture2D* a_abilityIcon);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "UI")
 	void SetAbilityFourCooldownPercent(float a_cooldownPercent);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "UI")
+	void ShowAbilityFourSelected();
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "UI")
 	void SetAbilityFourIcon(UTexture2D* a_abilityIcon);

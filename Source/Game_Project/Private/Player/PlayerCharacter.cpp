@@ -19,6 +19,8 @@
 #include "EnemyCharacter.h"
 #include <Game_GameInstance.h>
 
+#include "Enemy_ProjectileBase.h"
+
 #pragma region UNREAL METHODS
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -182,6 +184,8 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 	UGame_GameInstance* gameInstance = Cast<UGame_GameInstance>(GetGameInstance());
 	gameInstance->PrintStackInfo();
+
+	UE_LOG(LogTemp,Error,TEXT("Needed Player XP: %i"), m_ExpLevelBarrier)
 }
 #pragma endregion
 
@@ -230,24 +234,40 @@ void APlayerCharacter::UseAbility()
 void APlayerCharacter::ChangeToAbilitySlot0()
 {
 	ChangeToAbilitySlot(0);
+	if (m_playerUIInstance)
+	{
+		m_playerUIInstance->ShowAbilityOneSelected();
+	}
 }
 
 void APlayerCharacter::ChangeToAbilitySlot1()
 {
 	if (m_AbilityNum < 2) return;
 	ChangeToAbilitySlot(1);
+	if (m_playerUIInstance)
+	{
+		m_playerUIInstance->ShowAbilityTwoSelected();
+	}
 }
 
 void APlayerCharacter::ChangeToAbilitySlot2()
 {
 	if (m_AbilityNum < 3) return;
 	ChangeToAbilitySlot(2);
+	if (m_playerUIInstance)
+	{
+		m_playerUIInstance->ShowAbilityThreeSelected();
+	}
 }
 
 void APlayerCharacter::ChangeToAbilitySlot3()
 {
 	if (m_AbilityNum < 4) return;
 	ChangeToAbilitySlot(3);
+	if (m_playerUIInstance)
+	{
+		m_playerUIInstance->ShowAbilityFourSelected();
+	}
 }
 
 void APlayerCharacter::ChangeToPlayerClassA()
@@ -641,9 +661,17 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 			FVector knockbackDirection = GetActorLocation() - DamageCauser->GetActorLocation();
 			knockbackDirection.Z = 0;
 			knockbackDirection.Normalize();
-
-			AEnemyCharacter* enemy = Cast<AEnemyCharacter>(EventInstigator->GetCharacter());
-			HandleKnockback(knockbackDirection, enemy->GetKnockback());
+			if (EventInstigator)
+			{
+				if (AEnemyCharacter* enemy = Cast<AEnemyCharacter>(EventInstigator->GetCharacter()))
+				{
+					HandleKnockback(knockbackDirection, enemy->GetKnockback());
+				}
+			}
+			else if (AEnemy_ProjectileBase* projectile = Cast<AEnemy_ProjectileBase>(DamageCauser))
+			{
+				HandleKnockback(knockbackDirection, projectile->GetKnockback());
+			}
 		}
 	}
 	
@@ -683,6 +711,8 @@ void APlayerCharacter::CheckForDeath()
 		DisableInput(Cast<APlayerController>(GetController()));
 		FTimerHandle deathDelayTimer;
 		float deathDelayBeforeRespawn = 3.0f;
+		UGame_GameInstance* gameInstance = Cast<UGame_GameInstance>(GetGameInstance());
+
 		GetWorld()->GetTimerManager().SetTimer(deathDelayTimer, FTimerDelegate::CreateUObject(this, &APlayerCharacter::RespawnAfterDeath), deathDelayBeforeRespawn, false);
 	}
 }

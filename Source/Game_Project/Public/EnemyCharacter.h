@@ -152,10 +152,10 @@ protected:
 	float m_knockback = 400.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
-	float m_minExpWorth = 50.0f;
+	float m_minExpWorth = 70.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
-	float m_maxExpWorth = 100.0f;
+	float m_maxExpWorth = 80.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
 	int m_moneyValueOnDeath = 5;
