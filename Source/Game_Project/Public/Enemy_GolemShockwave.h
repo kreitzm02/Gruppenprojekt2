@@ -60,6 +60,8 @@ private:
 	UPROPERTY()
 	AEnemyCharacter* m_enemyCharacter = nullptr;
 
+	bool m_hitPlayer = false;
+
 	UFUNCTION()
 	virtual void OnHit(UPrimitiveComponent* a_overlappedComponent, AActor* a_otherActor, UPrimitiveComponent* a_otherComp, int32 a_otherBodyIndex, bool a_bFromSweep, const FHitResult& a_sweepResult);
 
