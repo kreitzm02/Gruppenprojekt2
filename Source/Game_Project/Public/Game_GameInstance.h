@@ -83,6 +83,8 @@ public:
 	FVector GetLastOverworldPos() { return m_lastPlayerOverworldPos; }
 
 private:
+	void ShowInitialTutorial();
+
 	void TickTimer();
 	void OnTimerEnd();
 
@@ -113,4 +115,7 @@ private:
 
 
 	FVector m_lastPlayerOverworldPos = FVector::ZeroVector;
+
+	UPROPERTY(EditAnywhere, Category = "Initial Tutorial")
+	TSubclassOf<UUserWidget> m_initialTutorialUI;
 };

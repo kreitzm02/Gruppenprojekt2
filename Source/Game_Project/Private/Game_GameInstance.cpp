@@ -18,6 +18,13 @@ void UGame_GameInstance::Init()
 	UE_LOG(LogTemp, Error, TEXT("music volume save:%f"), m_playerSave->m_musicVol)
 	m_musicVolume = m_playerSave->m_musicVol;
 	m_sfxVolume = m_playerSave->m_sfxVol;
+
+	if (m_playerSave->m_firstStart)
+	{
+		FTimerHandle initialTutorialTimer;
+		GetWorld()->GetTimerManager().SetTimer(initialTutorialTimer,this ,&UGame_GameInstance::ShowInitialTutorial,1.0f,false);
+	}
+	
 }
 
 void UGame_GameInstance::PrintStackInfo()
@@ -143,6 +150,14 @@ void UGame_GameInstance::SetSFXVolume(float a_volume)
 
 
 
+
+void UGame_GameInstance::ShowInitialTutorial()
+{
+	UUserWidget* initialTutorial = CreateWidget(GetWorld(), m_initialTutorialUI);
+	initialTutorial->AddToViewport();
+	m_playerSave->m_firstStart = false;
+	UGameplayStatics::SaveGameToSlot(m_playerSave, TEXT("PlayerSaveSlot"), 0);
+}
 
 
 void UGame_GameInstance::StartGameTimer()
