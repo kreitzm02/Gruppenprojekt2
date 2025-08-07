@@ -359,22 +359,22 @@ void UDungeonBuilder::BuildDebugObjects()
 				meshActor->SetMobility(EComponentMobility::Static);
 			}
 		}
-		//else if (curType == ERoomType::EXIT)
-		//{
-		//	FInt32Vector2 intPos = m_Data->m_AllRooms[i].GetRoomCenter();
-		//	FVector position = { (float)intPos.X * m_UnitSize, (float)intPos.Y * m_UnitSize, 0 };
-		//	FActorSpawnParameters params;
-		//  params.OverrideLevel = m_Level;
-		//	ACustomChunkManager* chunkManager = Cast<ACustomChunkManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACustomChunkManager::StaticClass()));
-		//	AStaticMeshActor* meshActor = Cast<AStaticMeshActor>(chunkManager->SpawnActorInChunk(AStaticMeshActor::StaticClass(), position, FRotator::ZeroRotator, params));
-		//	//AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), position, { 0, 0, 0 }); // testing!
-		//	if (meshActor)
-		//	{
-		//		meshActor->SetMobility(EComponentMobility::Movable);
-		//		meshActor->GetStaticMeshComponent()->SetStaticMesh(m_DungeonTheme->m_ExitCubeMesh);
-		//		meshActor->SetMobility(EComponentMobility::Static);
-		//	}
-		//}
+		else if (curType == ERoomType::EXIT)
+		{
+			FInt32Vector2 intPos = m_Data->m_AllRooms[i].GetRoomCenter();
+			FVector position = { (float)intPos.X * m_UnitSize, (float)intPos.Y * m_UnitSize, 0 };
+			FActorSpawnParameters params;
+		  params.OverrideLevel = m_Level;
+			ACustomChunkManager* chunkManager = Cast<ACustomChunkManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACustomChunkManager::StaticClass()));
+			AStaticMeshActor* meshActor = Cast<AStaticMeshActor>(chunkManager->SpawnActorInChunk(AStaticMeshActor::StaticClass(), position, FRotator::ZeroRotator, params));
+			//AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), position, { 0, 0, 0 }); // testing!
+			if (meshActor)
+			{
+				meshActor->SetMobility(EComponentMobility::Movable);
+				meshActor->GetStaticMeshComponent()->SetStaticMesh(m_DungeonTheme->m_ExitCubeMesh);
+				meshActor->SetMobility(EComponentMobility::Static);
+			}
+		}
 	}
 }
 
@@ -599,7 +599,7 @@ void UDungeonBuilder::TryPlaceDoor(int32 a_GridX, int32 a_GridY, const FDungeonR
 	UE_LOG(LogTemp, Error, TEXT("Door tries to spawn"));
 	TArray<TArray<ECellType>> grid = m_Data->m_DungeonGrid;
 
-	if (grid[a_GridX][a_GridY] != ECellType::FLOOR && grid[a_GridX][a_GridY] != ECellType::FLOORCORRIDOR) return;
+	//if (grid[a_GridX][a_GridY] != ECellType::FLOOR && grid[a_GridX][a_GridY] != ECellType::FLOORCORRIDOR) return;
 	UE_LOG(LogTemp, Error, TEXT("Door has been spawned"));
 	bool canBePlaced = false;
 	FVector pos = { a_GridX * m_UnitSize, (float)a_GridY * m_UnitSize, -400.0f };

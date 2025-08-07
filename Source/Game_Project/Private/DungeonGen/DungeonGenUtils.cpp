@@ -248,8 +248,8 @@ int32 UDungeonGenUtils::GetOrthogonalRotationBasedOnCenter(FVector a_Pos, FVecto
 {
 	float differenceX = a_Pos.X - a_Center.X;
 	float differenceY = a_Pos.Y - a_Center.Y;
-	if (FMath::Abs(differenceX) > FMath::Abs(differenceY))
-		return differenceX > 0 ? 270 : 90;
+	if (FMath::Abs(differenceX) >= FMath::Abs(differenceY))
+		return differenceX > 0 ? 90 : 270;
 	else
 		return differenceY > 0 ? 180 : 0;
 }
