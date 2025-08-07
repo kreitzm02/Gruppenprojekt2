@@ -3,6 +3,7 @@
 
 #include "AbilityComponent.h"
 #include <Kismet/GameplayStatics.h>
+#include <Game_GameInstance.h>
 
 // Sets default values for this component's properties
 UAbilityComponent::UAbilityComponent()
@@ -20,12 +21,12 @@ void UAbilityComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	for (auto& abilityClass : m_AbilityClasses)
-	{
-		if (!abilityClass) continue;
-		UBaseAbility* newAbility = NewObject<UBaseAbility>(this, abilityClass);
-		m_Abilities.Add(newAbility);
-	}
+	//for (auto& abilityClass : m_AbilityClasses)
+	//{
+	//	if (!abilityClass) continue;
+	//	UBaseAbility* newAbility = NewObject<UBaseAbility>(this, abilityClass);
+	//	m_Abilities.Add(newAbility);
+	//}
 	
 }
 
@@ -67,6 +68,7 @@ bool UAbilityComponent::TryAddAbility(TSubclassOf<UBaseAbility> a_AbilityClass)
 	if (!newAbility) return false;
 	UE_LOG(LogTemp, Warning, TEXT("New ability added"));
 	m_Abilities.Add(newAbility);
+	m_AbilityClasses.Add(a_AbilityClass);
 	return true;
 }
 
@@ -74,6 +76,7 @@ void UAbilityComponent::RemoveAllAbilities()
 {
 	for (UBaseAbility* ability : m_Abilities) ability->ForceEndAbility(this->GetOwner());
 	m_Abilities.Empty();
+	m_AbilityClasses.Empty();
 }
 
 void UAbilityComponent::RemoveAbility(TSubclassOf<UBaseAbility> a_AbilityClass)
@@ -83,6 +86,7 @@ void UAbilityComponent::RemoveAbility(TSubclassOf<UBaseAbility> a_AbilityClass)
 		if (m_Abilities[i] && m_Abilities[i]->GetClass() == a_AbilityClass)
 		{
 			m_Abilities.RemoveAt(i);
+			m_AbilityClasses.RemoveAt(i);
 			return;
 		}
 	}
@@ -93,6 +97,7 @@ void UAbilityComponent::RemoveAbilityFromIndex(int a_Index)
 	if (a_Index > m_Abilities.Num()) return;
 
 	m_Abilities.RemoveAt(a_Index);
+	m_AbilityClasses.RemoveAt(a_Index);
 }
 
 float UAbilityComponent::GetRemainingCooldownFromAbility(int32 a_Index)

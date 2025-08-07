@@ -97,6 +97,7 @@ public:
 
 	// external way to see and react to player stats
 	float GetPlayerHealth() { return m_PlayerHealth; }
+	float GetPlayerMaxHealth() { return m_PlayerMaxHealth;  }
 	float GetPlayerLuck() { return m_PlayerLuck; }
 	float GetPlayerDefense() { return m_PlayerDefense; }
 	float GetPlayerMovementSpeed() { return m_PlayerMovementSpeed; }

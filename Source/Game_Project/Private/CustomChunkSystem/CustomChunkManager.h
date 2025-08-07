@@ -22,6 +22,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Chunk", meta = (ClampMin = "1", UIMin = "1", ClampMax = "100", UIMax = "100", DisplayName = "Active Radius in Chunks"))
 	int m_ChunkActiveRadius = 2;
 
+	UPROPERTY(EditAnywhere, Category = "Chunk", meta = (ClampMin = "0.01", UIMin = "0.01", ClampMax = "1.0", UIMax = "1.0", DisplayName = "Time between Chunk updates"))
+	float m_ChunkUpdateInterval = 0.2f;
+
 	UPROPERTY()
 	TMap<FIntPoint, FCustomChunk> m_AllChunks;
 
@@ -42,4 +45,7 @@ private:
 	void UpdateChunkActivation();
 	void SetChunkActive(const FIntPoint& a_Position, bool a_Active);
 	void UpdateChunkForMovableActors();
+
+	float m_ChunkUpdateTimer = 0.0f;
+	
 };
