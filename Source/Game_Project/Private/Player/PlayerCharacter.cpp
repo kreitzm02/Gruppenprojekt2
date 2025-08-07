@@ -57,7 +57,7 @@ void APlayerCharacter::BeginPlay()
 	// TODO: Create LoadFromSaveFile()
 	UGame_GameInstance* gameInstance = Cast<UGame_GameInstance>(GetGameInstance());
 	m_CurrentPlayerClass = gameInstance->m_playerSave->m_CurrentPlayerClass;
-	SetupPlayer();
+	
 
 	FillAbilityLevelMap();
 
@@ -69,6 +69,8 @@ void APlayerCharacter::BeginPlay()
 		}
 		m_AbilityLevels = gameInstance->m_playerSave->m_AbilityLevels;
 	}
+
+	SetupPlayer();
 	
 	m_AnimInstance = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 	   
