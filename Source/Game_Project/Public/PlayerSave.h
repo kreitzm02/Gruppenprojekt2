@@ -105,4 +105,7 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player Saves")
 	float m_sfxVol = 0.5f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player Saves")
+	float m_firstStart = true;
 };
