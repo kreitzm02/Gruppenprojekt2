@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Enemy_ProjectileBase.h"
+#include "NiagaraComponent.h"
 #include "Enemy_RogueArrow.generated.h"
 
 /**
@@ -28,4 +29,7 @@ public:
 
 private:
 	virtual void MoveInDirection(float a_deltaTime) override;
+
+	UPROPERTY(EditAnywhere, Category = "Projectile Settings")
+	UNiagaraComponent* m_niagaraComponent = nullptr;
 };
