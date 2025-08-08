@@ -62,8 +62,14 @@ void ACustomChunkManager::BeginPlay()
 void ACustomChunkManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	UpdateChunkActivation();
-	UpdateChunkForMovableActors();
+	m_ChunkUpdateTimer += DeltaTime;
+
+	if (m_ChunkUpdateTimer >= m_ChunkUpdateInterval)
+	{
+		UpdateChunkActivation();
+		UpdateChunkForMovableActors();
+		m_ChunkUpdateTimer = 0.0f;
+	}
 }
 
 FIntPoint ACustomChunkManager::GetChunkPosFromWorldPos(const FVector& a_WorldPos) const
@@ -100,7 +106,7 @@ void ACustomChunkManager::SetChunkActive(const FIntPoint& a_Position, bool a_Act
 		{
 			actor->SetActorTickEnabled(a_Active);
 			actor->SetActorHiddenInGame(!a_Active);
-			actor->SetActorEnableCollision(a_Active);
+			//actor->SetActorEnableCollision(a_Active);
 			
 			TArray<UPrimitiveComponent*> comps;
 			actor->GetComponents<UPrimitiveComponent>(comps);
@@ -113,7 +119,6 @@ void ACustomChunkManager::SetChunkActive(const FIntPoint& a_Position, bool a_Act
 					if (c->IsAnyRigidBodyAwake()) c->PutAllRigidBodiesToSleep();
 					else c->WakeAllRigidBodies();
 				}
-					
 			}
 		}
 	}

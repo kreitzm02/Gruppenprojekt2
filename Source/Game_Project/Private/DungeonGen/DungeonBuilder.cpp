@@ -359,22 +359,22 @@ void UDungeonBuilder::BuildDebugObjects()
 				meshActor->SetMobility(EComponentMobility::Static);
 			}
 		}
-		//else if (curType == ERoomType::EXIT)
-		//{
-		//	FInt32Vector2 intPos = m_Data->m_AllRooms[i].GetRoomCenter();
-		//	FVector position = { (float)intPos.X * m_UnitSize, (float)intPos.Y * m_UnitSize, 0 };
-		//	FActorSpawnParameters params;
-		//  params.OverrideLevel = m_Level;
-		//	ACustomChunkManager* chunkManager = Cast<ACustomChunkManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACustomChunkManager::StaticClass()));
-		//	AStaticMeshActor* meshActor = Cast<AStaticMeshActor>(chunkManager->SpawnActorInChunk(AStaticMeshActor::StaticClass(), position, FRotator::ZeroRotator, params));
-		//	//AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), position, { 0, 0, 0 }); // testing!
-		//	if (meshActor)
-		//	{
-		//		meshActor->SetMobility(EComponentMobility::Movable);
-		//		meshActor->GetStaticMeshComponent()->SetStaticMesh(m_DungeonTheme->m_ExitCubeMesh);
-		//		meshActor->SetMobility(EComponentMobility::Static);
-		//	}
-		//}
+		else if (curType == ERoomType::EXIT)
+		{
+			FInt32Vector2 intPos = m_Data->m_AllRooms[i].GetRoomCenter();
+			FVector position = { (float)intPos.X * m_UnitSize, (float)intPos.Y * m_UnitSize, 0 };
+			FActorSpawnParameters params;
+		  params.OverrideLevel = m_Level;
+			ACustomChunkManager* chunkManager = Cast<ACustomChunkManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACustomChunkManager::StaticClass()));
+			AStaticMeshActor* meshActor = Cast<AStaticMeshActor>(chunkManager->SpawnActorInChunk(AStaticMeshActor::StaticClass(), position, FRotator::ZeroRotator, params));
+			//AStaticMeshActor* meshActor = m_WorldContext->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), position, { 0, 0, 0 }); // testing!
+			if (meshActor)
+			{
+				meshActor->SetMobility(EComponentMobility::Movable);
+				meshActor->GetStaticMeshComponent()->SetStaticMesh(m_DungeonTheme->m_ExitCubeMesh);
+				meshActor->SetMobility(EComponentMobility::Static);
+			}
+		}
 	}
 }
 
@@ -557,7 +557,7 @@ void UDungeonBuilder::SpawnBossEnemyRandom()
 		if (curType != ERoomType::EXIT && curType != ERoomType::BOSS) continue;
 
 		FInt32Vector2 intPos = m_Data->m_AllRooms[i].GetRoomCenter();
-		FVector position = { (float)intPos.X * m_UnitSize, (float)intPos.Y * m_UnitSize, 10.0f };
+		FVector position = { (float)intPos.X * m_UnitSize, (float)intPos.Y * m_UnitSize, 0.0f };
 
 		TSubclassOf<AEnemyCharacter> bossToSpawn = m_DungeonTheme->m_BossCharacters[randomBossIndex];
 

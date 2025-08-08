@@ -36,6 +36,7 @@ void UDamageBallAbilityAction::PrepareAbilityAction(AActor* a_AbilityUser)
 void UDamageBallAbilityAction::PlayAbilityAction(AActor* a_AbilityUser)
 {
 	Super::PlayAbilityAction(a_AbilityUser);
+	if (!m_VFX|| !a_AbilityUser) return;
 
 	a_AbilityUser->GetWorld()->GetTimerManager().SetTimer(m_StartTimerHandle, FTimerDelegate::CreateUObject(this, &UDamageBallAbilityAction::PlayDamageBall, a_AbilityUser), m_Delay, false);
 }
@@ -43,6 +44,119 @@ void UDamageBallAbilityAction::PlayAbilityAction(AActor* a_AbilityUser)
 void UDamageBallAbilityAction::EndAbilityAction(AActor* a_AbilityUser)
 {
 	forceDestroyActive = true;
+}
+
+void UDamageBallAbilityAction::MoveDamageBallTick(TSharedPtr<FDamageBallInstance> a_BallInstance, AActor* a_AbilityUser)
+{
+	FVector nextPos;
+	FRotator rot;
+
+	if (m_Speed == 0.0f)
+	{
+		a_BallInstance->m_CircleAngle += m_CircularRotationSpeed * 0.01f;
+		if (a_BallInstance->m_CircleAngle >= 360.0f) a_BallInstance->m_CircleAngle -= 360.0f;
+		const float radians = FMath::DegreesToRadians(a_BallInstance->m_CircleAngle);
+		const FVector circleOffset = FVector(FMath::Cos(radians), FMath::Sin(radians), 0.0f) * m_CircularMotionCircleRadius;
+		FVector center = a_AbilityUser->GetActorLocation();
+		nextPos = center + circleOffset;
+		const FVector radialDir = circleOffset.GetSafeNormal();
+		const FVector tangentDir = FVector::CrossProduct(FVector::UpVector, radialDir).GetSafeNormal();
+		a_BallInstance->m_Direction = tangentDir;
+		rot = tangentDir.Rotation();
+		rot.Pitch -= 90.0f;
+	}
+	else
+	{
+		const float step = m_Speed * 0.01f;
+		nextPos = a_BallInstance->m_CurrPosition + a_BallInstance->m_Direction * step;
+		rot = a_BallInstance->m_Direction.Rotation();
+		rot.Pitch -= 90.0f;
+	}
+
+	// wall bounce
+	FHitResult hit;
+	bool wallHit = a_AbilityUser->GetWorld()->LineTraceSingleByChannel(hit, a_BallInstance->m_CurrPosition, nextPos, ECC_Visibility);
+
+	if (wallHit)
+	{
+		AActor* hitActor = hit.GetActor();
+		if (a_BallInstance->m_HitCount >= m_CollisionsBeforeDestruction || forceDestroyActive)
+		{
+			if (a_BallInstance->m_VFXComp)
+			{
+				a_BallInstance->m_VFXComp->DestroyComponent();
+				a_BallInstance->m_VFXComp = nullptr;
+			}
+			EndDamageBall(a_BallInstance);
+			UE_LOG(LogTemp, Warning, TEXT("Damage Ball ended after max collision"));
+			return;
+		}
+		else if (m_BouncesOfWalls && hitActor && hitActor->IsRootComponentStatic() && a_BallInstance->m_HitCount <= m_CollisionsBeforeDestruction && !hitActor->IsA<AEnemyCharacter>())
+		{
+			const FVector Normal = hit.Normal;
+			a_BallInstance->m_Direction = a_BallInstance->m_Direction.MirrorByPlane(FPlane(Normal, 0)).GetSafeNormal();
+			a_BallInstance->m_Direction.Z = 0.0f;
+			a_BallInstance->m_CurrPosition = hit.Location + a_BallInstance->m_Direction * 2.0f;
+			a_BallInstance->m_HitCount++;
+			a_BallInstance->m_AlreadyHitActors.Empty();
+			return;
+		}
+	}
+
+	// enemy hit
+	TArray<FOverlapResult> overlaps;
+	FCollisionShape shape = FCollisionShape::MakeSphere(m_BallSize * 1.99f);
+	bool overlap = a_AbilityUser->GetWorld()->OverlapMultiByChannel(overlaps, nextPos, FQuat::Identity, ECC_Pawn, shape);
+
+	if (overlap)
+	{
+		for (const FOverlapResult& result : overlaps)
+		{
+			AActor* hitActor = result.GetActor();
+			if (hitActor && hitActor != a_AbilityUser && !a_BallInstance->m_AlreadyHitActors.Contains(hitActor))
+			{
+				a_BallInstance->m_AlreadyHitActors.Add(hitActor);
+				a_BallInstance->m_HitCount++;
+				UGame_GameInstance* gameInstance = Cast<UGame_GameInstance>(a_AbilityUser->GetWorld()->GetGameInstance());
+				float finalAttackDamage = m_Damage * gameInstance->m_playerSave->GetPlayerDmgMultiplier() + gameInstance->m_AdditionalDamage;
+				UGameplayStatics::ApplyDamage(hitActor, finalAttackDamage, nullptr, a_AbilityUser, nullptr);
+				if (AEnemyCharacter* hitEnemy = Cast<AEnemyCharacter>(hitActor))
+				{
+					hitEnemy->TakeKnockback(m_KnockbackStrenght, hitEnemy->GetActorLocation() - a_BallInstance->m_CurrPosition);
+				}
+
+				if (a_BallInstance->m_HitCount >= m_CollisionsBeforeDestruction)
+				{
+					EndDamageBall(a_BallInstance);
+					return;
+				}
+			}
+		}
+	}
+
+	// debug 
+	//DrawDebugSphere(a_AbilityUser->GetWorld(), nextPos, m_BallSize, 16, m_Color, false, 0.05f);
+
+	if (a_BallInstance->m_VFXComp)
+	{
+		a_BallInstance->m_VFXComp->SetWorldLocation(nextPos);
+		a_BallInstance->m_VFXComp->SetWorldRotation(rot);
+
+	}
+
+	// move
+	a_BallInstance->m_CurrPosition = nextPos;
+}
+
+void UDamageBallAbilityAction::EndDamageBall(TSharedPtr<FDamageBallInstance> a_BallInstance)
+{
+	if (a_BallInstance->m_VFXComp)
+	{
+		a_BallInstance->m_VFXComp->DestroyComponent();
+		a_BallInstance->m_VFXComp = nullptr;
+	}
+	GetWorld()->GetTimerManager().ClearTimer(a_BallInstance->m_MoveHandle);
+	UE_LOG(LogTemp, Warning, TEXT("Damage Ball Auto-ended after duration"));
 }
 
 void UDamageBallAbilityAction::PlayDamageBall(AActor* a_AbilityUser)
@@ -59,139 +173,24 @@ void UDamageBallAbilityAction::PlayDamageBall(AActor* a_AbilityUser)
 		const FVector startPosition = a_AbilityUser->GetActorLocation() + offsetRotated * m_OffsetFromSpawn;
 		const FRotator spawnRotation = FRotator(offsetRotated.Rotation().Pitch - 90.0f, offsetRotated.Rotation().Yaw, offsetRotated.Rotation().Roll);
 
-		TSharedRef<FDamageBallInstance> ballInstance = MakeShared<FDamageBallInstance>();
-		ballInstance->m_Direction = offsetRotated.GetSafeNormal();
-		ballInstance->m_CurrPosition = startPosition;
-		ballInstance->m_CircleAngle = m_BallInitialRotation;
+		TSharedPtr<FDamageBallInstance> inst = MakeShared<FDamageBallInstance>();
+		inst->m_Direction = offsetRotated.GetSafeNormal();
+		inst->m_CurrPosition = startPosition;
+		inst->m_CircleAngle = m_BallInitialRotation;
 
 		FTimerHandle endTimerHandle;
 		FTimerHandle moveTickHandle;
 
-		FRotator rot;
+		
 
-		if (m_VFX && !ballInstance->m_VFXComp)
+		if (m_VFX && !inst->m_VFXComp)
 		{
 			const FVector scale = FVector(m_BallSize * 0.01f);
-			ballInstance->m_VFXComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(a_AbilityUser->GetWorld(), m_VFX, startPosition, spawnRotation, scale, true, true, ENCPoolMethod::None, true);
+			inst->m_VFXComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(a_AbilityUser->GetWorld(), m_VFX, startPosition, spawnRotation, scale, true, true, ENCPoolMethod::None, true);
 		}
 
-		a_AbilityUser->GetWorld()->GetTimerManager().SetTimer(moveTickHandle, FTimerDelegate::CreateLambda([=,this]() mutable
-		{
-			// move
-			FVector nextPos;
-
-			if (m_Speed == 0.0f)
-			{
-				ballInstance->m_CircleAngle += m_CircularRotationSpeed * 0.01f;
-				if (ballInstance->m_CircleAngle >= 360.0f) ballInstance->m_CircleAngle -= 360.0f;
-				const float radians = FMath::DegreesToRadians(ballInstance->m_CircleAngle);
-				const FVector circleOffset = FVector(FMath::Cos(radians), FMath::Sin(radians), 0.0f) * m_CircularMotionCircleRadius;
-				FVector center = a_AbilityUser->GetActorLocation();
-				nextPos = center + circleOffset;
-				const FVector radialDir = circleOffset.GetSafeNormal();
-				const FVector tangentDir = FVector::CrossProduct(FVector::UpVector, radialDir).GetSafeNormal();
-				ballInstance->m_Direction = tangentDir;
-				rot = tangentDir.Rotation();
-				rot.Pitch -= 90.0f;
-			}
-			else
-			{
-				const float step = m_Speed * 0.01f;
-				nextPos = ballInstance->m_CurrPosition + ballInstance->m_Direction * step;
-				rot = ballInstance->m_Direction.Rotation();
-				rot.Pitch -= 90.0f;
-			}
-
-			// wall bounce
-			FHitResult hit;
-			bool wallHit = a_AbilityUser->GetWorld()->LineTraceSingleByChannel(hit, ballInstance->m_CurrPosition, nextPos, ECC_Visibility);
-
-			if (wallHit)
-			{
-				AActor* hitActor = hit.GetActor();
-				if (ballInstance->m_HitCount >= m_CollisionsBeforeDestruction || forceDestroyActive)
-				{
-					if (ballInstance->m_VFXComp)
-					{
-						ballInstance->m_VFXComp->DestroyComponent();
-						ballInstance->m_VFXComp = nullptr;
-					}
-					a_AbilityUser->GetWorld()->GetTimerManager().ClearTimer(moveTickHandle);
-					UE_LOG(LogTemp, Warning, TEXT("Damage Ball ended after max collision"));
-					return;
-				}
-				else if (m_BouncesOfWalls && hitActor && hitActor->IsRootComponentStatic() && ballInstance->m_HitCount <= m_CollisionsBeforeDestruction && !hitActor->IsA<AEnemyCharacter>())
-				{
-					const FVector Normal = hit.Normal;
-					ballInstance->m_Direction = ballInstance->m_Direction.MirrorByPlane(FPlane(Normal, 0)).GetSafeNormal();
-					ballInstance->m_Direction.Z = 0.0f;
-					ballInstance->m_CurrPosition = hit.Location + ballInstance->m_Direction * 2.0f;
-					ballInstance->m_HitCount++;
-					ballInstance->m_AlreadyHitActors.Empty();
-					return;
-				}
-			}
-
-			// enemy hit
-			TArray<FOverlapResult> overlaps;
-			FCollisionShape shape = FCollisionShape::MakeSphere(m_BallSize * 1.99f);
-			bool overlap = a_AbilityUser->GetWorld()->OverlapMultiByChannel(overlaps, nextPos, FQuat::Identity, ECC_Pawn, shape);
-
-			if (overlap)
-			{
-				for (const FOverlapResult& result : overlaps)
-				{
-					AActor* hitActor = result.GetActor();
-					if (hitActor && hitActor != a_AbilityUser && !ballInstance->m_AlreadyHitActors.Contains(hitActor))
-					{
-						ballInstance->m_AlreadyHitActors.Add(hitActor);
-						ballInstance->m_HitCount++;
-						UGame_GameInstance* gameInstance = Cast<UGame_GameInstance>(a_AbilityUser->GetWorld()->GetGameInstance());
-						float finalAttackDamage = m_Damage * gameInstance->m_playerSave->GetPlayerDmgMultiplier() + gameInstance->m_AdditionalDamage;
-						UGameplayStatics::ApplyDamage(hitActor, finalAttackDamage, nullptr, a_AbilityUser, nullptr);
-						if (AEnemyCharacter* hitEnemy = Cast<AEnemyCharacter>(hitActor))
-						{
-							hitEnemy->TakeKnockback(m_KnockbackStrenght, hitEnemy->GetActorLocation() - ballInstance->m_CurrPosition);
-						}
-
-						if (ballInstance->m_HitCount >= m_CollisionsBeforeDestruction)
-						{
-							a_AbilityUser->GetWorld()->GetTimerManager().ClearTimer(moveTickHandle);
-							a_AbilityUser->GetWorld()->GetTimerManager().ClearTimer(endTimerHandle);
-							return;
-						}
-					}
-				}
-			}
-
-			// debug 
-			//DrawDebugSphere(a_AbilityUser->GetWorld(), nextPos, m_BallSize, 16, m_Color, false, 0.05f);
-
-			if (ballInstance->m_VFXComp)
-			{
-				ballInstance->m_VFXComp->SetWorldLocation(nextPos);
-				ballInstance->m_VFXComp->SetWorldRotation(rot);
-
-			}
-
-			// move
-			ballInstance->m_CurrPosition = nextPos;
-		}), 0.01f, true);
-
-		UWorld* world = a_AbilityUser->GetWorld();
-		FTimerHandle moveHandle = moveTickHandle;
-		FTimerHandle endHandle = endTimerHandle;
-
-
-		a_AbilityUser->GetWorld()->GetTimerManager().SetTimer(endHandle, FTimerDelegate::CreateLambda([world, moveHandle, endHandle, ballInstance]() mutable
-		{
-			if (ballInstance->m_VFXComp)
-			{
-				ballInstance->m_VFXComp->DestroyComponent();
-				ballInstance->m_VFXComp = nullptr;
-			}
-			world->GetTimerManager().ClearTimer(moveHandle);
-			UE_LOG(LogTemp, Warning, TEXT("Damage Ball Auto-ended after duration"));
-		}), m_MaxDuration, false);
+		a_AbilityUser->GetWorld()->GetTimerManager().SetTimer(inst->m_MoveHandle, FTimerDelegate::CreateUObject(this, &UDamageBallAbilityAction::MoveDamageBallTick, inst, a_AbilityUser), 0.01f, true);
+		
+		a_AbilityUser->GetWorld()->GetTimerManager().SetTimer(inst->m_EndHandle, FTimerDelegate::CreateUObject(this, &UDamageBallAbilityAction::EndDamageBall, inst), m_MaxDuration, false);
 	}
 }

@@ -161,7 +161,7 @@ void ADungeonGen::GenerateDungeon()
 	m_Builder->Init(m_UnitSize, m_DungeonTheme, &m_Data, GetWorld(), m_WallOffset, m_ThisLevel);
 	m_Builder->BuildFloor();
 	m_Builder->BuildWall();
-	m_Builder->BuildDebugObjects();
+	//m_Builder->BuildDebugObjects();
 	m_Builder->BuildDecorationObjects();
 	m_Builder->BuildBossRoom();
 	m_Builder->GenerateEnemies();

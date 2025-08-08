@@ -17,6 +17,8 @@ struct FDamageBallInstance
 	TSet<AActor*> m_AlreadyHitActors;
 	float m_CircleAngle;
 	UNiagaraComponent* m_VFXComp = nullptr;
+	FTimerHandle m_MoveHandle;
+	FTimerHandle m_EndHandle;
 };
 
 UCLASS(Blueprintable, EditInlineNew)
@@ -83,4 +85,6 @@ private:
 	UAnimMontage* m_AttackMontage;
 	FTimerHandle m_StartTimerHandle;
 	bool forceDestroyActive = false;
+	void MoveDamageBallTick(TSharedPtr<FDamageBallInstance> a_BallInstance, AActor* a_AbilityUser);
+	void EndDamageBall(TSharedPtr<FDamageBallInstance> a_BallInstance);
 };
