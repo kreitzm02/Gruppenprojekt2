@@ -52,7 +52,8 @@ void USelfHealAbilityAction::PlaySelfHeal(AActor* a_AbilityUser)
 	// heal player
 	if (APlayerCharacter* player = Cast<APlayerCharacter>(a_AbilityUser))
 	{
-		player->TryAddPlayerHealth(m_HPAmount * Cast<UGame_GameInstance>(a_AbilityUser->GetWorld()->GetGameInstance())->m_playerSave->GetPlayerHPRegenMultiplier());
+		float hpToAdd = player->GetPlayerMaxHealth() * m_HPAmount;
+		player->TryAddPlayerHealth(hpToAdd);
 	}
 
 	a_AbilityUser->GetWorld()->GetTimerManager().SetTimer(m_MoveTimerHandle, FTimerDelegate::CreateUObject(this, &USelfHealAbilityAction::MoveSelfHeal, a_AbilityUser), 0.01f, true);
