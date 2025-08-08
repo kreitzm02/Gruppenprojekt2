@@ -83,6 +83,7 @@ void UTornadoAbilityAction::MoveTornadoTick(TSharedPtr<FTornadoInstance> a_Insta
 	FHitResult hit;
 	FCollisionObjectQueryParams objParams;
 	objParams.AddObjectTypesToQuery(ECC_WorldStatic);
+	objParams.AddObjectTypesToQuery(ECC_Visibility);
 
 	bool wallHit = GetWorld()->SweepSingleByObjectType(hit, start, start + movePerTick, FQuat::Identity, objParams, FCollisionShape::MakeSphere(m_CollisionRadius));
 
@@ -126,31 +127,84 @@ void UTornadoAbilityAction::MoveTornadoTick(TSharedPtr<FTornadoInstance> a_Insta
 
 	// enemy attraction
 
-	TArray<FOverlapResult> pullOverlaps;
-	FCollisionShape pullShape = FCollisionShape::MakeSphere(m_AttractionRadius);
+	//TArray<FOverlapResult> pullOverlaps;
+	//FCollisionShape pullShape = FCollisionShape::MakeSphere(m_AttractionRadius);
+	//
+	//bool anyPulls = GetWorld()->OverlapMultiByChannel(pullOverlaps, a_Instance->m_CurrPosition, FQuat::Identity, ECC_Pawn, pullShape);
+	//if (anyPulls)
+	//{
+	//	for (const FOverlapResult& pullRes : pullOverlaps)
+	//	{
+	//		AActor* actor = pullRes.GetActor();
+	//		if (!actor || actor == nullptr) continue;
+	//
+	//		if (AEnemyCharacter* enemy = Cast<AEnemyCharacter>(actor))
+	//		{
+	//			if (UPrimitiveComponent* root = Cast<UPrimitiveComponent>(enemy->GetRootComponent()))
+	//			{
+	//				FVector toCenter = (a_Instance->m_CurrPosition - enemy->GetActorLocation());
+	//				float dist = toCenter.Size();
+	//				toCenter.Normalize();
+	//
+	//				float speed = m_AttractionStrength * (1.0f - FMath::Clamp(dist / m_AttractionRadius, 0.0f, 1.0f));
+	//				enemy->SetActorLocation(enemy->GetActorLocation() + toCenter * speed * 0.01f);
+	//			}
+	//		}
+	//	}
+	//}
 
-	bool anyPulls = GetWorld()->OverlapMultiByChannel(pullOverlaps, a_Instance->m_CurrPosition, FQuat::Identity, ECC_Pawn, pullShape);
-	if (anyPulls)
+
+	TArray<FOverlapResult> pullOverlaps;
+	const FCollisionShape pullShape = FCollisionShape::MakeSphere(m_AttractionRadius);
+
+	if (GetWorld()->OverlapMultiByChannel(pullOverlaps, a_Instance->m_CurrPosition, FQuat::Identity, ECC_Pawn, pullShape))
 	{
+		float dt = FMath::Max(0.0f, GetWorld()->GetTimerManager().GetTimerRate(a_Instance->m_MoveHandle));
+
 		for (const FOverlapResult& pullRes : pullOverlaps)
 		{
 			AActor* actor = pullRes.GetActor();
-			if (!actor || actor == nullptr) continue;
+			if (!actor) continue;
 
-			if (AEnemyCharacter* enemy = Cast<AEnemyCharacter>(actor))
+			AEnemyCharacter* enemy = Cast<AEnemyCharacter>(actor);
+			if (!enemy) continue;
+
+			
+			FHitResult losHit;
+			FCollisionQueryParams qp(SCENE_QUERY_STAT(TornadoPullLOS), false, enemy);
+			bool blocked = GetWorld()->LineTraceSingleByChannel(
+				losHit,
+				enemy->GetActorLocation(),
+				a_Instance->m_CurrPosition,
+				ECC_Visibility,
+				qp
+			);
+
+			if (blocked)
 			{
-				if (UPrimitiveComponent* root = Cast<UPrimitiveComponent>(enemy->GetRootComponent()))
-				{
-					FVector toCenter = (a_Instance->m_CurrPosition - enemy->GetActorLocation());
-					float dist = toCenter.Size();
-					toCenter.Normalize();
+				continue;
+			}
 
-					float speed = m_AttractionStrength * (1.0f - FMath::Clamp(dist / m_AttractionRadius, 0.0f, 1.0f));
-					enemy->SetActorLocation(enemy->GetActorLocation() + toCenter * speed * 0.01f);
-				}
+			FVector toCenter = a_Instance->m_CurrPosition - enemy->GetActorLocation();
+			float dist = toCenter.Size();
+			if (dist <= KINDA_SMALL_NUMBER) continue;
+
+			toCenter /= dist; 
+			float speed = m_AttractionStrength * (1.0f - FMath::Clamp(dist / m_AttractionRadius, 0.0f, 1.0f));
+			FVector delta = toCenter * speed * dt;
+
+
+			FHitResult sweepHit;
+			enemy->SetActorLocation(enemy->GetActorLocation() + delta, true, &sweepHit, ETeleportType::None);
+			if (sweepHit.IsValidBlockingHit())
+			{
+				FVector slide = FVector::VectorPlaneProject(delta, sweepHit.Normal);
+				enemy->SetActorLocation(enemy->GetActorLocation() + slide * (1.f - sweepHit.Time), true);
 			}
 		}
 	}
+
+
 
 	// vfx
 	if (a_Instance->m_VFXComp)
