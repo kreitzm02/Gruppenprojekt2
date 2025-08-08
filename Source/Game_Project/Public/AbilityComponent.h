@@ -40,6 +40,12 @@ public:
 	bool TryAddAbility(TSubclassOf<UBaseAbility> a_AbilityClass);
 
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
+	bool TryReplaceAbility(TSubclassOf<UBaseAbility> a_abilityClassToReplace, TSubclassOf<UBaseAbility> a_newAbilityClass);
+
+	UFUNCTION(BlueprintCallable, Category = "Abilities")
+	bool TryReplaceAbilityFromIndex(int a_indexToReplace, TSubclassOf<UBaseAbility> a_newAbilityClass);
+
+	UFUNCTION(BlueprintCallable, Category = "Abilities")
 	void RemoveAllAbilities();
 
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
