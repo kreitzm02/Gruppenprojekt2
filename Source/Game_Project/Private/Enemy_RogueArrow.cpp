@@ -2,7 +2,6 @@
 
 
 #include "Enemy_RogueArrow.h"
-
 #include "Components/BoxComponent.h"
 
 AEnemy_RogueArrow::AEnemy_RogueArrow()
@@ -14,6 +13,9 @@ AEnemy_RogueArrow::AEnemy_RogueArrow()
 	m_projectileHitbox->SetCollisionObjectType(ECC_WorldDynamic);
 	m_projectileHitbox->SetCollisionResponseToAllChannels(ECR_Block);
 	m_projectileHitbox->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Overlap);
+
+	m_niagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Visuals"));
+	m_niagaraComponent->SetupAttachment(RootComponent);
 
 	//RootComponent = m_projectileHitbox;
 

@@ -48,5 +48,6 @@ void ADungeonExitPortal::OnPortalEnter(UPrimitiveComponent* a_overlappedComponen
 	m_DungeonLevelStreamer->UnloadDungeon();
 	a_otherActor->SetActorLocation(Cast<UGame_GameInstance>(GetGameInstance())->GetLastOverworldPos());
 	ULoadingScreenManager::Get(GetWorld())->EndLoading();
+	Destroy();
 }
 
