@@ -101,6 +101,17 @@ void UDamageBallAbilityAction::MoveDamageBallTick(TSharedPtr<FDamageBallInstance
 			a_BallInstance->m_AlreadyHitActors.Empty();
 			return;
 		}
+		else if (!m_BouncesOfWalls && !hitActor->IsA<AEnemyCharacter>())
+		{
+			if (a_BallInstance->m_VFXComp)
+			{
+				a_BallInstance->m_VFXComp->DestroyComponent();
+				a_BallInstance->m_VFXComp = nullptr;
+			}
+			EndDamageBall(a_BallInstance);
+			UE_LOG(LogTemp, Warning, TEXT("Damage Ball after Wall Collision"));
+			return;
+		}
 	}
 
 	// enemy hit
@@ -113,7 +124,7 @@ void UDamageBallAbilityAction::MoveDamageBallTick(TSharedPtr<FDamageBallInstance
 		for (const FOverlapResult& result : overlaps)
 		{
 			AActor* hitActor = result.GetActor();
-			if (hitActor && hitActor != a_AbilityUser && !a_BallInstance->m_AlreadyHitActors.Contains(hitActor))
+			if (hitActor && hitActor != a_AbilityUser && hitActor->IsA<AEnemyCharacter>() && !a_BallInstance->m_AlreadyHitActors.Contains(hitActor))
 			{
 				a_BallInstance->m_AlreadyHitActors.Add(hitActor);
 				a_BallInstance->m_HitCount++;
