@@ -30,7 +30,7 @@ public:
 	void SetMeleeDamage(AActor* a_AbilityUser);
 
 private:
-
+	UPROPERTY()
 	UAnimMontage* m_AttackMontage;
 
 	FTimerHandle m_EndTimerHandle;

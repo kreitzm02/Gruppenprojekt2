@@ -114,6 +114,8 @@ void APlayerCharacter::BeginPlay()
 
 	gameInstance = Cast<UGame_GameInstance>(GetGameInstance());
 	gameInstance->OnSFXVolumeChanged.AddDynamic(this, &APlayerCharacter::HandleVolumeChanged);
+
+	m_CurrentAttackDamage = m_AttackDamage * Cast<UGame_GameInstance>(GetGameInstance())->m_playerSave->m_damageMultiplier + Cast<UGame_GameInstance>(GetGameInstance())->m_AdditionalDamage;
 }
 
 // Called every frame
@@ -391,7 +393,7 @@ void APlayerCharacter::SetupChangedPlayerClass()
 	if (m_MeleeHitBox)
 	{
 		m_MeleeHitBox->SetupAttachment(GetMesh(), TEXT("hand_r"));
-		m_MeleeHitBox->SetBoxExtent({ 2.5f,0.9f,0.8f });
+		m_MeleeHitBox->SetBoxExtent({ 2.5f,1.5f,0.8f });
 		m_MeleeHitBox->SetRelativeLocation({ -1.3f, 0.0f, -0.5f });
 		m_MeleeHitBox->SetVisibility(false);
 		m_MeleeHitBox->SetHiddenInGame(true);
@@ -445,7 +447,7 @@ void APlayerCharacter::SetupPlayer()
 	if (m_MeleeHitBox)
 	{
 		m_MeleeHitBox->SetupAttachment(GetMesh(), TEXT("hand_r"));
-		m_MeleeHitBox->SetBoxExtent({ 2.5f,0.9f,0.8f });;
+		m_MeleeHitBox->SetBoxExtent({ 2.5f,1.5f,0.8f });
 		m_MeleeHitBox->SetRelativeLocation({ -1.3f, 0.0f, -0.5f });
 		m_MeleeHitBox->SetVisibility(false);
 		m_MeleeHitBox->SetHiddenInGame(true);
@@ -492,11 +494,11 @@ void APlayerCharacter::SetupMeleeHitbox()
 {
 	m_MeleeHitBox = CreateDefaultSubobject<UBoxComponent>(TEXT("MeleeHitBox"));
 	m_MeleeHitBox->SetupAttachment(GetMesh(), TEXT("hand_r"));
-	m_MeleeHitBox->SetBoxExtent({ 2.5f,0.9f,0.8f });
+	m_MeleeHitBox->SetBoxExtent({ 2.5f,1.5f,0.8f });
 	m_MeleeHitBox->SetRelativeLocation({ -1.3f, 0.0f, -0.5f });
 	m_MeleeHitBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	m_MeleeHitBox->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel2);
-	m_MeleeHitBox->SetCollisionResponseToAllChannels(ECR_Overlap);
+	m_MeleeHitBox->SetCollisionResponseToAllChannels(ECR_Ignore);
 	m_MeleeHitBox->SetVisibility(false);
 	m_MeleeHitBox->SetHiddenInGame(true);
 	m_MeleeHitBox->OnComponentBeginOverlap.AddDynamic(this, &APlayerCharacter::OnHit);
@@ -656,14 +658,16 @@ void APlayerCharacter::HideAllWeaponsExcept(FName a_BoneName)
 
 void APlayerCharacter::HideMeleeHitbox()
 {
-	m_CurrentAttackDamage = 0.0f;
+	//m_CurrentAttackDamage = 0.0f;
 	UE_LOG(LogTemp, Error, TEXT("AAAAAAAAAAAAAAA"))
+	m_MeleeHitBox->SetCollisionResponseToAllChannels(ECR_Ignore);
 }
 
 void APlayerCharacter::ShowMeleeHitbox()
 {
-	m_CurrentAttackDamage = m_AttackDamage * Cast<UGame_GameInstance>(GetGameInstance())->m_playerSave->m_damageMultiplier + Cast<UGame_GameInstance>(GetGameInstance())->m_AdditionalDamage;
+	//m_CurrentAttackDamage = m_AttackDamage * Cast<UGame_GameInstance>(GetGameInstance())->m_playerSave->m_damageMultiplier + Cast<UGame_GameInstance>(GetGameInstance())->m_AdditionalDamage;
 	UE_LOG(LogTemp, Error, TEXT("BBBBBBBBBBBBBB"))
+	m_MeleeHitBox->SetCollisionResponseToAllChannels(ECR_Overlap);
 }
 
 #pragma endregion
