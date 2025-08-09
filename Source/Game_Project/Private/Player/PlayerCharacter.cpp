@@ -961,6 +961,9 @@ void APlayerCharacter::AddAbility(UMainAbilityContainerDataAsset* a_Ability, boo
 
 		m_PlayerAbilities->TryReplaceAbility(ability, newAbility);
 
+		UGame_GameInstance* gameInstance = Cast<UGame_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+		gameInstance->m_playerSave->m_AbilityClasses = m_PlayerAbilities->m_AbilityClasses;
+
 		GetWorld()->GetTimerManager().SetTimer(m_setAbilityOneIconTimer, this, &APlayerCharacter::SetAbilityOneIcon, 0.2f, false);
 		GetWorld()->GetTimerManager().SetTimer(m_setAbilityTwoIconTimer, this, &APlayerCharacter::SetAbilityTwoIcon, 0.2f, false);
 		GetWorld()->GetTimerManager().SetTimer(m_setAbilityThreeIconTimer, this, &APlayerCharacter::SetAbilityThreeIcon, 0.2f, false);

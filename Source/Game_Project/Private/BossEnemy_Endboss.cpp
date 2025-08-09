@@ -157,7 +157,7 @@ void ABossEnemy_Endboss::Tick(float DeltaTime)
 		{
 			m_ownActionSoundComp->Sound = m_basicAttackSound;
 			m_ownActionSoundComp->Play();
-			FireProjectileWithCount(m_player->GetActorLocation() - GetActorLocation(), m_currentProjectileSpawnPoint, m_multipleProjectileAtkCount);
+			FireProjectileWithCount(m_player->GetActorLocation() - GetActorLocation(), m_currentProjectileSpawnPoint, 5);
 			m_shotFired = true;
 		}
 
@@ -242,10 +242,21 @@ void ABossEnemy_Endboss::Tick(float DeltaTime)
 
 float ABossEnemy_Endboss::TakeDamage(float a_damageAmount, FDamageEvent const& a_damageEvent, AController* a_eventInstigator, AActor* a_damageCauser)
 {
-	m_currentHealth = FMath::Clamp(m_currentHealth - a_damageAmount, 0.0f, m_maxHealth);
+	if (!m_isInvulnerable)
+	{
+		m_currentHealth = FMath::Clamp(m_currentHealth - a_damageAmount, 0.0f, m_maxHealth);
 
-	m_currentDoStuffMultiplier = 1 + (1 - m_currentHealth / m_maxHealth) / m_maxMultiplierAtHPPercent * (m_doStuffMaxMultiplier - 1);
-	m_currentDoStuffMultiplier = FMath::Clamp(m_currentDoStuffMultiplier, 1.0f, m_doStuffMaxMultiplier);
+		m_currentDoStuffMultiplier = 1 + (1 - m_currentHealth / m_maxHealth) / m_maxMultiplierAtHPPercent * (m_doStuffMaxMultiplier - 1);
+		m_currentDoStuffMultiplier = FMath::Clamp(m_currentDoStuffMultiplier, 1.0f, m_doStuffMaxMultiplier);
+
+		UpdateHealthBar();
+
+		m_receivingActionSoundComp->Sound = m_hitSound;
+		m_receivingActionSoundComp->Play(0.0f);
+
+		GetWorld()->GetTimerManager().SetTimer(m_invulnarabilityTimerHandle, this, &ABossEnemy_Endboss::MakeThisVulnerable, m_invulnerableTime, false);
+	}
+
 
 	if (m_nextSpecialAtPercent >= m_currentHealth / m_maxHealth && !m_isDead)
 	{
@@ -263,10 +274,6 @@ float ABossEnemy_Endboss::TakeDamage(float a_damageAmount, FDamageEvent const& a
 		m_periodicBurnGroundStarted = true;
 	}
 
-	UpdateHealthBar();
-
-	m_receivingActionSoundComp->Sound = m_hitSound;
-	m_receivingActionSoundComp->Play(0.0f);
 
 	if (m_currentHealth <= 0.0f && !m_isDead)
 	{
@@ -287,14 +294,14 @@ float ABossEnemy_Endboss::TakeDamage(float a_damageAmount, FDamageEvent const& a
 void ABossEnemy_Endboss::ShowPlayerVictory()
 {
 	FTimerHandle resetGame;
-	GetWorld()->GetTimerManager().SetTimer(resetGame, this, &ABossEnemy_Endboss::ResetGame, 5.0f, false);
+	GetWorld()->GetTimerManager().SetTimer(resetGame, this, &ABossEnemy_Endboss::ResetGame, 3.0f, false);
 
 	//victory stuff
 }
 
 void ABossEnemy_Endboss::ResetGame()
 {
-	UGameplayStatics::OpenLevel(this,"MainHub1");
+	UGameplayStatics::OpenLevel(this, "MainHub1");
 }
 
 
@@ -394,24 +401,28 @@ void ABossEnemy_Endboss::FireProjectile(FVector a_targetDir, FVector a_spawnPoin
 	projectile->SetProjectileLifeSpan(m_projectileLifetime);
 	projectile->SetTargetDirection(a_targetDir);
 	UGameplayStatics::FinishSpawningActor(projectile, transform);
+	UE_LOG(LogTemp, Log, TEXT("Projectile Spawned"))
 }
 
 void ABossEnemy_Endboss::FireProjectileWithCount(FVector a_targetDir, FVector a_spawnPoint, int a_count)
 {
 	float rotation = m_multiProjectileSpaceDegree;
-
+	UE_LOG(LogTemp, Log, TEXT("Projectile Vector: %f,%f,%f"), a_targetDir.X, a_targetDir.Y, a_targetDir.Z)
 	for (int i = 0; i < a_count; i++)
 	{
 		if (i == 0)
 		{
+			
 			FireProjectile(a_targetDir, a_spawnPoint);
 		}
 		else if (i % 2 == 1)
 		{
+			UE_LOG(LogTemp, Log, TEXT("Rotated Vector: %f,%f,%f"), FRotator(0.0f, rotation, 0.0f).RotateVector(a_targetDir).X, FRotator(0.0f, rotation, 0.0f).RotateVector(a_targetDir).Y, FRotator(0.0f, rotation, 0.0f).RotateVector(a_targetDir).Z)
 			FireProjectile(FRotator(0.0f, rotation, 0.0f).RotateVector(a_targetDir), a_spawnPoint);
 		}
 		else if (i % 2 == 0)
 		{
+			UE_LOG(LogTemp, Log, TEXT("Rotated Vector: %f,%f,%f"), FRotator(0.0f, rotation * -1, 0.0f).RotateVector(a_targetDir).X, FRotator(0.0f, rotation, 0.0f).RotateVector(a_targetDir).Y, FRotator(0.0f, rotation, 0.0f).RotateVector(a_targetDir).Z)
 			FireProjectile(FRotator(0.0f, rotation * -1, 0.0f).RotateVector(a_targetDir), a_spawnPoint);
 			rotation += m_multiProjectileSpaceDegree;
 		}
