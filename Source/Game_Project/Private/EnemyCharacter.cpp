@@ -155,12 +155,17 @@ void AEnemyCharacter::UpdateHealthBar()
 
 float AEnemyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	m_currentHealth = FMath::Clamp(m_currentHealth - DamageAmount, 0.0f, m_maxHealth);
+	if (!m_isInvulnerable)
+	{
+		m_currentHealth = FMath::Clamp(m_currentHealth - DamageAmount, 0.0f, m_maxHealth);
 
-	UpdateHealthBar();
+		UpdateHealthBar();
 
-	m_receivingActionSoundComp->Sound = m_hitSound;
-	m_receivingActionSoundComp->Play(0.0f);
+		m_receivingActionSoundComp->Sound = m_hitSound;
+		m_receivingActionSoundComp->Play(0.0f);
+
+		GetWorld()->GetTimerManager().SetTimer(m_invulnarabilityTimerHandle, this, &AEnemyCharacter::MakeThisVulnerable, m_invulnerableTime, false);
+	}
 
 	if (m_currentHealth <= 0.0f && !m_isDead)
 	{

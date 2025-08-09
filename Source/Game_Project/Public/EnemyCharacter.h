@@ -86,10 +86,19 @@ protected:
 
 	virtual void OnDeath();
 
+	void MakeThisVulnerable() { m_isInvulnerable = false; }
+
 	UFUNCTION()
 	void HandleVolumeChanged(float a_newVolume);
 
 	bool m_isDead = false;
+
+	UPROPERTY(VisibleAnywhere, Category = "Enemy Properties")
+	float m_invulnerableTime = 0.1f;
+
+	FTimerHandle m_invulnarabilityTimerHandle;
+
+	bool m_isInvulnerable = false;
 
 	UPROPERTY()
 	UGame_GameInstance* m_gameInstance;

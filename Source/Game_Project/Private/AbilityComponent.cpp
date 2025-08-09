@@ -72,6 +72,49 @@ bool UAbilityComponent::TryAddAbility(TSubclassOf<UBaseAbility> a_AbilityClass)
 	return true;
 }
 
+bool UAbilityComponent::TryReplaceAbility(TSubclassOf<UBaseAbility> a_abilityClassToReplace, TSubclassOf<UBaseAbility> a_newAbilityClass)
+{
+	if (!a_abilityClassToReplace || !a_newAbilityClass || !GetOwner()) return false;
+	UE_LOG(LogTemp, Warning, TEXT("TryAddAbility was called"));
+
+	int index = 0;
+
+	for (UBaseAbility* existingAbility : m_Abilities)
+	{
+		if (existingAbility->GetClass() == a_abilityClassToReplace)
+		{
+			break;
+		}
+		else
+		{
+			index++;
+		}
+	}
+
+	if (index >= m_Abilities.Num()) return false;
+
+	UBaseAbility* newAbility = NewObject<UBaseAbility>(this, a_newAbilityClass);
+	if (!newAbility) return false;
+	UE_LOG(LogTemp, Warning, TEXT("Ability Replaced"));
+	m_Abilities[index] = newAbility;
+	m_AbilityClasses[index] = (a_newAbilityClass);
+	return true;
+}
+
+bool UAbilityComponent::TryReplaceAbilityFromIndex(int a_indexToReplace, TSubclassOf<UBaseAbility> a_newAbilityClass)
+{
+	if (a_indexToReplace >= m_Abilities.Num() || !a_newAbilityClass || !GetOwner()) return false;
+	UE_LOG(LogTemp, Warning, TEXT("TryAddAbility was called"));
+
+	UBaseAbility* newAbility = NewObject<UBaseAbility>(this, a_newAbilityClass);
+	if (!newAbility) return false;
+	UE_LOG(LogTemp, Warning, TEXT("Ability Replaced"));
+	m_Abilities[a_indexToReplace] = newAbility;
+	m_AbilityClasses[a_indexToReplace] = (a_newAbilityClass);
+	return true;
+}
+
+
 void UAbilityComponent::RemoveAllAbilities()
 {
 	for (UBaseAbility* ability : m_Abilities) ability->ForceEndAbility(this->GetOwner());

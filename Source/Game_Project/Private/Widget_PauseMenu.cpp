@@ -41,6 +41,9 @@ void UWidget_PauseMenu::EndCurrentRound()
 {
 	//reset player stats
 	//move to main hub
+	UGameplayStatics::OpenLevel(this, "MainHub1");
+	UGame_GameInstance* gameInstance = Cast<UGame_GameInstance>(GetGameInstance());
+	gameInstance->SetIsInLevel(false);
 }
 
 void UWidget_PauseMenu::QuitGame()

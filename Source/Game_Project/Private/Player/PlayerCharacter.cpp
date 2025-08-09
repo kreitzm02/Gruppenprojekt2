@@ -951,8 +951,24 @@ void APlayerCharacter::AddAbility(UMainAbilityContainerDataAsset* a_Ability, boo
 		int index = m_AbilityLevels.FindRef(abilityType);
 
 		if (index == abilityLvl) return; // ability is already lvl3
-		m_PlayerAbilities->RemoveAbility(ability); // removing the lower lvl ability
-		AddAbility(a_Ability, false); // adding the new ability
+
+		//m_PlayerAbilities->RemoveAbility(ability); // removing the lower lvl ability
+		//AddAbility(a_Ability, false); // adding the new ability
+
+		abilityType = a_Ability->GetAbilityType();
+		abilityLvl = m_AbilityLevels.FindRef(abilityType);
+		TSubclassOf<UBaseAbility> newAbility = a_Ability->GetAbility(abilityLvl);
+
+		m_PlayerAbilities->TryReplaceAbility(ability, newAbility);
+
+		UGame_GameInstance* gameInstance = Cast<UGame_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+		gameInstance->m_playerSave->m_AbilityClasses = m_PlayerAbilities->m_AbilityClasses;
+
+		GetWorld()->GetTimerManager().SetTimer(m_setAbilityOneIconTimer, this, &APlayerCharacter::SetAbilityOneIcon, 0.2f, false);
+		GetWorld()->GetTimerManager().SetTimer(m_setAbilityTwoIconTimer, this, &APlayerCharacter::SetAbilityTwoIcon, 0.2f, false);
+		GetWorld()->GetTimerManager().SetTimer(m_setAbilityThreeIconTimer, this, &APlayerCharacter::SetAbilityThreeIcon, 0.2f, false);
+		GetWorld()->GetTimerManager().SetTimer(m_setAbilityFourIconTimer, this, &APlayerCharacter::SetAbilityFourIcon, 0.2f, false);
+
 		return;
 	}
 	m_PlayerAbilities->TryAddAbility(ability);
@@ -978,9 +994,12 @@ void APlayerCharacter::ReplaceAbility(UMainAbilityContainerDataAsset* a_NewAbili
 	EAllAbilities abilityType = a_NewAbility->GetAbilityType();
 	int abilityLvl = m_AbilityLevels.FindRef(abilityType);
 	TSubclassOf<UBaseAbility> ability = a_NewAbility->GetAbility(abilityLvl);
-	m_PlayerAbilities->RemoveAbilityFromIndex(a_OldAbilitySlot);
-	m_AbilityNum--;
-	AddAbility(a_NewAbility, true);
+	//m_PlayerAbilities->RemoveAbilityFromIndex(a_OldAbilitySlot);
+	//m_AbilityNum--;
+	//AddAbility(a_NewAbility, true);
+
+	m_PlayerAbilities->TryReplaceAbilityFromIndex(a_OldAbilitySlot, ability);
+
 	GetWorld()->GetTimerManager().SetTimer(m_setAbilityOneIconTimer, this, &APlayerCharacter::SetAbilityOneIcon, 0.2f, false);
 	GetWorld()->GetTimerManager().SetTimer(m_setAbilityTwoIconTimer, this, &APlayerCharacter::SetAbilityTwoIcon, 0.2f, false);
 	GetWorld()->GetTimerManager().SetTimer(m_setAbilityThreeIconTimer, this, &APlayerCharacter::SetAbilityThreeIcon, 0.2f, false);
