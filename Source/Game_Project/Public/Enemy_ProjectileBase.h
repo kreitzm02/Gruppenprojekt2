@@ -30,7 +30,7 @@ public:
 
 	void SetTarget(AActor* a_target){ m_target = a_target; }
 
-	void SetTargetDirection(const FVector &a_target) { m_targetDirection = a_target; }
+	void SetTargetDirection(FVector a_target) { m_targetDirection = a_target; }
 
 	void SetProjectileSpeed(float a_projectileSpeed){ m_projectileSpeed = a_projectileSpeed; }
 

@@ -110,16 +110,20 @@ void ABossEnemy_Golem::PlayJumpSound(bool a_shouldLoop, float a_startPoint, floa
 
 float ABossEnemy_Golem::TakeDamage(float a_damageAmount, FDamageEvent const& a_damageEvent, AController* a_eventInstigator, AActor* a_damageCauser)
 {
-	m_currentHealth = FMath::Clamp(m_currentHealth - a_damageAmount, 0.0f, m_maxHealth);
+	if (!m_isInvulnerable)
+	{
+		m_currentHealth = FMath::Clamp(m_currentHealth - a_damageAmount, 0.0f, m_maxHealth);
 
-	m_currentDoStuffMultiplier = 1 + (1 - m_currentHealth / m_maxHealth) / m_maxMultiplierAtHPPercent * (m_doStuffMaxMultiplier - 1);
-	m_currentDoStuffMultiplier = FMath::Clamp(m_currentDoStuffMultiplier, 1.0f, m_doStuffMaxMultiplier);
+		m_currentDoStuffMultiplier = 1 + (1 - m_currentHealth / m_maxHealth) / m_maxMultiplierAtHPPercent * (m_doStuffMaxMultiplier - 1);
+		m_currentDoStuffMultiplier = FMath::Clamp(m_currentDoStuffMultiplier, 1.0f, m_doStuffMaxMultiplier);
 
+		UpdateHealthBar();
 
-	UpdateHealthBar();
+		m_receivingActionSoundComp->Sound = m_hitSound;
+		m_receivingActionSoundComp->Play(0.0f);
 
-	m_receivingActionSoundComp->Sound = m_hitSound;
-	m_receivingActionSoundComp->Play(0.0f);
+		GetWorld()->GetTimerManager().SetTimer(m_invulnarabilityTimerHandle, this, &ABossEnemy_Golem::MakeThisVulnerable, m_invulnerableTime, false);
+	}
 
 	if (m_currentHealth <= 0.0f && !m_isDead)
 	{
