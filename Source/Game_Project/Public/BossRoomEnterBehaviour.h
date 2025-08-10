@@ -39,6 +39,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<AActor*> m_DungeonDoors;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<AActor*> m_BossEnemies;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	USoundWave* m_BossMusic;
 

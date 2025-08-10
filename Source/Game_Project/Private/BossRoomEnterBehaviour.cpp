@@ -6,6 +6,10 @@
 #include "Engine/StaticMeshActor.h"
 #include "Components/AudioComponent.h"
 #include "DungeonDoorBehaviour.h"
+#include "BossEnemy_Golem.h"
+#include "BossEnemy_Mage.h"
+#include "BossEnemy_Rogue.h"
+#include "BossEnemy_Warrior.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -30,6 +34,17 @@ void ABossRoomEnterBehaviour::BeginPlay()
 {
 	Super::BeginPlay();
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ADungeonDoorBehaviour::StaticClass(), m_DungeonDoors);
+
+	TArray<AActor*> tempActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABossEnemy_Golem::StaticClass(), tempActors);
+	m_BossEnemies.Append(tempActors);
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABossEnemy_Mage::StaticClass(), tempActors);
+	m_BossEnemies.Append(tempActors);
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABossEnemy_Warrior::StaticClass(), tempActors);
+	m_BossEnemies.Append(tempActors);
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABossEnemy_Rogue::StaticClass(), tempActors);
+	m_BossEnemies.Append(tempActors);
+
 
 	TArray<AActor*> foundActors;
 	UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName("MusicTag"), foundActors);
@@ -66,6 +81,26 @@ void ABossRoomEnterBehaviour::OnTriggerOverlap(UPrimitiveComponent* OverlappedCo
 			if (ADungeonDoorBehaviour* door = Cast<ADungeonDoorBehaviour>(a))
 			{
 				door->m_ShouldOpen = true;
+			}
+		}
+
+		for (AActor* a : m_BossEnemies)
+		{
+			if (ABossEnemy_Rogue* rogue = Cast<ABossEnemy_Rogue>(a))
+			{
+				rogue->Activate();
+			}
+			else if (ABossEnemy_Mage* mage = Cast<ABossEnemy_Mage>(a))
+			{
+				mage->Activate();
+			}
+			else if (ABossEnemy_Warrior* warrior = Cast<ABossEnemy_Warrior>(a))
+			{
+				warrior->Activate();
+			}
+			else if (ABossEnemy_Golem* golem = Cast<ABossEnemy_Golem>(a))
+			{
+				golem->Activate();
 			}
 		}
 	}
