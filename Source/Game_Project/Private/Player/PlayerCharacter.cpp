@@ -317,7 +317,7 @@ void APlayerCharacter::ChangeToPlayerClassC()
 void APlayerCharacter::ChangeToPlayerClassD()
 {
 	//testing only!!
-	AddExperiencePoints(200);
+	//AddExperiencePoints(200);
 	//m_CurrentPlayerClass = 3;
 	//SetupChangedPlayerClass();
 }
