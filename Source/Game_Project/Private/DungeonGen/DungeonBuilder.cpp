@@ -521,6 +521,24 @@ void UDungeonBuilder::GenerateEnemies()
 		if (curType == ERoomType::EXIT || curType == ERoomType::ENTRANCE || curType == ERoomType::BOSS) continue;
 
 		FInt32Vector2 intPos = m_Data->m_AllRooms[i].GetRoomCenter();
+		if (m_Data->m_DungeonGrid[intPos.X][intPos.Y] != ECellType::FLOOR)
+		{
+			bool shouldBreak = false;
+			for (int x = m_Data->m_AllRooms[i].m_RoomOrigin.X; x < m_Data->m_AllRooms[i].m_RoomOrigin.X + m_Data->m_AllRooms[i].m_RoomCellLength; x++)
+			{
+				if (shouldBreak) break;
+				for (int y = m_Data->m_AllRooms[i].m_RoomOrigin.Y; y < m_Data->m_AllRooms[i].m_RoomOrigin.Y + m_Data->m_AllRooms[i].m_RoomCellWidth; y++)
+				{
+					if (m_Data->m_DungeonGrid[x][y] == ECellType::FLOOR)
+					{
+						intPos.X = x;
+						intPos.Y = y;
+						shouldBreak = true;
+						break;
+					}
+				}
+			}
+		}
 		FVector position = { (float)intPos.X * m_UnitSize, (float)intPos.Y * m_UnitSize, 0 };
 
 		int enemiesInRoom = FMath::RandRange(2, 5);
@@ -669,6 +687,7 @@ bool UDungeonBuilder::TryPlacePrefabCornerOrthoRotation(TArray<TArray<ECellType>
 
 void UDungeonBuilder::PlaceTorchAt(int32 a_X, int32 a_Y, const FVector& a_PositionOffset, const FRotator& a_RotationOffset)
 {
+	if (m_Data->m_DungeonGrid[a_X][a_Y] != ECellType::FLOOR) return;
 	FVector pos = FVector(a_X * m_UnitSize, a_Y * m_UnitSize, 150.0f);
 	pos += a_PositionOffset;
 

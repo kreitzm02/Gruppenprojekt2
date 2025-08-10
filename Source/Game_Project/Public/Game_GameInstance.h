@@ -78,6 +78,8 @@ public:
 
 	float m_AdditionalDamage = 0.0f;
 
+	float m_AdditionalDefense = 0.0f;
+
 	void SetLastOverworldPos(FVector a_lastPos) { m_lastPlayerOverworldPos = a_lastPos; }
 
 	FVector GetLastOverworldPos() { return m_lastPlayerOverworldPos; }

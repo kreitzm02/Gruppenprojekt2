@@ -22,8 +22,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Berserk Ability Action Settings", meta = (DisplayName = "Atk Points to Raise"))
 	float m_APAmount;
 
-	UPROPERTY(EditAnywhere, Category = "Berserk Ability Action Settings", meta = (DisplayName = "Defense to Reduce"))
-	float m_DPAmount;
+	UPROPERTY(EditAnywhere, Category = "Berserk Ability Action Settings", meta = (DisplayName = "Player Damage Per Second"))
+	float m_PlayerDamagePerSecond;
 
 	UPROPERTY(EditAnywhere, Category = "Berserk Ability Action Settings", meta = (DisplayName = "Duration"))
 	float m_Duration;
@@ -45,11 +45,12 @@ private:
 
 	FTimerHandle m_StartTimerHandle;
 	FTimerHandle m_MoveTimerHandle;
+	FTimerHandle m_DamageTimerHandle;
 	FTimerHandle m_EndTimerHandle;
 	UAnimMontage* m_AttackMontage;
 	UNiagaraComponent* m_VFXComp;
-	float m_SavedPlayerAP;
-	float m_SavedPlayerDP;
+	float m_SavedPlayerHP;
 	void PlayBerserk(AActor* a_AbilityUser);
 	void MoveBerserk(AActor* a_AbilityUser);
+	void GettingDamage(AActor* a_AbilityUser);
 };

@@ -33,11 +33,10 @@ void UShieldAbilityAction::PlayAbilityAction(AActor* a_AbilityUser)
 	Super::PlayAbilityAction(a_AbilityUser);
 	if (!m_ShieldVFX || !a_AbilityUser) return;
 
-	if (APlayerCharacter* player = Cast<APlayerCharacter>(a_AbilityUser))
+	UGame_GameInstance* gi = Cast<UGame_GameInstance>(a_AbilityUser->GetWorld()->GetGameInstance());
+	if (gi->m_AdditionalDefense < m_DPAmount)
 	{
-		m_SavedPlayerDP = player->GetPlayerDefense();
-
-		player->ChangeDefense(m_SavedPlayerDP + m_DPAmount);
+		gi->m_AdditionalDefense += m_DPAmount - gi->m_AdditionalDefense;
 	}
 
 	m_VFXComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(a_AbilityUser->GetWorld(), m_ShieldVFX, a_AbilityUser->GetActorLocation() - FVector(0.0f, 0.0f, 50.0f),
@@ -54,10 +53,12 @@ void UShieldAbilityAction::EndAbilityAction(AActor* a_AbilityUser)
 	m_VFXComp->DestroyComponent();
 	m_VFXComp = nullptr;
 
-	if (APlayerCharacter* player = Cast<APlayerCharacter>(a_AbilityUser))
+	UGame_GameInstance* gi = Cast<UGame_GameInstance>(a_AbilityUser->GetWorld()->GetGameInstance());
+	if (gi->m_AdditionalDefense == m_DPAmount)
 	{
-		player->ChangeDefense(m_SavedPlayerDP);
+		gi->m_AdditionalDefense = 0;
 	}
+
 	UE_LOG(LogTemp, Warning, TEXT("Shield Ability Action Ended"));
 }
 
