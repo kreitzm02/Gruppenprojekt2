@@ -36,8 +36,10 @@ void UMeleeAbilityAction::PlayAbilityAction(AActor* a_AbilityUser)
 		player->m_AnimInstance->Montage_Play(m_AttackMontage);
 		// sound
 		FTimerHandle setDamageDelayedTimerHandle;
+		FTimerHandle vfxEndTimerHandle;
 		FTimerHandle endTimerHandle;
-		player->GetWorld()->GetTimerManager().SetTimer(setDamageDelayedTimerHandle, FTimerDelegate::CreateUObject(this, &UMeleeAbilityAction::SetMeleeDamage, a_AbilityUser), m_AttackMontage->GetPlayLength() * 0.25f, false);
+		player->GetWorld()->GetTimerManager().SetTimer(setDamageDelayedTimerHandle, FTimerDelegate::CreateUObject(this, &UMeleeAbilityAction::SetMeleeDamage, a_AbilityUser), m_AttackMontage->GetPlayLength() * 0.3f, false);
+		player->GetWorld()->GetTimerManager().SetTimer(vfxEndTimerHandle, FTimerDelegate::CreateUObject(this, &UMeleeAbilityAction::DestroyMeleeVFX, a_AbilityUser), m_AttackMontage->GetPlayLength() * 0.7f, false);
 		player->GetWorld()->GetTimerManager().SetTimer(endTimerHandle, FTimerDelegate::CreateUObject(this, &UMeleeAbilityAction::EndAbilityAction, a_AbilityUser), m_AttackMontage->GetPlayLength(), false);
 		UE_LOG(LogTemp, Warning, TEXT("Player just used an ability that included melee ability action!"))
 	}
@@ -58,3 +60,12 @@ void UMeleeAbilityAction::SetMeleeDamage(AActor* a_AbilityUser)
 		player->ShowMeleeHitbox();
 	}
 }
+
+void UMeleeAbilityAction::DestroyMeleeVFX(AActor* a_AbilityUser)
+{
+	if (APlayerCharacter* player = Cast<APlayerCharacter>(a_AbilityUser))
+	{
+		player->DestroyMeleeVFX();
+	}
+}
+

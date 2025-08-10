@@ -37,6 +37,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Dungeon")
 	void UnloadDungeon();
 
+	bool ADungeonIsLoaded() { return m_LoadedDungeonInstance != nullptr;}
+
 private:
 
 	static ULevelStreamingDynamic* m_LoadedDungeonInstance;

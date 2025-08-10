@@ -68,6 +68,7 @@ void AMainHubPortal::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor*
 
         UGame_GameInstance* gameInstance = Cast<UGame_GameInstance>(GetGameInstance());
         gameInstance->StartGameTimer();
+        gameInstance->SetIsInLevel(true);
     }
 }
 

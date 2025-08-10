@@ -13,6 +13,8 @@
 #include <WLvlUpAbilitySelect.h>
 #include "WLvlUpAbilityReplace.h"
 #include <Widget_PauseMenu.h>
+
+#include "NiagaraSystem.h"
 #include "PlayerCharacter.generated.h"
 
 UCLASS()
@@ -70,6 +72,7 @@ public:
 
 	void HideMeleeHitbox();
 	void ShowMeleeHitbox();
+	void DestroyMeleeVFX();
 	void ClearAlreadyHitActors();
 
 	// take and deal damage
@@ -358,6 +361,12 @@ private:
 	TArray<UMainAbilityContainerDataAsset*> m_LvlUpAbilitySelection;
 
 	int32 m_AbilityToAddIndex;
+
+	UPROPERTY(EditAnywhere, Category = "Abilities")
+	UNiagaraSystem* m_meleeVFX;
+
+	UPROPERTY()
+	UNiagaraComponent* m_meleeVFXComp;
 	
 public:
 

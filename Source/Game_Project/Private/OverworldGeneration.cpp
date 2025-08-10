@@ -210,6 +210,8 @@ void AOverworldGeneration::BeginPlay()
                 if (roadStraightnessRandom <= m_roadStraightness)
                 {
                     selectedTile = 0;
+                    TArray<int> bigCurveRoadTiles = {};
+                    TArray<int> threeRoadTiles = {};
                     for (FTileRoadWithRotationData a_tile : possibleTiles)
                     {
                         
@@ -217,12 +219,31 @@ void AOverworldGeneration::BeginPlay()
                         {
                             break;
                         }
+                        else if (IsTileTileType(a_tile, RoadBigCurve))
+                        {
+                            bigCurveRoadTiles.Add(selectedTile);
+                        }
+                        else if (IsTileTileType(a_tile, RoadE) || IsTileTileType(a_tile, RoadYLeft) || IsTileTileType(a_tile, RoadYRight) || IsTileTileType(a_tile, RoadYWide))
+                        {
+                            threeRoadTiles.Add(selectedTile);
+                        }
                         selectedTile++;
                     }
 
                     if (selectedTile >= possibleTiles.Num())
                     {
-                        selectedTile = m_randomNumber.RandRange(0, possibleTiles.Num() - 1);
+                        if (bigCurveRoadTiles.Num() > 0)
+                        {
+                            selectedTile = bigCurveRoadTiles[m_randomNumber.RandRange(0, bigCurveRoadTiles.Num() - 1)];
+                        }
+                        else if (threeRoadTiles.Num() > 0)
+                        {
+                            selectedTile = threeRoadTiles[m_randomNumber.RandRange(0, threeRoadTiles.Num() - 1)];
+                        }
+                        else
+                        {
+                            selectedTile = m_randomNumber.RandRange(0, possibleTiles.Num() - 1);
+                        }
                     }
                 }
                 else
