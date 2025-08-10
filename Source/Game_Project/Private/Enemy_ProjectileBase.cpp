@@ -98,7 +98,7 @@ bool AEnemy_ProjectileBase::CheckForWallCollide()
 		);
 	}
 
-	if (hit)
+	if (hit && !hitResult.GetActor()->IsA(AEnemy_ProjectileBase::StaticClass()))
 	{
 		return true;
 	}
