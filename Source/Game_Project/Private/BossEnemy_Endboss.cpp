@@ -157,7 +157,7 @@ void ABossEnemy_Endboss::Tick(float DeltaTime)
 		{
 			m_ownActionSoundComp->Sound = m_basicAttackSound;
 			m_ownActionSoundComp->Play();
-			FireProjectileWithCount(m_player->GetActorLocation() - GetActorLocation(), m_currentProjectileSpawnPoint, 5);
+			FireProjectileWithCount(m_player->GetActorLocation() - GetActorLocation(), m_currentProjectileSpawnPoint, m_multipleProjectileAtkCount);
 			m_shotFired = true;
 		}
 

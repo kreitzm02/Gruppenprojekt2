@@ -66,9 +66,13 @@ bool UFSM_ConditionPlayerInRange::IsConditionMet(float a_deltaTime)
 	if (m_checkForInRange)
 	{
 		if (!hasOverlap) return false;
-		else
+		else if (Cast<AEnemyCharacter>(m_owner)->IsActivated())
 		{
 			return true;
+		}
+		else
+		{
+			return false;
 		}
 	}
 	else

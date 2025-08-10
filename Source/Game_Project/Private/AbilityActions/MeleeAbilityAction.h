@@ -28,7 +28,7 @@ public:
 	virtual void PlayAbilityAction(AActor* a_AbilityUser) override;
 	virtual void EndAbilityAction(AActor* a_AbilityUser) override;
 	void SetMeleeDamage(AActor* a_AbilityUser);
-
+	void DestroyMeleeVFX(AActor* a_AbilityUser);
 private:
 	UPROPERTY()
 	UAnimMontage* m_AttackMontage;

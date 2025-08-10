@@ -20,6 +20,8 @@
 #include <Game_GameInstance.h>
 
 #include "Enemy_ProjectileBase.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 
 #pragma region UNREAL METHODS
 // Sets default values
@@ -672,7 +674,23 @@ void APlayerCharacter::ShowMeleeHitbox()
 	//m_CurrentAttackDamage = m_AttackDamage * Cast<UGame_GameInstance>(GetGameInstance())->m_playerSave->m_damageMultiplier + Cast<UGame_GameInstance>(GetGameInstance())->m_AdditionalDamage;
 	UE_LOG(LogTemp, Error, TEXT("BBBBBBBBBBBBBB"))
 	m_MeleeHitBox->SetCollisionResponseToAllChannels(ECR_Overlap);
+	//if (m_meleeVFX)
+	//	m_meleeVFXComp = UNiagaraFunctionLibrary::SpawnSystemAttached(
+	//		m_meleeVFX,
+	//		m_MeleeHitBox,
+	//		NAME_None,
+	//		FVector(-1.5f,0.0f,0.5f),
+	//		FRotator::ZeroRotator,
+	//		EAttachLocation::SnapToTarget,
+	//		false
+	//	);
 }
+
+void APlayerCharacter::DestroyMeleeVFX()
+{
+	//m_meleeVFXComp->DestroyComponent();
+}
+
 
 #pragma endregion
 
