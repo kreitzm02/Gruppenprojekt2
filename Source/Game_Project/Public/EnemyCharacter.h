@@ -74,6 +74,10 @@ public:
 
 	float GetKnockback() { return m_knockback; }
 
+	bool IsActivated() { return m_isActivated; }
+
+	void Activate() { m_isActivated = true; }
+
 	UFUNCTION()
 	void PlayOwnSound(float a_startPoint);
 
@@ -192,4 +196,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
 	USoundWave* m_basicAttackSound = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
+	bool m_isActivated = true;
 };
