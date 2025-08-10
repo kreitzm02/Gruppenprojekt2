@@ -197,7 +197,15 @@ private:
 	float m_CurrentAttackDamage;
 
 	UPROPERTY(VisibleAnywhere)
+	float m_CurrentPlayerDefense;
+
+	UPROPERTY(VisibleAnywhere)
 	float m_PlayerStamina;
+
+	UFUNCTION()
+	void PlayerPassiveHealthRegen();
+
+	float m_HealthRegenTimer;
 
 	// leveling
 

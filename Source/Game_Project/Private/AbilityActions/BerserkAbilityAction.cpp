@@ -32,17 +32,12 @@ void UBerserkAbilityAction::PlayAbilityAction(AActor* a_AbilityUser)
 {
 	Super::PlayAbilityAction(a_AbilityUser);
 	if (!m_BerserkVFX || !a_AbilityUser) return;
-
-	if (APlayerCharacter* player = Cast<APlayerCharacter>(a_AbilityUser))
+	UGame_GameInstance* gi = Cast<UGame_GameInstance>(a_AbilityUser->GetWorld()->GetGameInstance());
+	if (gi->m_AdditionalDamage < m_APAmount)
 	{
-		m_SavedPlayerAP = player->GetPlayerAttackDamage();
-		m_SavedPlayerDP = player->GetPlayerDefense();
-
-		player->ChangeDefense(m_SavedPlayerDP - m_DPAmount);
+		gi->m_AdditionalDamage += m_APAmount - gi->m_AdditionalDamage;
 	}
-
-	Cast<UGame_GameInstance>(a_AbilityUser->GetWorld()->GetGameInstance())->m_AdditionalDamage = m_APAmount;
-
+		
 	m_VFXComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(a_AbilityUser->GetWorld(), m_BerserkVFX, a_AbilityUser->GetActorLocation() - FVector(0.0f, 0.0f, 50.0f),
 		FRotator::ZeroRotator, FVector(1.0f), false, true, ENCPoolMethod::None, true);
 
@@ -53,21 +48,28 @@ void UBerserkAbilityAction::EndAbilityAction(AActor* a_AbilityUser)
 {
 	a_AbilityUser->GetWorld()->GetTimerManager().ClearTimer(m_MoveTimerHandle);
 	a_AbilityUser->GetWorld()->GetTimerManager().ClearTimer(m_StartTimerHandle);
+	a_AbilityUser->GetWorld()->GetTimerManager().ClearTimer(m_DamageTimerHandle);
 	a_AbilityUser->GetWorld()->GetTimerManager().ClearTimer(m_EndTimerHandle);
 	m_VFXComp->DestroyComponent();
 	m_VFXComp = nullptr;
 
-	if (APlayerCharacter* player = Cast<APlayerCharacter>(a_AbilityUser))
+	UGame_GameInstance* gi = Cast<UGame_GameInstance>(a_AbilityUser->GetWorld()->GetGameInstance());
+	if (gi->m_AdditionalDamage == m_APAmount)
 	{
-		player->ChangeDefense(m_SavedPlayerDP);
+		gi->m_AdditionalDamage = 0;
 	}
-	Cast<UGame_GameInstance>(a_AbilityUser->GetWorld()->GetGameInstance())->m_AdditionalDamage = 0;
 	UE_LOG(LogTemp, Warning, TEXT("berserker Ability Action Ended"));
 }
 
 void UBerserkAbilityAction::PlayBerserk(AActor* a_AbilityUser)
 {
+	if (APlayerCharacter* player = Cast<APlayerCharacter>(a_AbilityUser))
+	{
+		m_SavedPlayerHP = player->GetPlayerHealth();
+	}
 	a_AbilityUser->GetWorld()->GetTimerManager().SetTimer(m_MoveTimerHandle, FTimerDelegate::CreateUObject(this, &UBerserkAbilityAction::MoveBerserk, a_AbilityUser), 0.01f, true);
+
+	a_AbilityUser->GetWorld()->GetTimerManager().SetTimer(m_DamageTimerHandle, FTimerDelegate::CreateUObject(this, &UBerserkAbilityAction::GettingDamage, a_AbilityUser), 1.0f, true);
 
 	UE_LOG(LogTemp, Warning, TEXT("Player just used an ability that included berserker ability action!"))
 
@@ -77,4 +79,20 @@ void UBerserkAbilityAction::PlayBerserk(AActor* a_AbilityUser)
 void UBerserkAbilityAction::MoveBerserk(AActor* a_AbilityUser)
 {
 	m_VFXComp->SetWorldLocation(a_AbilityUser->GetActorLocation() - FVector(0.0f, 0.0f, 50.0f));
+	if (APlayerCharacter* player = Cast<APlayerCharacter>(a_AbilityUser))
+	{
+		if (player->GetPlayerHealth() > m_SavedPlayerHP)
+		{
+			player->TryAddPlayerHealth((player->GetPlayerHealth() - m_SavedPlayerHP) * -1.0f);
+		}
+		m_SavedPlayerHP = player->GetPlayerHealth();
+	}
+}
+
+void UBerserkAbilityAction::GettingDamage(AActor* a_AbilityUser)
+{
+	if (APlayerCharacter* player = Cast<APlayerCharacter>(a_AbilityUser))
+	{
+		player->TryAddPlayerHealth(-m_PlayerDamagePerSecond);
+	}
 }
