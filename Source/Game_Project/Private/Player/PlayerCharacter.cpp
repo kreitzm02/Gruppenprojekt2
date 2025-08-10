@@ -71,7 +71,6 @@ void APlayerCharacter::BeginPlay()
 			AddAbilityDirect(abs[i]);
 		}
 		m_AbilityLevels = gameInstance->m_playerSave->m_AbilityLevels;
-		UE_LOG(LogTemp, Warning, TEXT("Getting Abilities from save file"))
 	}
 	else
 	{
@@ -114,8 +113,6 @@ void APlayerCharacter::BeginPlay()
 
 	gameInstance = Cast<UGame_GameInstance>(GetGameInstance());
 	gameInstance->OnSFXVolumeChanged.AddDynamic(this, &APlayerCharacter::HandleVolumeChanged);
-
-	m_CurrentAttackDamage = m_AttackDamage * Cast<UGame_GameInstance>(GetGameInstance())->m_playerSave->m_damageMultiplier + Cast<UGame_GameInstance>(GetGameInstance())->m_AdditionalDamage;
 }
 
 // Called every frame
@@ -150,7 +147,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 		m_AbilityCooldownTimes[i] = m_PlayerAbilities->GetRemainingCooldownFromAbility(i);
 		m_AbilityIcons[i] = m_PlayerAbilities->GetAbilityIcon(i);
 		m_AbilityNames[i] = m_PlayerAbilities->GetAbilityName(i);
-		UE_LOG(LogTemp, Warning, TEXT("Slot: %i, Ability: %s"), i, *m_PlayerAbilities->GetAbilityName(i).ToString())
+		//UE_LOG(LogTemp, Warning, TEXT("Slot: %i, Ability: %s"), i, *m_PlayerAbilities->GetAbilityName(i).ToString())
 		m_AbilityMaxCooldownTimes[i] = m_PlayerAbilities->GetAbilityCooldown(i);
 	}
 	UpdatePlayerStamina(DeltaTime, speed, movementThreshold);
@@ -180,8 +177,6 @@ void APlayerCharacter::Tick(float DeltaTime)
 		break;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Player Abilities: %i"), m_AbilityNum)
-
 	m_PlayerMaxHealth = m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_BaseHealthPoints * Cast<UGame_GameInstance>(GetGameInstance())->m_playerSave->GetPlayerHPMultiplier();
 
 	if (!m_playerIsHittable)
@@ -193,10 +188,8 @@ void APlayerCharacter::Tick(float DeltaTime)
 		}
 	}
 
-	UGame_GameInstance* gameInstance = Cast<UGame_GameInstance>(GetGameInstance());
-	gameInstance->PrintStackInfo();
-
-	UE_LOG(LogTemp,Error,TEXT("Needed Player XP: %i"), m_ExpLevelBarrier)
+	//UGame_GameInstance* gameInstance = Cast<UGame_GameInstance>(GetGameInstance());
+	//gameInstance->PrintStackInfo();
 
 	if (Controller && Controller->IsPlayerController())
 	{
@@ -208,6 +201,15 @@ void APlayerCharacter::Tick(float DeltaTime)
 			SetActorRotation(newRot);
 		}
 	}
+
+	m_HealthRegenTimer += DeltaTime;
+
+	if (m_HealthRegenTimer >= 1.0f)
+	{
+		PlayerPassiveHealthRegen();
+		m_HealthRegenTimer = 0.0f;
+	}
+	PlayerPassiveHealthRegen();
 }
 #pragma endregion
 
@@ -313,7 +315,7 @@ void APlayerCharacter::ChangeToPlayerClassC()
 void APlayerCharacter::ChangeToPlayerClassD()
 {
 	//testing only!!
-	//AddExperiencePoints(200);
+	AddExperiencePoints(200);
 	//m_CurrentPlayerClass = 3;
 	//SetupChangedPlayerClass();
 }
@@ -523,8 +525,9 @@ void APlayerCharacter::UpdatePlayerLevel()
 	m_PlayerLevelExp = FMath::Max(0, m_PlayerLevelExp - m_ExpLevelBarrier);
 	if (m_PlayerLvl < 25)
 	{
-		m_ExpLevelBarrier *= 1 + (((100 - 4 * m_PlayerLvl) / m_PlayerLvl) / 100);
-		m_ExpForLevelUp *= 1 + (((100 - 4 * m_PlayerLvl) / m_PlayerLvl) / 100);
+		float valueToAdd = ((100.0f - 4.0f * (float)m_PlayerLvl) / (float)m_PlayerLvl) / 100.0f;
+		m_ExpLevelBarrier *= 1.0f + valueToAdd;
+		m_ExpForLevelUp *= 1.0f + valueToAdd;
 	}
 	m_playerUIInstance->SetExpPercent(float(m_PlayerLevelExp) / m_ExpForLevelUp);
 	for (int i = 0; i < m_LvlUpAbilitySelection.Num(); i++)
@@ -532,8 +535,9 @@ void APlayerCharacter::UpdatePlayerLevel()
 		m_LvlUpAbilitySelection[i] = GetRandomAbilityFromPool();
 	}
 	ToggleLvlUpUI(true);
-	UE_LOG(LogTemp, Warning, TEXT("Player reached Level: %i"), m_PlayerLvl);
-	UE_LOG(LogTemp, Warning, TEXT("Player experience points: %i"), m_PlayerLevelExp);
+	UE_LOG(LogTemp, Error, TEXT("Player reached Level: %i"), m_PlayerLvl);
+	UE_LOG(LogTemp, Error, TEXT("Player experience points: %i"), m_PlayerLevelExp);
+	UE_LOG(LogTemp, Error, TEXT("Needed Player XP: %i"), m_ExpLevelBarrier)
 }
 
 #pragma endregion
@@ -683,9 +687,11 @@ void APlayerCharacter::ClearAlreadyHitActors()
 
 float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	float totalDmg = DamageAmount * (100 - m_PlayerDefense) / 100;
+	float totalDmg = 0.0f;
 	if (m_playerIsHittable)
 	{
+		m_CurrentPlayerDefense = m_PlayerDefense + Cast<UGame_GameInstance>(GetGameInstance())->m_AdditionalDefense;
+		totalDmg = DamageAmount * (100 - m_CurrentPlayerDefense) / 100;
 		UE_LOG(LogTemp, Warning, TEXT("player got damage: %f"), totalDmg)
 		UE_LOG(LogTemp, Warning, TEXT("Player health: %f"), m_PlayerHealth)
 		TryAddPlayerHealth(totalDmg * -1); // "adds" negative health
@@ -726,6 +732,7 @@ void APlayerCharacter::OnHit(UPrimitiveComponent* a_overlappedComponent, AActor*
 	{
 		if (m_AlreadyHitActors.Contains(a_otherActor)) return;
 		m_AlreadyHitActors.Add(a_otherActor);
+		m_CurrentAttackDamage = m_AttackDamage * Cast<UGame_GameInstance>(GetGameInstance())->m_playerSave->m_damageMultiplier + Cast<UGame_GameInstance>(GetGameInstance())->m_AdditionalDamage;
 		UGameplayStatics::ApplyDamage(a_otherActor, m_CurrentAttackDamage, GetController(), this, nullptr);
 		if (AEnemyCharacter* hitEnemy = Cast<AEnemyCharacter>(a_otherActor))
 		{
@@ -1157,6 +1164,11 @@ void APlayerCharacter::UpdatePlayerStamina(float a_DeltaTime, float a_Speed, flo
 	{
 		ChangePlayerStamina(5.5f * Cast<UGame_GameInstance>(GetGameInstance())->m_playerSave->GetPlayerStaminaRegenMultiplier() * a_DeltaTime);
 	}
+}
+
+void APlayerCharacter::PlayerPassiveHealthRegen()
+{
+	TryAddPlayerHealth(Cast<UGame_GameInstance>(GetGameInstance())->m_playerSave->m_healthRegen);
 }
 
 void APlayerCharacter::SetCurrentPlayerClass(int a_ClassIndex)

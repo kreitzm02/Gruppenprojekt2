@@ -43,7 +43,7 @@ void ULoadingScreenManager::EndLoading()
 {
     if (m_LoadingWidget)
     {
-        m_World->GetTimerManager().SetTimer(m_EndLoadingDelayTimer, FTimerDelegate::CreateUObject(this, &ULoadingScreenManager::EndLoadingDelegate), 2.0f, false);
+        m_World->GetTimerManager().SetTimer(m_EndLoadingDelayTimer, FTimerDelegate::CreateUObject(this, &ULoadingScreenManager::EndLoadingDelegate), 0.1f, false);
     }
 }
 
