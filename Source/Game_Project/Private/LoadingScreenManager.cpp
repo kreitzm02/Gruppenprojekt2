@@ -24,7 +24,7 @@ ULoadingScreenManager* ULoadingScreenManager::Get(UWorld* World)
 
 void ULoadingScreenManager::StartLoading(UWorld* a_World)
 {
-    if (!m_LoadingWidget && m_LoadingWidgetClass != nullptr)
+    if (!m_LoadingWidget && m_LoadingWidgetClass)
     {
         UClass* WidgetClass = m_LoadingWidgetClass.LoadSynchronous();
         if (WidgetClass)
