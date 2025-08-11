@@ -524,10 +524,10 @@ void UDungeonBuilder::GenerateEnemies()
 		if (m_Data->m_DungeonGrid[intPos.X][intPos.Y] != ECellType::FLOOR)
 		{
 			bool shouldBreak = false;
-			for (int x = m_Data->m_AllRooms[i].m_RoomOrigin.X; x < m_Data->m_AllRooms[i].m_RoomOrigin.X + m_Data->m_AllRooms[i].m_RoomCellLength; x++)
+			for (int x = m_Data->m_AllRooms[i].m_RoomOrigin.X + 1; x < m_Data->m_AllRooms[i].m_RoomOrigin.X + m_Data->m_AllRooms[i].m_RoomCellLength - 1; x++)
 			{
 				if (shouldBreak) break;
-				for (int y = m_Data->m_AllRooms[i].m_RoomOrigin.Y; y < m_Data->m_AllRooms[i].m_RoomOrigin.Y + m_Data->m_AllRooms[i].m_RoomCellWidth; y++)
+				for (int y = m_Data->m_AllRooms[i].m_RoomOrigin.Y + 1; y < m_Data->m_AllRooms[i].m_RoomOrigin.Y + m_Data->m_AllRooms[i].m_RoomCellWidth - 1; y++)
 				{
 					if (m_Data->m_DungeonGrid[x][y] == ECellType::FLOOR)
 					{
