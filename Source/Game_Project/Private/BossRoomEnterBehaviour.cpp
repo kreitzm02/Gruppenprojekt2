@@ -86,21 +86,9 @@ void ABossRoomEnterBehaviour::OnTriggerOverlap(UPrimitiveComponent* OverlappedCo
 
 		for (AActor* a : m_BossEnemies)
 		{
-			if (ABossEnemy_Rogue* rogue = Cast<ABossEnemy_Rogue>(a))
+			if (AEnemyCharacter* enemy = Cast<AEnemyCharacter>(a))
 			{
-				rogue->Activate();
-			}
-			else if (ABossEnemy_Mage* mage = Cast<ABossEnemy_Mage>(a))
-			{
-				mage->Activate();
-			}
-			else if (ABossEnemy_Warrior* warrior = Cast<ABossEnemy_Warrior>(a))
-			{
-				warrior->Activate();
-			}
-			else if (ABossEnemy_Golem* golem = Cast<ABossEnemy_Golem>(a))
-			{
-				golem->Activate();
+				enemy->Activate();
 			}
 		}
 	}
