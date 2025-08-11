@@ -163,9 +163,9 @@ void ADungeonGen::GenerateDungeon()
 	m_Builder->BuildWall();
 	//m_Builder->BuildDebugObjects();
 	m_Builder->BuildDecorationObjects();
+	m_Builder->SpawnBossEnemyRandom();
 	m_Builder->BuildBossRoom();
 	m_Builder->GenerateEnemies();
-	m_Builder->SpawnBossEnemyRandom();
 	m_Builder->BuildTorches();
 	BuildNavMeshForDungeon();
 	ULoadingScreenManager::Get(GetWorld())->EndLoading();
