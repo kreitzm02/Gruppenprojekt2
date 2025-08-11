@@ -773,6 +773,7 @@ void APlayerCharacter::CheckForDeath()
 		FTimerHandle deathDelayTimer;
 		float deathDelayBeforeRespawn = 3.0f;
 		UGame_GameInstance* gameInstance = Cast<UGame_GameInstance>(GetGameInstance());
+		gameInstance->StopTimer();
 
 		GetWorld()->GetTimerManager().SetTimer(deathDelayTimer, FTimerDelegate::CreateUObject(this, &APlayerCharacter::RespawnAfterDeath), deathDelayBeforeRespawn, false);
 	}
