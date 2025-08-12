@@ -69,6 +69,7 @@ bool UAbilityComponent::TryAddAbility(TSubclassOf<UBaseAbility> a_AbilityClass)
 	UE_LOG(LogTemp, Warning, TEXT("New ability added"));
 	m_Abilities.Add(newAbility);
 	m_AbilityClasses.Add(a_AbilityClass);
+
 	return true;
 }
 
@@ -98,6 +99,7 @@ bool UAbilityComponent::TryReplaceAbility(TSubclassOf<UBaseAbility> a_abilityCla
 	UE_LOG(LogTemp, Warning, TEXT("Ability Replaced"));
 	m_Abilities[index] = newAbility;
 	m_AbilityClasses[index] = (a_newAbilityClass);
+
 	return true;
 }
 
@@ -111,6 +113,7 @@ bool UAbilityComponent::TryReplaceAbilityFromIndex(int a_indexToReplace, TSubcla
 	UE_LOG(LogTemp, Warning, TEXT("Ability Replaced"));
 	m_Abilities[a_indexToReplace] = newAbility;
 	m_AbilityClasses[a_indexToReplace] = (a_newAbilityClass);
+
 	return true;
 }
 

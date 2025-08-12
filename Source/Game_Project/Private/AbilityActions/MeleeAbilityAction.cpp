@@ -50,6 +50,7 @@ void UMeleeAbilityAction::EndAbilityAction(AActor* a_AbilityUser)
 	if (APlayerCharacter* player = Cast<APlayerCharacter>(a_AbilityUser))
 	{
 		player->HideMeleeHitbox();
+		player->DestroyMeleeVFX();
 	}
 }
 
