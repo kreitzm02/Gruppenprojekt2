@@ -2,6 +2,8 @@
 
 
 #include "ShopNPC.h"
+#include <Kismet/GameplayStatics.h>
+#include "GameFramework/CharacterMovementComponent.h"
 void AShopNPC::Interact()
 {
     if (m_UIClass && !m_UI)
@@ -16,5 +18,5 @@ void AShopNPC::Interact()
         PC->bShowMouseCursor = true;
         PC->SetInputMode(FInputModeUIOnly());
     }
-    //UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.0f);
+    UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.0f);
 }

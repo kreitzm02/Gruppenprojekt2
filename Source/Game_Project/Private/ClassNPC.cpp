@@ -2,6 +2,7 @@
 
 
 #include "ClassNPC.h"
+#include <Kismet/GameplayStatics.h>
 
 void AClassNPC::Interact()
 {
@@ -17,5 +18,5 @@ void AClassNPC::Interact()
         PC->bShowMouseCursor = true;
         PC->SetInputMode(FInputModeUIOnly());
     }
-    //UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.0f);
+    UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.0f);
 }
