@@ -674,6 +674,10 @@ void APlayerCharacter::ShowMeleeHitbox()
 	//m_CurrentAttackDamage = m_AttackDamage * Cast<UGame_GameInstance>(GetGameInstance())->m_playerSave->m_damageMultiplier + Cast<UGame_GameInstance>(GetGameInstance())->m_AdditionalDamage;
 	UE_LOG(LogTemp, Error, TEXT("BBBBBBBBBBBBBB"))
 	m_MeleeHitBox->SetCollisionResponseToAllChannels(ECR_Overlap);
+	if (m_meleeVFXComp)
+	{
+		m_meleeVFXComp->DestroyComponent();
+	}
 	if (m_meleeVFX)
 		m_meleeVFXComp = UNiagaraFunctionLibrary::SpawnSystemAttached(
 			m_meleeVFX,
@@ -688,7 +692,10 @@ void APlayerCharacter::ShowMeleeHitbox()
 
 void APlayerCharacter::DestroyMeleeVFX()
 {
-	m_meleeVFXComp->DestroyComponent();
+	if (m_meleeVFXComp)
+	{
+		m_meleeVFXComp->DestroyComponent();
+	}
 }
 
 
@@ -995,6 +1002,8 @@ void APlayerCharacter::AddAbility(UMainAbilityContainerDataAsset* a_Ability, boo
 		GetWorld()->GetTimerManager().SetTimer(m_setAbilityThreeIconTimer, this, &APlayerCharacter::SetAbilityThreeIcon, 0.2f, false);
 		GetWorld()->GetTimerManager().SetTimer(m_setAbilityFourIconTimer, this, &APlayerCharacter::SetAbilityFourIcon, 0.2f, false);
 
+		m_PlayerAbilities->EquipAbility(m_CurrentAbilitySlot);
+
 		return;
 	}
 	m_PlayerAbilities->TryAddAbility(ability);
@@ -1007,6 +1016,9 @@ void APlayerCharacter::AddAbility(UMainAbilityContainerDataAsset* a_Ability, boo
 	GetWorld()->GetTimerManager().SetTimer(m_setAbilityTwoIconTimer, this, &APlayerCharacter::SetAbilityTwoIcon, 0.2f, false);
 	GetWorld()->GetTimerManager().SetTimer(m_setAbilityThreeIconTimer, this, &APlayerCharacter::SetAbilityThreeIcon, 0.2f, false);
 	GetWorld()->GetTimerManager().SetTimer(m_setAbilityFourIconTimer, this, &APlayerCharacter::SetAbilityFourIcon, 0.2f, false);
+
+	m_PlayerAbilities->EquipAbility(m_CurrentAbilitySlot);
+
 	return;
 }
 
@@ -1017,6 +1029,7 @@ void APlayerCharacter::ReplaceAbility(UMainAbilityContainerDataAsset* a_NewAbili
 		AddAbility(a_NewAbility, true);
 		return;
 	}
+
 	EAllAbilities abilityType = a_NewAbility->GetAbilityType();
 	int abilityLvl = m_AbilityLevels.FindRef(abilityType);
 	TSubclassOf<UBaseAbility> ability = a_NewAbility->GetAbility(abilityLvl);
@@ -1030,6 +1043,8 @@ void APlayerCharacter::ReplaceAbility(UMainAbilityContainerDataAsset* a_NewAbili
 	GetWorld()->GetTimerManager().SetTimer(m_setAbilityTwoIconTimer, this, &APlayerCharacter::SetAbilityTwoIcon, 0.2f, false);
 	GetWorld()->GetTimerManager().SetTimer(m_setAbilityThreeIconTimer, this, &APlayerCharacter::SetAbilityThreeIcon, 0.2f, false);
 	GetWorld()->GetTimerManager().SetTimer(m_setAbilityFourIconTimer, this, &APlayerCharacter::SetAbilityFourIcon, 0.2f, false);
+
+	m_PlayerAbilities->EquipAbility(m_CurrentAbilitySlot);
 }
 
 void APlayerCharacter::ChangeAbilityLevel(EAllAbilities a_Ability, int a_Value)
