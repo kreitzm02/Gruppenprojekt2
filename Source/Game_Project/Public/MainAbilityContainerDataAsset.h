@@ -34,7 +34,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "General Settings", meta = (DisplayName = "General Display Name"))
 	FString m_DisplayName;
 
-	UPROPERTY(EditAnywhere, Category = "General Settings", meta = (DisplayName = "Description"))
+	UPROPERTY(EditAnywhere, Category = "General Settings", meta = (DisplayName = "Description", MultiLine = "true"))
 	FText m_Description;
 
 	UPROPERTY(EditAnywhere, Category = "General Settings", meta = (DisplayName = "General Display Icon"))
