@@ -11,106 +11,65 @@ void UFSM_BossGolemJump::Initialize()
 	Super::Initialize();
 
 	ABossEnemy_Golem* enemy = Cast<ABossEnemy_Golem>(m_ownerCharacter);
-	m_jumpAnimation = enemy->GetJumpAnimation();
-	m_detectionRange = enemy->GetPlayerChaseRadius();
-	m_animationLength = m_jumpAnimation->GetPlayLength();
-	m_owner = enemy;
+	if (enemy)
+	{
+		m_jumpAnimation = enemy->GetJumpAnimation();
+		m_detectionRange = enemy->GetPlayerChaseRadius();
+		m_animationLength = m_jumpAnimation->GetPlayLength();
+		m_owner = enemy;
+	}
 }
 
 void UFSM_BossGolemJump::OnEnter()
 {
 	Super::OnEnter();
-
-	if (m_ownerCharacter == nullptr)
+	if (m_owner)
 	{
-		UE_LOG(LogTemp, Error, TEXT("Charge has no Owner Pawn!"))
-	}
-	else
-	{
-		TArray<FOverlapResult> overlaps;
-		FCollisionQueryParams queryParams;
-		queryParams.AddIgnoredActor(m_ownerCharacter);
-
-		FCollisionObjectQueryParams objectQueryParams;
-		objectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel1);
-
-		bool hasOverlap = m_ownerCharacter->GetWorld()->OverlapMultiByObjectType(
-			overlaps,
-			m_ownerCharacter->GetActorLocation(),
-			FQuat::Identity,
-			objectQueryParams,
-			FCollisionShape::MakeSphere(m_detectionRange),
-			queryParams
-		);
-		for (FOverlapResult& overlap : overlaps)
+		if (m_ownerCharacter == nullptr)
 		{
-			AActor* actor = overlap.GetActor();
-			if (actor && actor->IsA(ACharacter::StaticClass()))
-			{
-				m_player = Cast<ACharacter>(actor);
-			}
-		}
-	}
-
-	m_currentMultiplier = m_owner->GetMultiplier();
-
-	m_ownerSkeletalMesh->PlayAnimation(m_jumpAnimation, true);
-
-	if (UAnimSingleNodeInstance* node = m_ownerSkeletalMesh->GetSingleNodeInstance())
-	{
-		node->SetPlayRate(m_currentMultiplier);
-	}
-
-	m_isJumping = true;
-
-	m_jumpStartLocation = m_owner->GetActorLocation();
-
-	m_jumpToLocation = m_player->GetActorLocation();
-
-	m_ellapsedTime = 0.0f;
-
-	m_owner->PlayJumpSound(false);
-
-	m_owner->SetActorRotation((m_player->GetActorLocation() - m_owner->GetActorLocation()).Rotation());
-}
-
-void UFSM_BossGolemJump::OnUpdate(float a_deltatime)
-{
-	Super::OnUpdate(a_deltatime);
-
-	if (m_isJumping)
-	{
-		m_ellapsedTime += a_deltatime * m_currentMultiplier;
-		float alpha = m_ellapsedTime / m_animationLength;
-
-		alpha = FMath::Clamp(alpha,0.0f,1.0f);
-
-		if (alpha >= 1.0f)
-		{
-			m_isJumping = false;
-
-			m_owner->CreateJumpShockwave();
-
-			m_owner->AddUsedJump();
+			UE_LOG(LogTemp, Error, TEXT("Charge has no Owner Pawn!"))
 		}
 		else
 		{
-			FVector position = FMath::Lerp(m_jumpStartLocation, m_jumpToLocation, alpha);
+			TArray<FOverlapResult> overlaps;
+			FCollisionQueryParams queryParams;
+			queryParams.AddIgnoredActor(m_ownerCharacter);
 
-			position.Z = FMath::Sin(alpha * PI) * m_jumpHeight + m_owner->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+			FCollisionObjectQueryParams objectQueryParams;
+			objectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel1);
 
-			m_owner->SetActorLocation(position);
+			bool hasOverlap = m_ownerCharacter->GetWorld()->OverlapMultiByObjectType(
+				overlaps,
+				m_ownerCharacter->GetActorLocation(),
+				FQuat::Identity,
+				objectQueryParams,
+				FCollisionShape::MakeSphere(m_detectionRange),
+				queryParams
+			);
+			for (FOverlapResult& overlap : overlaps)
+			{
+				AActor* actor = overlap.GetActor();
+				if (actor && actor->IsA(ACharacter::StaticClass()))
+				{
+					m_player = Cast<ACharacter>(actor);
+				}
+			}
 		}
 
+		m_currentMultiplier = m_owner->GetMultiplier();
 
-	}
-	else
-	{
+		m_ownerSkeletalMesh->PlayAnimation(m_jumpAnimation, true);
+
+		if (UAnimSingleNodeInstance* node = m_ownerSkeletalMesh->GetSingleNodeInstance())
+		{
+			node->SetPlayRate(m_currentMultiplier);
+		}
+
+		m_isJumping = true;
+
 		m_jumpStartLocation = m_owner->GetActorLocation();
 
 		m_jumpToLocation = m_player->GetActorLocation();
-
-		m_isJumping = true;
 
 		m_ellapsedTime = 0.0f;
 
@@ -118,15 +77,64 @@ void UFSM_BossGolemJump::OnUpdate(float a_deltatime)
 
 		m_owner->SetActorRotation((m_player->GetActorLocation() - m_owner->GetActorLocation()).Rotation());
 	}
-	
+}
+
+void UFSM_BossGolemJump::OnUpdate(float a_deltatime)
+{
+	Super::OnUpdate(a_deltatime);
+	if (m_owner)
+	{
+		if (m_isJumping)
+		{
+			m_ellapsedTime += a_deltatime * m_currentMultiplier;
+			float alpha = m_ellapsedTime / m_animationLength;
+
+			alpha = FMath::Clamp(alpha, 0.0f, 1.0f);
+
+			if (alpha >= 1.0f)
+			{
+				m_isJumping = false;
+
+				m_owner->CreateJumpShockwave();
+
+				m_owner->AddUsedJump();
+			}
+			else
+			{
+				FVector position = FMath::Lerp(m_jumpStartLocation, m_jumpToLocation, alpha);
+
+				position.Z = FMath::Sin(alpha * PI) * m_jumpHeight + m_owner->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+
+				m_owner->SetActorLocation(position);
+			}
+
+
+		}
+		else
+		{
+			m_jumpStartLocation = m_owner->GetActorLocation();
+
+			m_jumpToLocation = m_player->GetActorLocation();
+
+			m_isJumping = true;
+
+			m_ellapsedTime = 0.0f;
+
+			m_owner->PlayJumpSound(false);
+
+			m_owner->SetActorRotation((m_player->GetActorLocation() - m_owner->GetActorLocation()).Rotation());
+		}
+	}
 
 }
 
 void UFSM_BossGolemJump::OnExit()
 {
 	Super::OnExit();
-
-	m_owner->ResetUsedJump();
-	m_owner->StopOwnSound();
-	m_owner->SetJumpReady(false);
+	if (m_owner)
+	{
+		m_owner->ResetUsedJump();
+		m_owner->StopOwnSound();
+		m_owner->SetJumpReady(false);
+	}
 }

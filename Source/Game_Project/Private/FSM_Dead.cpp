@@ -10,12 +10,17 @@ void UFSM_Dead::Initialize()
 {
 	Super::Initialize();
 	AEnemyCharacter* enemy = Cast<AEnemyCharacter>(m_ownerCharacter);
+
+	if (!enemy) return;
+
 	m_deathAnimation = enemy->GetDeathAnimation();
 }
 
 void UFSM_Dead::OnEnter()
 {
 	Super::OnEnter();
+
+	if (!m_ownerCharacter) return;
 
 	m_ownerSkeletalMesh->PlayAnimation(m_deathAnimation, false);
 

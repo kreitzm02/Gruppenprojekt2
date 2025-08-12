@@ -11,6 +11,9 @@ void UFSM_BossMageBurnGround::Initialize()
 	Super::Initialize();
 
 	m_owner = Cast<ABossEnemy_Mage>(m_ownerCharacter);
+
+	if (!m_owner) return;
+
 	m_castBurnGroundAnimation = m_owner->GetBurnGroundAnimation();
 	m_detectionRange = m_owner->GetPlayerChaseRadius();
 	m_animationLength = m_castBurnGroundAnimation->GetPlayLength();
@@ -20,7 +23,8 @@ void UFSM_BossMageBurnGround::OnEnter()
 {
 	Super::OnEnter();
 
-	
+	if (!m_owner) return;
+
 	m_ownerCharacter->GetCharacterMovement()->StopMovementImmediately();
 	
 
@@ -73,6 +77,8 @@ void UFSM_BossMageBurnGround::OnUpdate(float a_deltaTime)
 {
 	Super::OnUpdate(a_deltaTime);
 
+	if (!m_owner) return;
+
 	m_passedTime += a_deltaTime * m_currentMultiplier;
 
 	if (m_passedTime >= m_burnGroundAtAnimStartOffset && !m_burnGroundFired)
@@ -104,6 +110,9 @@ void UFSM_BossMageBurnGround::OnUpdate(float a_deltaTime)
 void UFSM_BossMageBurnGround::OnExit()
 {
 	Super::OnExit();
+
+	if (!m_owner) return;
+
 	m_owner->StopOwnSound();
 
 	m_owner->ResetUsedBurnGrounds();

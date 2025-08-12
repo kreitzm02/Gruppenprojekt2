@@ -14,6 +14,9 @@ void UFSM_IdleWalkAround::Initialize()
 {
     Super::Initialize();
     AEnemyCharacter* enemy = Cast<AEnemyCharacter>(m_ownerCharacter);
+
+    if (!enemy) return;
+
     m_walkAnimation = enemy->GetWalkAnimation();
 	m_walkSpeed = enemy->GetIdleWalkSpeed();
 }
@@ -21,6 +24,8 @@ void UFSM_IdleWalkAround::Initialize()
 void UFSM_IdleWalkAround::OnEnter()
 {
 	Super::OnEnter();
+
+    if (!m_ownerCharacter) return;
 
     //m_ownerSkeletalMesh->PlayAnimation(m_walkAnimation, true);
 
@@ -53,6 +58,8 @@ void UFSM_IdleWalkAround::OnUpdate(float a_deltaTime)
 void UFSM_IdleWalkAround::OnExit()
 {
 	Super::OnExit();
+
+    if (!m_ownerCharacter) return;
 
     if (ACharacter* character = Cast<ACharacter>(m_ownerCharacter))
     {

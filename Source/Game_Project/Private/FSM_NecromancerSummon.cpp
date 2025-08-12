@@ -11,12 +11,17 @@ void UFSM_NecromancerSummon::Initialize()
 	Super::Initialize();
 
 	m_thisEnemy = Cast<AEnemy_Necromancer>(m_ownerCharacter);
+
+	if (!m_thisEnemy) return;
+
 	m_summonAnimation = m_thisEnemy->GetSummonAnimation();
 }
 
 void UFSM_NecromancerSummon::OnEnter()
 {
 	Super::OnEnter();
+
+	if (!m_thisEnemy) return;
 
 	m_thisEnemy->GetCharacterMovement()->StopMovementImmediately();
 	m_ownerSkeletalMesh->PlayAnimation(m_summonAnimation, true);
@@ -32,6 +37,8 @@ void UFSM_NecromancerSummon::OnUpdate(float a_deltaTime)
 void UFSM_NecromancerSummon::OnExit()
 {
 	Super::OnExit();
+
+	if (!m_thisEnemy) return;
 
 	m_thisEnemy->SetSummonReady(false);
 }

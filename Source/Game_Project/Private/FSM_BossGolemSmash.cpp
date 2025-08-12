@@ -10,15 +10,18 @@ void UFSM_BossGolemSmash::Initialize()
 	Super::Initialize();
 
 	m_owner = Cast<ABossEnemy_Golem>(m_ownerCharacter);
-	m_smashAnimation = m_owner->GetSmashAnimation();
-	m_detectionRange = m_owner->GetPlayerChaseRadius();
-	m_animationLength = m_smashAnimation->GetPlayLength();
+	if (m_owner)
+	{
+		m_smashAnimation = m_owner->GetSmashAnimation();
+		m_detectionRange = m_owner->GetPlayerChaseRadius();
+		m_animationLength = m_smashAnimation->GetPlayLength();
+	}
 }
 
 void UFSM_BossGolemSmash::OnEnter()
 {
 	Super::OnEnter();
-
+	
 	if (m_ownerCharacter == nullptr)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Charge has no Owner Pawn!"))
@@ -48,60 +51,64 @@ void UFSM_BossGolemSmash::OnEnter()
 				m_player = Cast<ACharacter>(actor);
 			}
 		}
-	}
 
-	m_currentMultiplier = m_owner->GetMultiplier();
+		m_currentMultiplier = m_owner->GetMultiplier();
 
-	m_passedTime = 0.0f;
+		m_passedTime = 0.0f;
 
-	m_shockwaveStarted = false;
+		m_shockwaveStarted = false;
 
-	m_ownerSkeletalMesh->PlayAnimation(m_smashAnimation, false);
+		m_ownerSkeletalMesh->PlayAnimation(m_smashAnimation, false);
 
-	m_owner->PlaySmashAttackSound(false);
+		m_owner->PlaySmashAttackSound(false);
 
-	if (UAnimSingleNodeInstance* node = m_ownerSkeletalMesh->GetSingleNodeInstance())
-	{
-		node->SetPlayRate(m_currentMultiplier);
+		if (UAnimSingleNodeInstance* node = m_ownerSkeletalMesh->GetSingleNodeInstance())
+		{
+			node->SetPlayRate(m_currentMultiplier);
+		}
 	}
 }
 
 void UFSM_BossGolemSmash::OnUpdate(float a_deltaTime)
 {
 	Super::OnUpdate(a_deltaTime);
-
-	m_passedTime += a_deltaTime * m_currentMultiplier;
-
-	if (m_passedTime >= m_shockwaveAtAnimStartOffset && !m_shockwaveStarted)
+	if (m_owner)
 	{
-		m_owner->CreateSmashShockwaveWithBoulder(m_player);
-		m_shockwaveStarted = true;
-	}
+		m_passedTime += a_deltaTime * m_currentMultiplier;
 
-	if (m_passedTime >= m_animationLength)
-	{
-		m_passedTime = 0.0f;
-
-		m_owner->PlaySmashAttackSound(false);
-
-		m_ownerSkeletalMesh->PlayAnimation(m_smashAnimation, false);
-
-		if (UAnimSingleNodeInstance* node = m_ownerSkeletalMesh->GetSingleNodeInstance())
+		if (m_passedTime >= m_shockwaveAtAnimStartOffset && !m_shockwaveStarted)
 		{
-			node->SetPlayRate(m_currentMultiplier);
+			m_owner->CreateSmashShockwaveWithBoulder(m_player);
+			m_shockwaveStarted = true;
 		}
 
-		m_shockwaveStarted = false;
+		if (m_passedTime >= m_animationLength)
+		{
+			m_passedTime = 0.0f;
 
-		m_owner->AddUsedSmash();
+			m_owner->PlaySmashAttackSound(false);
+
+			m_ownerSkeletalMesh->PlayAnimation(m_smashAnimation, false);
+
+			if (UAnimSingleNodeInstance* node = m_ownerSkeletalMesh->GetSingleNodeInstance())
+			{
+				node->SetPlayRate(m_currentMultiplier);
+			}
+
+			m_shockwaveStarted = false;
+
+			m_owner->AddUsedSmash();
+		}
 	}
 }
 
 void UFSM_BossGolemSmash::OnExit()
 {
 	Super::OnExit();
+	if (m_owner)
+	{
+		m_owner->ResetUsedSmash();
 
-	m_owner->ResetUsedSmash();
-
-	m_owner->SetSmashReady(false);
+		m_owner->SetSmashReady(false);
+	}
 }

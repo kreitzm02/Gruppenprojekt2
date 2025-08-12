@@ -13,6 +13,9 @@ void UFSM_WarriorCharge::Initialize()
 {
 	Super::Initialize();
 	AEnemy_Warrior* enemy = Cast<AEnemy_Warrior>(m_ownerCharacter);
+
+	if (!enemy) return;
+
 	m_chargeAnimation = enemy->GetChargeAnimation();
 	m_chargeSpeed = enemy->GetChargeSpeed();
 	m_chaseRange = enemy->GetPlayerChaseRadius();
@@ -21,6 +24,8 @@ void UFSM_WarriorCharge::Initialize()
 void UFSM_WarriorCharge::OnEnter()
 {
 	Super::OnEnter();
+
+	if (!m_ownerCharacter) return;
 
 	m_ownerSkeletalMesh->PlayAnimation(m_chargeAnimation, true);
 
@@ -62,6 +67,8 @@ void UFSM_WarriorCharge::OnUpdate(float a_deltatime)
 {
 	Super::OnUpdate(a_deltatime);
 
+	if (!m_ownerCharacter) return;
+
 	AAIController* aiController = Cast<AAIController>(m_ownerCharacter->GetController());
 	if (aiController)
 	{
@@ -80,6 +87,8 @@ void UFSM_WarriorCharge::OnUpdate(float a_deltatime)
 void UFSM_WarriorCharge::OnExit()
 {
 	Super::OnExit();
+
+	if (!m_ownerCharacter) return;
 
 	AEnemy_Warrior* enemy = Cast<AEnemy_Warrior>(m_ownerCharacter);
 	enemy->SetChargeReady(false);

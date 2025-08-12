@@ -11,6 +11,9 @@ void UFSM_BossMageFireball::Initialize()
 {
 	Super::Initialize();
 	m_thisEnemy = Cast<ABossEnemy_Mage>(m_ownerCharacter);
+
+	if (!m_thisEnemy) return;
+
 	m_castShootAnimation = m_thisEnemy->GetFireballCastAnimation();
 	m_castingAnimation = m_thisEnemy->GetFireballCastingAnimation();
 	m_thisEnemy->SetFireballCastTime(m_castingAnimation->GetPlayLength() * m_castingLoopsUntilFireball + m_castShootAnimation->GetPlayLength());
@@ -21,6 +24,8 @@ void UFSM_BossMageFireball::Initialize()
 void UFSM_BossMageFireball::OnEnter()
 {
 	Super::OnEnter();
+
+	if (!m_thisEnemy) return;
 
 	m_ownerCharacter->GetCharacterMovement()->StopMovementImmediately();
 
@@ -67,6 +72,8 @@ void UFSM_BossMageFireball::OnUpdate(float a_deltaTime)
 {
 	Super::OnUpdate(a_deltaTime);
 
+	if (!m_thisEnemy) return;
+
 	FVector playerDirection = m_player->GetActorLocation() - m_ownerCharacter->GetActorLocation();
 	playerDirection.Z = 0.0f;
 	m_ownerCharacter->SetActorRotation(playerDirection.Rotation());
@@ -92,6 +99,9 @@ void UFSM_BossMageFireball::OnUpdate(float a_deltaTime)
 void UFSM_BossMageFireball::OnExit()
 {
 	Super::OnExit();
+
+	if (!m_thisEnemy) return;
+
 	m_thisEnemy->StopOwnSound();
 	m_thisEnemy->SetFireballReady(false);
 }

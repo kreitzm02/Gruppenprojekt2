@@ -68,8 +68,8 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Projectile Settings")
 	float m_knockback = 400.0f;
 
-	UPROPERTY(EditAnywhere, Category = "Projectile Settings")
-	float m_damage = 1.0f;
+	//UPROPERTY(EditAnywhere, Category = "Projectile Settings")
+	//float m_damage = 1.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Projectile Settings")
 	float m_lineTraceLenght = 1.0f;
