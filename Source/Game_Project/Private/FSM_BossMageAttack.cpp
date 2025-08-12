@@ -11,6 +11,9 @@ void UFSM_BossMageAttack::Initialize()
 	Super::Initialize();
 
 	m_thisEnemy = Cast<ABossEnemy_Mage>(m_ownerCharacter);
+
+	if (!m_thisEnemy) return;
+
 	m_attackAnimation = m_thisEnemy->GetAttackAnimation();
 
 	m_animDuration = m_attackAnimation->GetPlayLength();
@@ -19,6 +22,8 @@ void UFSM_BossMageAttack::Initialize()
 void UFSM_BossMageAttack::OnEnter()
 {
 	Super::OnEnter();
+
+	if (!m_thisEnemy) return;
 
 	if (ACharacter* character = Cast<ACharacter>(m_ownerCharacter))
 	{
@@ -61,6 +66,8 @@ void UFSM_BossMageAttack::OnUpdate(float a_deltaTime)
 {
 	Super::OnUpdate(a_deltaTime);
 
+	if (!m_thisEnemy) return;
+
 	if (m_player)
 	{
 		FVector playerDirection = m_player->GetActorLocation() - m_ownerCharacter->GetActorLocation();
@@ -92,5 +99,8 @@ void UFSM_BossMageAttack::OnUpdate(float a_deltaTime)
 void UFSM_BossMageAttack::OnExit()
 {
 	Super::OnExit();
+
+	if (!m_thisEnemy) return;
+
 	m_thisEnemy->StopOwnSound();
 }

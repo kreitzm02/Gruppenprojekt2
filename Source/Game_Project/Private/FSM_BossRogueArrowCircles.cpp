@@ -12,6 +12,9 @@ void UFSM_BossRogueArrowCircles::Initialize()
 	Super::Initialize();
 
 	m_thisEnemy = Cast<ABossEnemy_Rogue>(m_ownerCharacter);
+
+	if (!m_thisEnemy) return;
+
 	m_attackAnimation = m_thisEnemy->GetAttackWOReloadAnimation();
 	m_spawnPoint = m_thisEnemy->GetActorLocation();
 	UE_LOG(LogTemp,Warning,TEXT("boss spawnpoint is: %f  %f  %f"), m_spawnPoint.X, m_spawnPoint.Y, m_spawnPoint.Z)
@@ -20,6 +23,8 @@ void UFSM_BossRogueArrowCircles::Initialize()
 void UFSM_BossRogueArrowCircles::OnEnter()
 {
 	Super::OnEnter();
+
+	if (!m_thisEnemy) return;
 
 	m_spawnPoint.Z = m_thisEnemy->GetActorLocation().Z;
 	UE_LOG(LogTemp, Warning, TEXT("boss spawnpoint is: %f  %f  %f"), m_spawnPoint.X, m_spawnPoint.Y, m_spawnPoint.Z)
@@ -43,6 +48,8 @@ void UFSM_BossRogueArrowCircles::OnEnter()
 void UFSM_BossRogueArrowCircles::OnUpdate(float a_deltaTime)
 {
 	Super::OnUpdate(a_deltaTime);
+
+	if (!m_thisEnemy) return;
 
 	if(!m_movedToSpawn)
 	{
@@ -96,6 +103,9 @@ void UFSM_BossRogueArrowCircles::OnUpdate(float a_deltaTime)
 void UFSM_BossRogueArrowCircles::OnExit()
 {
 	m_movedToSpawn = false;
+
+	if (!m_thisEnemy) return;
+
 	m_thisEnemy->SetArrowCircleReady(false);
 	m_thisEnemy->GetCharacterMovement()->MaxWalkSpeed = m_thisEnemy->GetChaseWalkSpeed();
 	m_thisEnemy->StopOwnSound();

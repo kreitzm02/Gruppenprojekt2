@@ -88,6 +88,7 @@ void AEnemy_GolemShockwave::Tick(float DeltaTime)
 		{
 			if (!m_hitPlayer)
 			{
+				if (m_enemyCharacter)
 				UGameplayStatics::ApplyDamage(actor, m_enemyCharacter->GetAttackDamage(), m_enemyCharacter->GetController(), this, nullptr);
 				m_hitPlayer = true;
 			}
@@ -105,6 +106,7 @@ void AEnemy_GolemShockwave::OnHit(UPrimitiveComponent* a_overlappedComponent, AA
 		{
 			if (!m_hitPlayer)
 			{
+				if (m_enemyCharacter)
 				UGameplayStatics::ApplyDamage(a_otherActor, m_enemyCharacter->GetAttackDamage(), m_enemyCharacter->GetController(), this, nullptr);
 				m_hitPlayer = true;
 			}

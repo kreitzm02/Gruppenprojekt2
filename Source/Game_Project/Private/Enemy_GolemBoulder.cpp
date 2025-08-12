@@ -66,6 +66,7 @@ void AEnemy_GolemBoulder::OnHit(UPrimitiveComponent* a_overlappedComponent, AAct
 		{
 			if (a_otherComp->GetCollisionObjectType() == ECC_GameTraceChannel1)
 			{
+				if (m_owner)
 				UGameplayStatics::ApplyDamage(a_otherActor, m_owner->GetAttackDamage(), m_owner->GetController(), this, nullptr);
 				DestroyBoulder();
 			}

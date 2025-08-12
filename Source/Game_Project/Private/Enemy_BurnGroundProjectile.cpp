@@ -157,9 +157,15 @@ void AEnemy_BurnGroundProjectile::OnHit()
 	
 	if (m_passedTimeLastDmgInterval >= m_possibleDamageIntervalInSec)
 	{
-		UGameplayStatics::ApplyDamage(m_overlappedActor, m_owner->GetAttackDamage(), m_owner->GetController(), this, nullptr);
-		m_passedTimeLastDmgInterval = 0.0f;
-		UE_LOG(LogTemp,Error,TEXT("player hit by burning ground"))
+		if (m_owner)
+		{
+			m_owner->SetKnockback(m_knockback);
+			UGameplayStatics::ApplyDamage(m_overlappedActor, m_owner->GetAttackDamage(), m_owner->GetController(), this, nullptr);
+			m_owner->ResetKnockback();
+			m_passedTimeLastDmgInterval = 0.0f;
+			UE_LOG(LogTemp,Error,TEXT("player hit by burning ground"))
+		}
+		
 	}
 
 }

@@ -99,6 +99,8 @@ void AEnemyCharacter::BeginPlay()
 	m_receivingActionSoundComp->SetVolumeMultiplier(m_gameInstance->GetSFXVolume());
 
 	m_gameInstance->OnSFXVolumeChanged.AddDynamic(this, &AEnemyCharacter::HandleVolumeChanged);
+
+	m_defaultKnockback = m_knockback;
 }
 
 // Called every frame
@@ -149,6 +151,7 @@ void AEnemyCharacter::StopOwnSound()
 void AEnemyCharacter::UpdateHealthBar()
 {
 	float healthPercent = m_currentHealth / m_maxHealth;
+	if (m_widgetHealthBar)
 	m_widgetHealthBar->SetHealthPercent(healthPercent);
 }
 
@@ -225,7 +228,6 @@ void AEnemyCharacter::OnHit(UPrimitiveComponent* a_overlappedComponent, AActor* 
 	{
 		if (a_otherComp->GetCollisionObjectType() == ECC_GameTraceChannel1)
 		{
-			//this->m_weaponHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			UGameplayStatics::ApplyDamage(a_otherActor, m_attackDamage, GetController(), this, nullptr);
 			UE_LOG(LogTemp, Warning, TEXT("Enemy hit a player"))
 		}

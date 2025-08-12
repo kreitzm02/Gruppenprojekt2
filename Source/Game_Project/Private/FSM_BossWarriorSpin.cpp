@@ -12,6 +12,9 @@ void UFSM_BossWarriorSpin::Initialize()
 {
 	Super::Initialize();
 	ABossEnemy_Warrior* enemy = Cast<ABossEnemy_Warrior>(m_ownerCharacter);
+
+	if (!enemy) return;
+
 	m_chargeAnimation = enemy->GetSpinAnimation();
 	m_spinSpeed = enemy->GetSpinSpeed();
 	m_detectionRange = enemy->GetPlayerChaseRadius();
@@ -21,6 +24,8 @@ void UFSM_BossWarriorSpin::Initialize()
 void UFSM_BossWarriorSpin::OnEnter()
 {
 	Super::OnEnter();
+
+	if (!m_owner) return;
 
 	m_ownerSkeletalMesh->PlayAnimation(m_chargeAnimation, true);
 
@@ -67,6 +72,8 @@ void UFSM_BossWarriorSpin::OnEnter()
 void UFSM_BossWarriorSpin::OnUpdate(float a_deltatime)
 {
 	Super::OnUpdate(a_deltatime);
+
+	if (!m_owner) return;
 
 	m_ownerCharacter->AddMovementInput(m_spinDirectionNormal);
 
@@ -124,6 +131,9 @@ void UFSM_BossWarriorSpin::OnUpdate(float a_deltatime)
 void UFSM_BossWarriorSpin::OnExit()
 {
 	Super::OnExit();
+
+	if (!m_owner) return;
+
 	m_owner->StopOwnSound();
 	m_owner->SetSpinReady(false);
 }

@@ -8,6 +8,9 @@ void UFSM_GolemSmash::Initialize()
 	Super::Initialize();
 
 	m_thisEnemy = Cast<AEnemy_Golem>(m_ownerCharacter);
+
+	if (!m_thisEnemy) return;
+
 	m_smashAnimation = m_thisEnemy->GetSmashAnimation();
 	m_thisEnemy->SetSmashDuration(m_smashAnimation->GetPlayLength());
 }
@@ -15,6 +18,8 @@ void UFSM_GolemSmash::Initialize()
 void UFSM_GolemSmash::OnEnter()
 {
 	Super::OnEnter();
+
+	if (!m_thisEnemy) return;
 
 	m_passedTime = 0.0f;
 	m_shockwaveStarted = false;
@@ -26,6 +31,8 @@ void UFSM_GolemSmash::OnEnter()
 void UFSM_GolemSmash::OnUpdate(float a_deltaTime)
 {
 	Super::OnUpdate(a_deltaTime);
+
+	if (!m_thisEnemy) return;
 
 	m_passedTime += a_deltaTime;
 
@@ -45,6 +52,9 @@ void UFSM_GolemSmash::OnUpdate(float a_deltaTime)
 void UFSM_GolemSmash::OnExit()
 {
 	Super::OnExit();
+
+	if (!m_thisEnemy) return;
+
 	m_thisEnemy->StopOwnSound();
 	m_thisEnemy->SetSmashReady(false);
 }

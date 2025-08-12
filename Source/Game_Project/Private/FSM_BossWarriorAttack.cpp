@@ -8,12 +8,19 @@
 void UFSM_BossWarriorAttack::Initialize()
 {
 	Super::Initialize();
+
 	m_thisEnemy = Cast<ABossEnemy_Warrior>(m_ownerCharacter);
+
+	if (!m_thisEnemy) return;
+
 	m_attackAnimation = m_thisEnemy->GetAttackAnimation();
 }
 
 void UFSM_BossWarriorAttack::OnEnter()
 {
+
+	if (!m_thisEnemy) return;
+
 	if (ACharacter* character = Cast<ACharacter>(m_ownerCharacter))
 	{
 		character->GetCharacterMovement()->StopMovementImmediately();
@@ -26,6 +33,8 @@ void UFSM_BossWarriorAttack::OnEnter()
 void UFSM_BossWarriorAttack::OnUpdate(float a_deltaTime)
 {
 	Super::OnUpdate(a_deltaTime);
+
+	if (!m_thisEnemy) return;
 
 	m_passedTime += a_deltaTime;
 
@@ -49,6 +58,8 @@ void UFSM_BossWarriorAttack::OnUpdate(float a_deltaTime)
 void UFSM_BossWarriorAttack::OnExit()
 {
 	Super::OnExit();
+
+	if (!m_thisEnemy) return;
 
 	m_thisEnemy->GetWeaponHitbox()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }

@@ -40,13 +40,14 @@ void AEnemy_MageFireballProjectile::BeginPlay()
 void AEnemy_MageFireballProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	m_targetDirection = m_target->GetActorLocation() - this->GetActorLocation();
-	m_targetDirection.Z = 0.0f;
-	m_targetDirection.Normalize();
-	this->SetActorRotation(m_targetDirection.Rotation());
-	MoveInDirection(DeltaTime);
-
-	
+	if (m_target)
+	{
+		m_targetDirection = m_target->GetActorLocation() - this->GetActorLocation();
+		m_targetDirection.Z = 0.0f;
+		m_targetDirection.Normalize();
+		this->SetActorRotation(m_targetDirection.Rotation());
+		MoveInDirection(DeltaTime);
+	}
 }
 
 void AEnemy_MageFireballProjectile::MoveInDirection(float a_deltaTime)

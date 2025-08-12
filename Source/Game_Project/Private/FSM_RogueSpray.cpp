@@ -12,12 +12,17 @@ void UFSM_RogueSpray::Initialize()
 	Super::Initialize();
 
 	m_thisEnemy = Cast<AEnemy_Rogue>(m_ownerCharacter);
+
+	if (!m_thisEnemy) return;
+
 	m_attackAnimation = m_thisEnemy->GetArrowSprayAnimation();
 }
 
 void UFSM_RogueSpray::OnEnter()
 {
 	Super::OnEnter();
+
+	if (!m_thisEnemy) return;
 
 	if (ACharacter* character = Cast<ACharacter>(m_ownerCharacter))
 	{
@@ -61,6 +66,8 @@ void UFSM_RogueSpray::OnUpdate(float a_deltaTime)
 {
 	Super::OnUpdate(a_deltaTime);
 
+	if (!m_thisEnemy) return;
+
 	if (m_player)
 	{
 		FVector playerDirection = m_player->GetActorLocation() - m_ownerCharacter->GetActorLocation();
@@ -89,7 +96,11 @@ void UFSM_RogueSpray::OnUpdate(float a_deltaTime)
 
 void UFSM_RogueSpray::OnExit()
 {
+	Super::OnExit();
+
+	if (!m_thisEnemy) return;
+
 	m_thisEnemy->SetArrowSprayReady(false);
 	m_thisEnemy->StopOwnSound();
-	Super::OnExit();
+	
 }
