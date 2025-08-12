@@ -1205,7 +1205,7 @@ void APlayerCharacter::UpdatePlayerStamina(float a_DeltaTime, float a_Speed, flo
 
 void APlayerCharacter::PlayerPassiveHealthRegen()
 {
-	TryAddPlayerHealth(Cast<UGame_GameInstance>(GetGameInstance())->m_playerSave->m_healthRegen * m_PlayerMaxHealth);
+	TryAddPlayerHealth(Cast<UGame_GameInstance>(GetGameInstance())->m_playerSave->GetPlayerHPRegenMultiplier());
 }
 
 void APlayerCharacter::SetCurrentPlayerClass(int a_ClassIndex)
