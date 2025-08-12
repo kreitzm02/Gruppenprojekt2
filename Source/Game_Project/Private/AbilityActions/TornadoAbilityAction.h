@@ -72,6 +72,8 @@ private:
 	void MoveTornadoTick(TSharedPtr<FTornadoInstance> a_Instance);
 	void UpdateHitActors(TSharedPtr<FTornadoInstance> a_Instance);
 	void EndTornado(TSharedPtr<FTornadoInstance> a_Instance);
+	void EndAllTornados();
 	UAnimMontage* m_AttackMontage;
 	FTimerHandle m_StartTimerHandle;
+	TArray<TSharedPtr<FTornadoInstance>> m_ActiveTornados;
  };

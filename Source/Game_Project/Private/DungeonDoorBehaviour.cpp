@@ -11,6 +11,7 @@ ADungeonDoorBehaviour::ADungeonDoorBehaviour()
 	PrimaryActorTick.bCanEverTick = true;
 
     m_DoorMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DoorMesh"));
+    
     RootComponent = m_DoorMesh;
 
     m_TriggerBox = CreateDefaultSubobject<UBoxComponent>(TEXT("TriggerBox"));
@@ -29,6 +30,8 @@ void ADungeonDoorBehaviour::BeginPlay()
 {
 	Super::BeginPlay();
     m_ClosedPosition = GetActorLocation();
+    m_DoorMesh->SetVisibility(false, true);
+    //m_DoorMesh->SetHiddenInGame(true, true);
 }
 
 // Called every frame
@@ -37,6 +40,11 @@ void ADungeonDoorBehaviour::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
     if (m_ShouldOpen)
     {
+        if (m_DoorMesh->IsVisible() == false)
+        {
+            m_DoorMesh->SetVisibility(true, true);
+            //m_DoorMesh->SetHiddenInGame(false, true);
+        }
         FVector current = GetActorLocation();
         FVector newLocation = FMath::VInterpConstantTo(current, m_ClosedPosition + FVector(0.f, 0.f, 400.f), DeltaTime, m_MoveSpeed);
         SetActorLocation(newLocation);

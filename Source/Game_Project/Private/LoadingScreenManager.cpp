@@ -7,7 +7,6 @@
 
 ULoadingScreenManager* ULoadingScreenManager::Get(UWorld* World)
 {
-    UPROPERTY()
     static ULoadingScreenManager* instance = nullptr;
     
     if (!instance)
