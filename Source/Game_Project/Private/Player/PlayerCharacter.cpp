@@ -837,6 +837,7 @@ void APlayerCharacter::ToggleLvlUpUI(bool a_SetActive)
 			m_LvlUpAbilitySelection[0]->m_Description,
 			m_LvlUpAbilitySelection[1]->m_Description,
 			m_LvlUpAbilitySelection[2]->m_Description);
+		m_lvlUpUIInstance->SetDescriptionOnHovered(FText::FromString(TEXT("Hover over an ability to show details.")), FText::FromString(TEXT("")));
 		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.0f);
 	}
 }
