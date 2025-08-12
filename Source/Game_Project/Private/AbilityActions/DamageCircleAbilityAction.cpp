@@ -56,7 +56,14 @@ void UDamageCircleAbilityAction::MoveCircle(AActor* a_AbilityUser)
 {
 	FVector location = m_CircleFollowsUser ? a_AbilityUser->GetActorLocation() : m_StaticCircleLocation;
 	location.Z -= 80.0f;
-	m_DCMeshActor->SetActorLocation(location);
+	if (m_DCMesh && m_DCMeshActor)
+	{
+		m_DCMeshActor->SetActorLocation(location);
+	}
+	else
+	{
+		EndAbilityAction(a_AbilityUser);
+	}
 }
 
 void UDamageCircleAbilityAction::PerformDamageTick(AActor* a_AbilityUser)
