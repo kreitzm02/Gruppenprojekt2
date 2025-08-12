@@ -39,6 +39,9 @@ void UTornadoAbilityAction::PlayAbilityAction(AActor* a_AbilityUser)
 	if (!m_TornadoVFX || !a_AbilityUser) return;
 
 	a_AbilityUser->GetWorld()->GetTimerManager().SetTimer(m_StartTimerHandle, FTimerDelegate::CreateUObject(this, &UTornadoAbilityAction::PlayTornado, a_AbilityUser), m_Delay, false);
+
+	FTimerHandle fallBackDestroyHandle;
+	a_AbilityUser->GetWorld()->GetTimerManager().SetTimer(fallBackDestroyHandle, FTimerDelegate::CreateUObject(this, &UTornadoAbilityAction::EndAllTornados), m_Duration, false);
 }
 
 void UTornadoAbilityAction::EndAbilityAction(AActor* a_AbilityUser)
@@ -55,6 +58,7 @@ void UTornadoAbilityAction::PlayTornado(AActor* a_AbilityUser)
 
 	// create tornado instance
 	TSharedPtr<FTornadoInstance> inst = MakeShared<FTornadoInstance>();
+	m_ActiveTornados.Add(inst);
 	inst->m_CurrPosition = spawnPos;
 	float dirAngle = FMath::RandRange(0.0f, 2.0f * PI);
 	inst->m_Direction = FVector(FMath::Cos(dirAngle), FMath::Sin(dirAngle), 0.0f).GetSafeNormal();
@@ -212,6 +216,10 @@ void UTornadoAbilityAction::MoveTornadoTick(TSharedPtr<FTornadoInstance> a_Insta
 		a_Instance->m_VFXComp->SetWorldLocation(a_Instance->m_CurrPosition);
 		a_Instance->m_VFXComp->SetWorldRotation(a_Instance->m_Direction.Rotation());
 	}
+	else
+	{
+		EndTornado(a_Instance);
+	}
 
 }
 
@@ -224,10 +232,21 @@ void UTornadoAbilityAction::EndTornado(TSharedPtr<FTornadoInstance> a_Instance)
 {
 	if (a_Instance->m_VFXComp)
 	{
+		a_Instance->m_VFXComp->DeactivateImmediate();
+		a_Instance->m_VFXComp->SetVisibility(false, true);
+		a_Instance->m_VFXComp->SetAutoDestroy(true);
 		a_Instance->m_VFXComp->DestroyComponent();
 		a_Instance->m_VFXComp = nullptr;
 	}
-
+	m_ActiveTornados.Remove(a_Instance);
 	GetWorld()->GetTimerManager().ClearTimer(a_Instance->m_MoveHandle);
 	GetWorld()->GetTimerManager().ClearTimer(a_Instance->m_ClearHitListHandle);
+}
+
+void UTornadoAbilityAction::EndAllTornados()
+{
+	for (TSharedPtr<FTornadoInstance> inst : m_ActiveTornados)
+	{
+		EndTornado(inst);
+	}
 }

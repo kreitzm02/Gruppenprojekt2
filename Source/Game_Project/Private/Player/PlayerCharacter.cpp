@@ -211,7 +211,6 @@ void APlayerCharacter::Tick(float DeltaTime)
 		PlayerPassiveHealthRegen();
 		m_HealthRegenTimer = 0.0f;
 	}
-	PlayerPassiveHealthRegen();
 }
 #pragma endregion
 
@@ -834,6 +833,10 @@ void APlayerCharacter::ToggleLvlUpUI(bool a_SetActive)
 			m_LvlUpAbilitySelection[1]->m_Icon,
 			m_LvlUpAbilitySelection[2]->m_Icon);
 		m_lvlUpUIInstance->SetLevelUpText(FText::FromString(FString::Printf(TEXT("You have reached Level %i!"), m_PlayerLvl)));
+		m_lvlUpUIInstance->SetDescriptions(
+			m_LvlUpAbilitySelection[0]->m_Description,
+			m_LvlUpAbilitySelection[1]->m_Description,
+			m_LvlUpAbilitySelection[2]->m_Description);
 		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.0f);
 	}
 }
@@ -1132,7 +1135,7 @@ void APlayerCharacter::ResetStatsToDefault()
 	m_PlayerMovementSpeed = currentPlayerDA->m_BaseMoveSpeed;
 	m_PlayerDefense = currentPlayerDA->m_BaseDefense;
 	m_PlayerLuck = currentPlayerDA->m_BaseLuck;
-	m_PlayerAttackSpeed = currentPlayerDA->m_BaseAttackSpeed;
+	m_AttackDamage = currentPlayerDA->m_BaseAttackPoints;
 	m_PlayerStamina = currentPlayerDA->m_BaseStamina;
 	m_PlayerMaxStamina = currentPlayerDA->m_BaseStamina;
 }
@@ -1163,7 +1166,7 @@ void APlayerCharacter::ChangeAttackSpeed(float a_Value)
 
 void APlayerCharacter::ChangeAttackDamage(float a_Value)
 {
-	m_AttackDamage += a_Value;
+	m_AttackDamage = a_Value;
 }
 
 void APlayerCharacter::ChangePlayerStamina(float a_Value)
@@ -1202,7 +1205,7 @@ void APlayerCharacter::UpdatePlayerStamina(float a_DeltaTime, float a_Speed, flo
 
 void APlayerCharacter::PlayerPassiveHealthRegen()
 {
-	TryAddPlayerHealth(Cast<UGame_GameInstance>(GetGameInstance())->m_playerSave->m_healthRegen);
+	TryAddPlayerHealth(Cast<UGame_GameInstance>(GetGameInstance())->m_playerSave->m_healthRegen * m_PlayerMaxHealth);
 }
 
 void APlayerCharacter::SetCurrentPlayerClass(int a_ClassIndex)

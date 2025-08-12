@@ -87,4 +87,6 @@ private:
 	bool forceDestroyActive = false;
 	void MoveDamageBallTick(TSharedPtr<FDamageBallInstance> a_BallInstance, AActor* a_AbilityUser);
 	void EndDamageBall(TSharedPtr<FDamageBallInstance> a_BallInstance);
+	void EndAllDamageBalls();
+	TArray<TSharedPtr<FDamageBallInstance>> m_ActiveBalls;
 };

@@ -34,6 +34,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "General Settings", meta = (DisplayName = "General Display Name"))
 	FString m_DisplayName;
 
+	UPROPERTY(EditAnywhere, Category = "General Settings", meta = (DisplayName = "Description"))
+	FText m_Description;
+
 	UPROPERTY(EditAnywhere, Category = "General Settings", meta = (DisplayName = "General Display Icon"))
 	UTexture2D* m_Icon;
 

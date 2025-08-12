@@ -39,6 +39,9 @@ void UDamageBallAbilityAction::PlayAbilityAction(AActor* a_AbilityUser)
 	if (!m_VFX|| !a_AbilityUser) return;
 
 	a_AbilityUser->GetWorld()->GetTimerManager().SetTimer(m_StartTimerHandle, FTimerDelegate::CreateUObject(this, &UDamageBallAbilityAction::PlayDamageBall, a_AbilityUser), m_Delay, false);
+
+	FTimerHandle fallBackDestroyHandle;
+	a_AbilityUser->GetWorld()->GetTimerManager().SetTimer(fallBackDestroyHandle, FTimerDelegate::CreateUObject(this, &UDamageBallAbilityAction::EndAllDamageBalls), m_MaxDuration, false);
 }
 
 void UDamageBallAbilityAction::EndAbilityAction(AActor* a_AbilityUser)
@@ -82,11 +85,6 @@ void UDamageBallAbilityAction::MoveDamageBallTick(TSharedPtr<FDamageBallInstance
 		AActor* hitActor = hit.GetActor();
 		if (a_BallInstance->m_HitCount >= m_CollisionsBeforeDestruction || forceDestroyActive)
 		{
-			if (a_BallInstance->m_VFXComp)
-			{
-				a_BallInstance->m_VFXComp->DestroyComponent();
-				a_BallInstance->m_VFXComp = nullptr;
-			}
 			EndDamageBall(a_BallInstance);
 			UE_LOG(LogTemp, Warning, TEXT("Damage Ball ended after max collision"));
 			return;
@@ -99,18 +97,17 @@ void UDamageBallAbilityAction::MoveDamageBallTick(TSharedPtr<FDamageBallInstance
 			a_BallInstance->m_CurrPosition = hit.Location + a_BallInstance->m_Direction * 2.0f;
 			a_BallInstance->m_HitCount++;
 			a_BallInstance->m_AlreadyHitActors.Empty();
-			return;
 		}
 		else if (!m_BouncesOfWalls && !hitActor->IsA<AEnemyCharacter>())
 		{
-			if (a_BallInstance->m_VFXComp)
+			a_BallInstance->m_HitCount++;
+			if (a_BallInstance->m_HitCount >= m_CollisionsBeforeDestruction)
 			{
-				a_BallInstance->m_VFXComp->DestroyComponent();
-				a_BallInstance->m_VFXComp = nullptr;
+				EndDamageBall(a_BallInstance);
+				UE_LOG(LogTemp, Warning, TEXT("Damage Ball after Wall Collision"));
+				return;
 			}
-			EndDamageBall(a_BallInstance);
-			UE_LOG(LogTemp, Warning, TEXT("Damage Ball after Wall Collision"));
-			return;
+			
 		}
 	}
 
@@ -162,12 +159,22 @@ void UDamageBallAbilityAction::MoveDamageBallTick(TSharedPtr<FDamageBallInstance
 void UDamageBallAbilityAction::EndDamageBall(TSharedPtr<FDamageBallInstance> a_BallInstance)
 {
 	if (a_BallInstance->m_VFXComp)
-	{
+	{       
 		a_BallInstance->m_VFXComp->DestroyComponent();
 		a_BallInstance->m_VFXComp = nullptr;
 	}
+	m_ActiveBalls.Remove(a_BallInstance);
 	GetWorld()->GetTimerManager().ClearTimer(a_BallInstance->m_MoveHandle);
+	GetWorld()->GetTimerManager().ClearTimer(a_BallInstance->m_EndHandle);
 	UE_LOG(LogTemp, Warning, TEXT("Damage Ball Auto-ended after duration"));
+}
+
+void UDamageBallAbilityAction::EndAllDamageBalls()
+{
+	for (TSharedPtr<FDamageBallInstance> inst : m_ActiveBalls)
+	{
+		EndDamageBall(inst);
+	}
 }
 
 void UDamageBallAbilityAction::PlayDamageBall(AActor* a_AbilityUser)
@@ -189,10 +196,10 @@ void UDamageBallAbilityAction::PlayDamageBall(AActor* a_AbilityUser)
 		inst->m_CurrPosition = startPosition;
 		inst->m_CircleAngle = m_BallInitialRotation;
 
+		m_ActiveBalls.Add(inst);
+
 		FTimerHandle endTimerHandle;
 		FTimerHandle moveTickHandle;
-
-		
 
 		if (m_VFX && !inst->m_VFXComp)
 		{
