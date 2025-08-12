@@ -11,6 +11,9 @@ void UFSM_BossWarriorCharge::Initialize()
 {
 	Super::Initialize();
 	ABossEnemy_Warrior* enemy = Cast<ABossEnemy_Warrior>(m_ownerCharacter);
+
+	if (!enemy) return;
+
 	m_chargeAnimation = enemy->GetChargeAnimation();
 	m_chargeSpeed = enemy->GetChargeSpeed();
 	m_detectionRange = enemy->GetPlayerChaseRadius();
@@ -21,6 +24,8 @@ void UFSM_BossWarriorCharge::Initialize()
 void UFSM_BossWarriorCharge::OnEnter()
 {
 	Super::OnEnter();
+
+	if (!m_owner) return;
 
 	m_ownerSkeletalMesh->PlayAnimation(m_chargeAnimation, true);
 
@@ -67,6 +72,8 @@ void UFSM_BossWarriorCharge::OnEnter()
 void UFSM_BossWarriorCharge::OnUpdate(float a_deltatime)
 {
 	Super::OnUpdate(a_deltatime);
+
+	if (!m_owner) return;
 
 	if(m_isCharging)
 	{
@@ -140,6 +147,8 @@ void UFSM_BossWarriorCharge::OnUpdate(float a_deltatime)
 void UFSM_BossWarriorCharge::OnExit()
 {
 	Super::OnExit();
+
+	if (!m_owner) return;
 
 	m_owner->SetChargeReady(false);
 	m_owner->ResetUsedCharges();

@@ -12,6 +12,9 @@ void UFSM_RogueAttack::Initialize()
 {
 	Super::Initialize();
 	m_thisEnemy = Cast<AEnemy_Rogue>(m_ownerCharacter);
+
+	if (!m_thisEnemy) return;
+
 	m_attackAnimation = m_thisEnemy->GetAttackAnimation();
 	m_reloadAnimation = m_thisEnemy->GetReloadAnimation();
 }
@@ -19,6 +22,8 @@ void UFSM_RogueAttack::Initialize()
 void UFSM_RogueAttack::OnEnter()
 {
 	Super::OnEnter();
+
+	if (!m_thisEnemy) return;
 
 	if (ACharacter* character = Cast<ACharacter>(m_ownerCharacter))
 	{
@@ -63,6 +68,8 @@ void UFSM_RogueAttack::OnUpdate(float a_deltaTime)
 {
 	Super::OnUpdate(a_deltaTime);
 
+	if (!m_thisEnemy) return;
+
 	FVector playerDirection = m_player->GetActorLocation() - m_ownerCharacter->GetActorLocation();
 	playerDirection.Z = 0.0f;
 	m_ownerCharacter->SetActorRotation(playerDirection.Rotation());
@@ -100,5 +107,8 @@ void UFSM_RogueAttack::OnUpdate(float a_deltaTime)
 void UFSM_RogueAttack::OnExit()
 {
 	Super::OnExit();
+
+	if (!m_thisEnemy) return;
+
 	m_thisEnemy->StopOwnSound();
 }

@@ -78,6 +78,9 @@ private:
 
 	float m_passedTimeLastDmgInterval = 10.0f;
 
+	UPROPERTY(EditAnywhere, Category = "Settings")
+	float m_knockback = 0.0f;
+
 	UPROPERTY()
 	AEnemyCharacter* m_owner = nullptr;
 

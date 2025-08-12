@@ -10,6 +10,7 @@ void UFSM_Attack::Initialize()
 {
 	Super::Initialize();
 	m_thisEnemy = Cast<AEnemy_Warrior>(m_ownerCharacter);
+	if (m_thisEnemy)
 	m_attackAnimation = m_thisEnemy->GetAttackAnimation();
 }
 
@@ -20,36 +21,44 @@ void UFSM_Attack::OnEnter()
 		character->GetCharacterMovement()->StopMovementImmediately();
 	}
 	Super::OnEnter();
-	m_animationDuration = m_attackAnimation->GetPlayLength();
-	m_thisEnemy->GetWeaponHitbox()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	if (m_thisEnemy)
+	{
+		m_animationDuration = m_attackAnimation->GetPlayLength();
+		m_thisEnemy->GetWeaponHitbox()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	}
 }
 
 void UFSM_Attack::OnUpdate(float a_deltaTime)
 {
 	Super::OnUpdate(a_deltaTime);
-
-	m_passedTime += a_deltaTime;
-
-	if (!m_animationStarted)
+	if (m_thisEnemy)
 	{
-		m_ownerSkeletalMesh->PlayAnimation(m_attackAnimation, false);
+		m_passedTime += a_deltaTime;
 
-		m_thisEnemy->PlayBasicAttackSound(false);
+		if (!m_animationStarted)
+		{
+			m_ownerSkeletalMesh->PlayAnimation(m_attackAnimation, false);
 
-		m_passedTime = 0.0f;
+			m_thisEnemy->PlayBasicAttackSound(false);
 
-		m_animationStarted = true;
-	}
+			m_passedTime = 0.0f;
 
-	if (m_animationStarted && m_passedTime >= m_animationDuration)
-	{
-		m_animationStarted = false;
+			m_animationStarted = true;
+		}
+
+		if (m_animationStarted && m_passedTime >= m_animationDuration)
+		{
+			m_animationStarted = false;
+		}
 	}
 }
 
 void UFSM_Attack::OnExit()
 {
 	Super::OnExit();
-	m_thisEnemy->StopOwnSound();
-	m_thisEnemy->GetWeaponHitbox()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	if (m_thisEnemy)
+	{
+		m_thisEnemy->StopOwnSound();
+		m_thisEnemy->GetWeaponHitbox()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
 }

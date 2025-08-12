@@ -16,6 +16,9 @@ void UFSM_ChasePlayer::Initialize()
 {
 	Super::Initialize();
 	AEnemyCharacter* enemy = Cast<AEnemyCharacter>(m_ownerCharacter);
+
+	if (!m_ownerCharacter) return;
+
 	m_chaseAnimation = enemy->GetChaseAnimation();
 	m_chaseRange = enemy->GetPlayerChaseRadius(); 
 	m_walkSpeed = enemy->GetChaseWalkSpeed();
@@ -24,6 +27,8 @@ void UFSM_ChasePlayer::Initialize()
 void UFSM_ChasePlayer::OnEnter()
 {
     Super::OnEnter();
+
+	if (!m_ownerCharacter) return;
 
 	m_ownerSkeletalMesh->PlayAnimation(m_chaseAnimation, true);
 
@@ -34,6 +39,9 @@ void UFSM_ChasePlayer::OnEnter()
 void UFSM_ChasePlayer::OnUpdate(float a_deltaTime)
 {
     Super::OnUpdate(a_deltaTime);
+
+	if (!m_ownerCharacter) return;
+
 	if (m_ownerCharacter == nullptr)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Player Chase has no Owner Pawn!"))

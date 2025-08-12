@@ -10,12 +10,17 @@ void UFSM_IdleStand::Initialize()
 {
 	Super::Initialize();
 	AEnemyCharacter* enemy = Cast<AEnemyCharacter>(m_ownerCharacter);
+
+	if (!m_ownerCharacter) return;
+
 	m_idleAnimation = enemy->GetIdleAnimation();
 }
 
 void UFSM_IdleStand::OnEnter()
 {
 	Super::OnEnter();
+
+	if (!m_ownerCharacter) return;
 
 	m_ownerSkeletalMesh->PlayAnimation(m_idleAnimation, true);
 

@@ -9,7 +9,11 @@
 void UFSM_RiseFromGround::Initialize()
 {
 	Super::Initialize();
+
 	m_thisEnemy = Cast<AEnemy_NecroSummon>(m_ownerCharacter);
+
+	if (!m_thisEnemy) return;
+
 	m_riseAnimation = m_thisEnemy->GetRiseAnimation();
 	m_duration = m_riseAnimation->GetPlayLength();
 	m_duration = m_duration/2;
@@ -18,6 +22,9 @@ void UFSM_RiseFromGround::Initialize()
 void UFSM_RiseFromGround::OnEnter()
 {
 	Super::OnEnter();
+
+	if (!m_thisEnemy) return;
+
 	m_ownerSkeletalMesh->PlayAnimation(m_riseAnimation, false);
 	FVector temp = m_thisEnemy->GetActorLocation();
 	startVec = temp;
@@ -29,6 +36,8 @@ void UFSM_RiseFromGround::OnUpdate(float a_deltatime)
 {
 	Super::OnUpdate(a_deltatime);
 
+	if (!m_thisEnemy) return;
+
 	m_passedTime += a_deltatime;
 	float alpha = FMath::Clamp(m_passedTime / m_duration, 0.0f, 1.0f);
 	FVector newPos = FMath::Lerp(startVec, endVec, alpha);
@@ -38,6 +47,8 @@ void UFSM_RiseFromGround::OnUpdate(float a_deltatime)
 void UFSM_RiseFromGround::OnExit()
 {
 	Super::OnExit();
+
+	if (!m_thisEnemy) return;
 
 	AEnemy_NecroSummon* enemy = Cast<AEnemy_NecroSummon>(m_ownerCharacter);
 	enemy->GetCharacterMovement()->GravityScale = 1.0f;

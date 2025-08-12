@@ -85,6 +85,9 @@ public:
 
 	void StopOwnSound();
 
+	void ResetKnockback() { m_knockback = m_defaultKnockback; }
+
+	void SetKnockback(float a_knockback) { m_knockback = a_knockback; }
 protected:
 	void UpdateHealthBar();
 
@@ -163,6 +166,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
 	float m_knockback = 400.0f;
+
+	float m_defaultKnockback;
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
 	float m_minExpWorth = 70.0f;
