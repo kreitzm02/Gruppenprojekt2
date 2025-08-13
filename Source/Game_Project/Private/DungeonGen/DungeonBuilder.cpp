@@ -617,7 +617,7 @@ void UDungeonBuilder::TryPlaceDoor(int32 a_GridX, int32 a_GridY, const FDungeonR
 	UE_LOG(LogTemp, Error, TEXT("Door tries to spawn"));
 	TArray<TArray<ECellType>> grid = m_Data->m_DungeonGrid;
 
-	//if (grid[a_GridX][a_GridY] != ECellType::FLOOR && grid[a_GridX][a_GridY] != ECellType::FLOORCORRIDOR) return;
+	if (grid[a_GridX][a_GridY] != ECellType::FLOOR && grid[a_GridX][a_GridY] != ECellType::FLOORCORRIDOR) return;
 	UE_LOG(LogTemp, Error, TEXT("Door has been spawned"));
 	bool canBePlaced = false;
 	FVector pos = { a_GridX * m_UnitSize, (float)a_GridY * m_UnitSize, -400.0f };
