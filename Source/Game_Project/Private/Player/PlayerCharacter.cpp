@@ -87,7 +87,7 @@ void APlayerCharacter::BeginPlay()
 
 	SetupWeapons();
 	HideAllWeapons();
-	ChangeToAbilitySlot0(); // the char equips his default ability
+	ChangeToAbilitySlot(0); // the char equips his default ability
 	SetupMovement();
 	m_AbilityCooldownTimes.Init(0.0f, m_AbilityMax);
 	m_AbilityMaxCooldownTimes.Init(0.0f, m_AbilityMax);
@@ -271,28 +271,32 @@ void APlayerCharacter::AbilitySlotDecrease()
 void APlayerCharacter::ChangeToAbilitySlot0()
 {
 	ChangeToAbilitySlot(0);
-	UpdateSelectedAbilityUI();
+	if (m_PlayerIsInMainhub) return;
+	m_PlayerAbilities->ActivateAbility(m_CurrentAbilitySlot);
 }
 
 void APlayerCharacter::ChangeToAbilitySlot1()
 {
 	if (m_AbilityNum < 2) return;
 	ChangeToAbilitySlot(1);
-	UpdateSelectedAbilityUI();
+	if (m_PlayerIsInMainhub) return;
+	m_PlayerAbilities->ActivateAbility(m_CurrentAbilitySlot);
 }
 
 void APlayerCharacter::ChangeToAbilitySlot2()
 {
 	if (m_AbilityNum < 3) return;
 	ChangeToAbilitySlot(2);
-	UpdateSelectedAbilityUI();
+	if (m_PlayerIsInMainhub) return;
+	m_PlayerAbilities->ActivateAbility(m_CurrentAbilitySlot);
 }
 
 void APlayerCharacter::ChangeToAbilitySlot3()
 {
 	if (m_AbilityNum < 4) return;
 	ChangeToAbilitySlot(3);
-	UpdateSelectedAbilityUI();
+	if (m_PlayerIsInMainhub) return;
+	m_PlayerAbilities->ActivateAbility(m_CurrentAbilitySlot);
 }
 
 void APlayerCharacter::ChangeToPlayerClassA()
@@ -411,7 +415,7 @@ void APlayerCharacter::SetupChangedPlayerClass()
 
 	// setup the player stats with the default values from the given data asset
 	ResetStatsToDefault();
-	ChangeToAbilitySlot0();
+	ChangeToAbilitySlot(0);
 }
 
 void APlayerCharacter::SetupCamera()
@@ -1066,6 +1070,7 @@ void APlayerCharacter::ChangeToAbilitySlot(int32 a_Index)
 	m_CurrentAbilitySlot = a_Index;
 	m_AttackDamage = m_PlayerCharDataAssets[m_CurrentPlayerClass]->m_BaseAttackPoints; // reset current attack damage
 	m_PlayerAbilities->EquipAbility(a_Index); // new damage will be set here if needed
+	UpdateSelectedAbilityUI();
 }
 
 void APlayerCharacter::AddAbilityFromUI(int a_Index)
