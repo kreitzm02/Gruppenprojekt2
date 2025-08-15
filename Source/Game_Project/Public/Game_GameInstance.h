@@ -84,6 +84,13 @@ public:
 
 	FVector GetLastOverworldPos() { return m_lastPlayerOverworldPos; }
 
+
+	void ResetEnemyScaling() { m_enemyScaling = 1.0f; }
+
+	void IncreaseEnemyScaling() { m_enemyScaling += m_enemyScalingIncreasePerDungeon; }
+
+	float GetEnemyScaling() { return m_enemyScaling; }
+
 private:
 	void ShowInitialTutorial();
 
@@ -120,4 +127,10 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Initial Tutorial")
 	TSubclassOf<UUserWidget> m_initialTutorialUI;
+
+
+	float m_enemyScaling = 1.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Scaling")
+	float m_enemyScalingIncreasePerDungeon = 0.2f;
 };

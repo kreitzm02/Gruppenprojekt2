@@ -40,8 +40,8 @@ void UDamageBallAbilityAction::PlayAbilityAction(AActor* a_AbilityUser)
 
 	a_AbilityUser->GetWorld()->GetTimerManager().SetTimer(m_StartTimerHandle, FTimerDelegate::CreateUObject(this, &UDamageBallAbilityAction::PlayDamageBall, a_AbilityUser), m_Delay, false);
 
-	FTimerHandle fallBackDestroyHandle;
-	a_AbilityUser->GetWorld()->GetTimerManager().SetTimer(fallBackDestroyHandle, FTimerDelegate::CreateUObject(this, &UDamageBallAbilityAction::EndAllDamageBalls), m_MaxDuration, false);
+	a_AbilityUser->GetWorld()->GetTimerManager().ClearTimer(m_fallBackDestroyHandle);
+	a_AbilityUser->GetWorld()->GetTimerManager().SetTimer(m_fallBackDestroyHandle, FTimerDelegate::CreateUObject(this, &UDamageBallAbilityAction::EndAllDamageBalls), m_MaxDuration, false);
 }
 
 void UDamageBallAbilityAction::EndAbilityAction(AActor* a_AbilityUser)

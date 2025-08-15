@@ -784,6 +784,16 @@ void APlayerCharacter::CheckForDeath()
 		float deathDelayBeforeRespawn = 3.0f;
 		UGame_GameInstance* gameInstance = Cast<UGame_GameInstance>(GetGameInstance());
 		gameInstance->StopTimer();
+		gameInstance->ResetEnemyScaling();
+
+		if (m_looseScreenClass)
+		{
+			if (!m_looseScreenInstance)
+			{
+				m_looseScreenInstance = CreateWidget<UUserWidget>(GetWorld(), m_looseScreenClass);
+			}
+			m_looseScreenInstance->AddToViewport();
+		}
 
 		GetWorld()->GetTimerManager().SetTimer(deathDelayTimer, FTimerDelegate::CreateUObject(this, &APlayerCharacter::RespawnAfterDeath), deathDelayBeforeRespawn, false);
 	}
@@ -791,6 +801,12 @@ void APlayerCharacter::CheckForDeath()
 
 void APlayerCharacter::RespawnAfterDeath()
 {
+	if (m_looseScreenInstance)
+	{
+		m_looseScreenInstance->RemoveFromParent();
+	}
+	
+
 	ULoadingScreenManager::Get(GetWorld())->StartLoading(GetWorld());
 	UGameplayStatics::OpenLevel(this, FName("MainHub1"));
 }

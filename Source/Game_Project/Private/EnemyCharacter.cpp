@@ -2,6 +2,8 @@
 
 
 #include "EnemyCharacter.h"
+
+#include "BossEnemy_Endboss.h"
 #include "FSM_EnemyStateMachineComponent.h"
 #include "Game_GameInstance.h"
 #include "Components/BoxComponent.h"
@@ -87,6 +89,9 @@ void AEnemyCharacter::BeginPlay()
 
 	m_characterHitbox->UpdateOverlaps();
 	m_weaponHitbox->UpdateOverlaps();
+
+	if (!IsA<ABossEnemy_Endboss>())
+	m_maxHealth *= m_gameInstance->GetEnemyScaling();
 
 	m_currentHealth = m_maxHealth;
 

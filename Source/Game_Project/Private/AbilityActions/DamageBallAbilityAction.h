@@ -84,6 +84,7 @@ private:
 
 	UAnimMontage* m_AttackMontage;
 	FTimerHandle m_StartTimerHandle;
+	FTimerHandle m_fallBackDestroyHandle;
 	bool forceDestroyActive = false;
 	void MoveDamageBallTick(TSharedPtr<FDamageBallInstance> a_BallInstance, AActor* a_AbilityUser);
 	void EndDamageBall(TSharedPtr<FDamageBallInstance> a_BallInstance);
