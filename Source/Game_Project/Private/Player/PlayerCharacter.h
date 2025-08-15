@@ -335,6 +335,12 @@ private:
 
 	void ActivateMouseCursor(bool a_SetActive);
 
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UUserWidget> m_looseScreenClass = nullptr;
+
+	UPROPERTY()
+	UUserWidget* m_looseScreenInstance = nullptr;
+
 	// abilities
 
 	TMap<EAllAbilities, int> m_AbilityLevels;

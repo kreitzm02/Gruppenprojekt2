@@ -9,6 +9,7 @@
 #include "Enemy_MageFireballProjectile.h"
 #include "Enemy_MageProjectile.h"
 #include "FSM_EnemyStateMachineComponent.h"
+#include "Game_GameInstance.h"
 #include "Components/CapsuleComponent.h"
 #include "Engine/OverlapResult.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -297,10 +298,23 @@ void ABossEnemy_Endboss::ShowPlayerVictory()
 	GetWorld()->GetTimerManager().SetTimer(resetGame, this, &ABossEnemy_Endboss::ResetGame, 3.0f, false);
 
 	//victory stuff
+	if (m_victoryWidgetClass)
+	{
+		if (!m_victoryWidget)
+		{
+			m_victoryWidget = CreateWidget<UUserWidget>(GetWorld(),m_victoryWidgetClass);
+		}
+		m_victoryWidget->AddToViewport();
+	}
 }
 
 void ABossEnemy_Endboss::ResetGame()
 {
+	if (!m_victoryWidget)
+	{
+		m_victoryWidget->RemoveFromParent();
+	}
+	m_gameInstance->ResetEnemyScaling();
 	UGameplayStatics::OpenLevel(this, "MainHub1");
 }
 
