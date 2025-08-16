@@ -195,6 +195,15 @@ private:
 	USoundWave* m_fireBurnGroundSound = nullptr;
 
 
+
+	UPROPERTY(EditAnywhere, Category = "Enemy Properties")
+	TSubclassOf<UUserWidget> m_victoryWidgetClass = nullptr;
+
+	UPROPERTY()
+	UUserWidget* m_victoryWidget = nullptr;
+
+
+
 	float m_baseMaxMoveSpeed;
 
 	float m_baseAcceleration;
