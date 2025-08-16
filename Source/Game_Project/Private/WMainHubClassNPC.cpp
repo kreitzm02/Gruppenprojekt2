@@ -4,6 +4,7 @@
 #include "WMainHubClassNPC.h"
 #include <Player/PlayerCharacter.h>
 #include <Kismet/GameplayStatics.h>
+#include <Blueprint/WidgetBlueprintLibrary.h>
 
 void UWMainHubClassNPC::NativeConstruct()
 {
@@ -11,6 +12,7 @@ void UWMainHubClassNPC::NativeConstruct()
 	{
 		Button_Class1->OnClicked.RemoveDynamic(this, &UWMainHubClassNPC::OnButton1Clicked);
 		Button_Class1->OnClicked.AddDynamic(this, &UWMainHubClassNPC::OnButton1Clicked);
+		Button_Class1->SetUserFocus(GetWorld()->GetFirstPlayerController());
 	}
 
 	if (Button_Class2)

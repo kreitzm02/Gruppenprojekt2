@@ -349,11 +349,11 @@ void APlayerCharacter::ActivatePauseMenu()
 
 	ActivateMouseCursor(true);
 	FInputModeUIOnly InputMode;
-	InputMode.SetWidgetToFocus(m_PauseUIInstance->TakeWidget());
+	//InputMode.SetWidgetToFocus(m_PauseUIInstance->TakeWidget());
 	APlayerController* pc = GetWorld()->GetFirstPlayerController();
 	pc->SetInputMode(InputMode);
 	m_PauseUIInstance->AddToViewport(2);
-	UGameplayStatics::SetGamePaused(GetWorld(), true);
+	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.001f);
 }
 
 void APlayerCharacter::ActivateBackwardWalking()
@@ -858,7 +858,7 @@ void APlayerCharacter::ToggleLvlUpUI(bool a_SetActive)
 			m_LvlUpAbilitySelection[1]->m_Description,
 			m_LvlUpAbilitySelection[2]->m_Description);
 		m_lvlUpUIInstance->SetDescriptionOnHovered(FText::FromString(TEXT("Hover over an ability to show details.")), FText::FromString(TEXT("")));
-		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.0f);
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.001f);
 	}
 }
 
@@ -885,7 +885,7 @@ void APlayerCharacter::ToggleLvlUpReplaceUI(bool a_SetActive)
 		m_lvlUpReplaceUIInstance->SetButtonImages(
 			m_PlayerAbilities->GetAbilityIcon(0), m_PlayerAbilities->GetAbilityIcon(2),
 			m_PlayerAbilities->GetAbilityIcon(1), m_PlayerAbilities->GetAbilityIcon(3));
-		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.0f);
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.001f);
 	}
 }
 
