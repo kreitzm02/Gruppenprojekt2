@@ -15,6 +15,7 @@ void UWLvlUpAbilitySelect::NativeConstruct()
 		Button_Ability1->OnClicked.AddDynamic(this, &UWLvlUpAbilitySelect::OnButton1Clicked);
 		Button_Ability1->OnHovered.RemoveDynamic(this, &UWLvlUpAbilitySelect::OnButton1Hovered);
 		Button_Ability1->OnHovered.AddDynamic(this, &UWLvlUpAbilitySelect::OnButton1Hovered);
+		Button_Ability1->SetUserFocus(GetWorld()->GetFirstPlayerController());
 	}
 	if (Button_Ability2)
 	{
