@@ -16,6 +16,7 @@ void UWMainHubTutorialNPC::NativeConstruct()
 	{
 		Button_No->OnClicked.RemoveDynamic(this, &UWMainHubTutorialNPC::OnButton2Clicked);
 		Button_No->OnClicked.AddDynamic(this, &UWMainHubTutorialNPC::OnButton2Clicked);
+		Button_No->SetUserFocus(GetWorld()->GetFirstPlayerController());
 	}
 }
 
