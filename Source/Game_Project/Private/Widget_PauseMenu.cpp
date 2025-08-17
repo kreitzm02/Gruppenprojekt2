@@ -12,7 +12,7 @@ void UWidget_PauseMenu::ResumeGame()
 	APlayerController* pc = GetWorld()->GetFirstPlayerController();
 	pc->SetInputMode(FInputModeGameOnly());
 	pc->bShowMouseCursor = false;
-	UGameplayStatics::SetGamePaused(GetWorld(), false);
+	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.0f);
 	RemoveFromParent();
 }
 

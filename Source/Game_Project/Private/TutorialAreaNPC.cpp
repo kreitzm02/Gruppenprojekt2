@@ -2,6 +2,7 @@
 
 
 #include "TutorialAreaNPC.h"
+#include <Kismet/GameplayStatics.h>
 
 void ATutorialAreaNPC::Interact()
 {
@@ -17,5 +18,5 @@ void ATutorialAreaNPC::Interact()
         PC->bShowMouseCursor = true;
         PC->SetInputMode(FInputModeUIOnly());
     }
-    //UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.0f);
+    UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.001f);
 }
