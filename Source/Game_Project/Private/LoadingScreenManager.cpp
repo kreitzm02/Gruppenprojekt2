@@ -4,8 +4,9 @@
 #include "LoadingScreenManager.h"
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
+#include <MoviePlayer.h>
 
-ULoadingScreenManager* ULoadingScreenManager::Get(UWorld* World)
+ULoadingScreenManager* ULoadingScreenManager::Get(UWorld* a_World)
 {
     static ULoadingScreenManager* instance = nullptr;
     
@@ -15,35 +16,33 @@ ULoadingScreenManager* ULoadingScreenManager::Get(UWorld* World)
         instance->SetFlags(RF_Transient);
         instance->AddToRoot();
     }
-    instance->m_World = World;
-    instance->m_LoadingWidgetClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(TEXT("/Game/LoadingScreen/WBP_Loading.WBP_Loading_C")));
+    instance->m_World = a_World;
+    instance->m_LoadingScreenWidgetClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(TEXT("/Game/LoadingScreen/WBP_Loading.WBP_Loading_C")));
     
     return instance;
 }
 
 void ULoadingScreenManager::StartLoading(UWorld* a_World)
 {
-    if (!m_LoadingWidget && m_LoadingWidgetClass)
-    {
-        UClass* WidgetClass = m_LoadingWidgetClass.LoadSynchronous();
-        if (WidgetClass)
-        {
-            m_LoadingWidget = CreateWidget<UUserWidget>(m_World, WidgetClass);
-            if (m_LoadingWidget)
-            {
-                m_LoadingWidget->AddToViewport(100);
-                UE_LOG(LogTemp, Warning, TEXT("Loading screen widget added to viewport"));
-            }
-        }
-    }
+    FLoadingScreenAttributes attributes;
+    attributes.bAutoCompleteWhenLoadingCompletes = true;
+    attributes.MinimumLoadingScreenDisplayTime = 2.0f;
+    UClass * WidgetClass = m_LoadingScreenWidgetClass.LoadSynchronous();
+    m_LoadingWidget = CreateWidget<UUserWidget>(m_World, WidgetClass);
+    attributes.WidgetLoadingScreen = m_LoadingWidget->TakeWidget();
+    attributes.PlaybackType = EMoviePlaybackType::MT_LoadingLoop;
+
+    GetMoviePlayer()->SetupLoadingScreen(attributes);
+    GetMoviePlayer()->PlayMovie();
 }
 
 void ULoadingScreenManager::EndLoading()
 {
-    if (m_LoadingWidget)
-    {
-        m_World->GetTimerManager().SetTimer(m_EndLoadingDelayTimer, FTimerDelegate::CreateUObject(this, &ULoadingScreenManager::EndLoadingDelegate), 0.1f, false);
-    }
+    GetMoviePlayer()->StopMovie();
+    //if (m_LoadingWidget)
+    //{
+    //    m_World->GetTimerManager().SetTimer(m_EndLoadingDelayTimer, FTimerDelegate::CreateUObject(this, &ULoadingScreenManager::EndLoadingDelegate), 0.1f, false);
+    //}
 }
 
 void ULoadingScreenManager::EndLoadingDelegate()

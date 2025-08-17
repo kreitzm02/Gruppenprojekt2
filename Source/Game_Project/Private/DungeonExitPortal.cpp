@@ -47,7 +47,7 @@ void ADungeonExitPortal::OnPortalEnter(UPrimitiveComponent* a_overlappedComponen
 
 	Cast<UGame_GameInstance>(GetGameInstance())->IncreaseEnemyScaling();
 
-	//ULoadingScreenManager::Get(GetWorld())->StartLoading(GetWorld());
+	ULoadingScreenManager::Get(GetWorld())->StartLoading(GetWorld());
 	m_DungeonLevelStreamer->UnloadDungeon();
 	a_otherActor->SetActorLocation(Cast<UGame_GameInstance>(GetGameInstance())->GetLastOverworldPos());
 	ULoadingScreenManager::Get(GetWorld())->EndLoading();

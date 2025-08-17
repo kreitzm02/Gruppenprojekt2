@@ -27,8 +27,8 @@ private:
 	UPROPERTY()
 	UUserWidget* m_LoadingWidget;
 
-	UPROPERTY()
-	TSoftClassPtr<UUserWidget> m_LoadingWidgetClass = nullptr;
+	UPROPERTY(EditDefaultsOnly)
+	TSoftClassPtr<UUserWidget> m_LoadingScreenWidgetClass;
 
 	UPROPERTY()
 	FTimerHandle m_EndLoadingDelayTimer;
