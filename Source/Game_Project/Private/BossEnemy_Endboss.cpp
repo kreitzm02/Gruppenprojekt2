@@ -314,6 +314,7 @@ void ABossEnemy_Endboss::ResetGame()
 	{
 		m_victoryWidget->RemoveFromParent();
 	}
+	m_gameInstance->SetIsInLevel(false);
 	m_gameInstance->ResetEnemyScaling();
 	UGameplayStatics::OpenLevel(this, "MainHub1");
 }
