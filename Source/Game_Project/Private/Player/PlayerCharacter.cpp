@@ -115,6 +115,11 @@ void APlayerCharacter::BeginPlay()
 
 	m_AudioComp->SetVolumeMultiplier(Cast<UGame_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()))->GetSFXVolume());
 	gameInstance->OnSFXVolumeChanged.AddDynamic(this, &APlayerCharacter::HandleVolumeChanged);
+
+	if (LevelName == "temp")
+	{
+		m_PlayerHealth = m_PlayerMaxHealth * Cast<UGame_GameInstance>(GetGameInstance())->m_playerSave->GetPlayerHPMultiplier();
+	}
 }
 
 // Called every frame
@@ -805,7 +810,8 @@ void APlayerCharacter::RespawnAfterDeath()
 	{
 		m_looseScreenInstance->RemoveFromParent();
 	}
-	
+
+	Cast<UGame_GameInstance>(GetGameInstance())->SetIsInLevel(false);
 
 	ULoadingScreenManager::Get(GetWorld())->StartLoading(GetWorld());
 	UGameplayStatics::OpenLevel(this, FName("MainHub1"));
