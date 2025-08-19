@@ -3,6 +3,8 @@
 
 #include "AbilityActions/MeleeAbilityAction.h"
 #include <Player/PlayerCharacter.h>
+#include <Kismet/GameplayStatics.h>
+#include <Game_GameInstance.h>
 
 void UMeleeAbilityAction::PrepareAbilityAction(AActor* a_AbilityUser)
 {
@@ -34,7 +36,8 @@ void UMeleeAbilityAction::PlayAbilityAction(AActor* a_AbilityUser)
 	{
 		player->ClearAlreadyHitActors();
 		player->m_AnimInstance->Montage_Play(m_AttackMontage);
-		// sound
+		float sfxVolume = Cast<UGame_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()))->GetSFXVolume();
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), Cast<USoundBase>(m_SoundEffect), player->GetActorLocation(), sfxVolume);
 		FTimerHandle setDamageDelayedTimerHandle;
 		FTimerHandle vfxEndTimerHandle;
 		FTimerHandle endTimerHandle;

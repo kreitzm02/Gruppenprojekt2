@@ -5,6 +5,7 @@
 #include <Player/PlayerCharacter.h>
 #include <NiagaraFunctionLibrary.h>
 #include <Game_GameInstance.h>
+#include <Kismet/GameplayStatics.h>
 
 void UBerserkAbilityAction::PrepareAbilityAction(AActor* a_AbilityUser)
 {
@@ -66,6 +67,9 @@ void UBerserkAbilityAction::PlayBerserk(AActor* a_AbilityUser)
 	if (APlayerCharacter* player = Cast<APlayerCharacter>(a_AbilityUser))
 	{
 		m_SavedPlayerHP = player->GetPlayerHealth();
+
+		float sfxVolume = Cast<UGame_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()))->GetSFXVolume();
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), Cast<USoundBase>(m_SoundEffect), player->GetActorLocation(), sfxVolume);
 	}
 	a_AbilityUser->GetWorld()->GetTimerManager().SetTimer(m_MoveTimerHandle, FTimerDelegate::CreateUObject(this, &UBerserkAbilityAction::MoveBerserk, a_AbilityUser), 0.01f, true);
 

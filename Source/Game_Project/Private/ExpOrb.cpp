@@ -22,7 +22,6 @@ AExpOrb::AExpOrb()
 
     m_CollisionSphere->OnComponentBeginOverlap.AddDynamic(this, &AExpOrb::OnOverlap);
 
-    // Visual Mesh als Kind
     m_OrbMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("OrbMesh"));
     m_OrbMesh->SetupAttachment(m_CollisionSphere);
     m_OrbMesh->SetRelativeScale3D(FVector(0.3f));

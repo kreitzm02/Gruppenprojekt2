@@ -15,6 +15,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Melee Ability Action Settings", meta = (DisplayName = "Additional Damage"))
 	int32 m_AdditionalDamage;
 
+	UPROPERTY(EditAnywhere, Category = "Melee Ability Action Settings", meta = (DisplayName = "Sound Effect"))
+	USoundWave* m_SoundEffect;
+
 	UPROPERTY(EditAnywhere, Category = "Melee Ability Action Settings", meta = (DisplayName = "Allow Critical Hits"))
 	bool m_AllowCriticalHits;
 

@@ -5,6 +5,7 @@
 #include <Player/PlayerCharacter.h>
 #include <NiagaraFunctionLibrary.h>
 #include <Game_GameInstance.h>
+#include <Kismet/GameplayStatics.h>
 
 void UShieldAbilityAction::PrepareAbilityAction(AActor* a_AbilityUser)
 {
@@ -65,6 +66,12 @@ void UShieldAbilityAction::EndAbilityAction(AActor* a_AbilityUser)
 void UShieldAbilityAction::PlayShield(AActor* a_AbilityUser)
 {
 	a_AbilityUser->GetWorld()->GetTimerManager().SetTimer(m_MoveTimerHandle, FTimerDelegate::CreateUObject(this, &UShieldAbilityAction::MoveShield, a_AbilityUser), 0.01f, true);
+
+	if (APlayerCharacter* player = Cast<APlayerCharacter>(a_AbilityUser))
+	{
+		float sfxVolume = Cast<UGame_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()))->GetSFXVolume();
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), Cast<USoundBase>(m_SoundEffect), player->GetActorLocation(), sfxVolume);
+	}
 
 	UE_LOG(LogTemp, Warning, TEXT("Player just used an ability that included berserker ability action!"))
 

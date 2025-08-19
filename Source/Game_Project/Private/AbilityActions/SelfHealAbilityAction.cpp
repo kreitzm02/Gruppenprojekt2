@@ -5,6 +5,7 @@
 #include <Player/PlayerCharacter.h>
 #include <NiagaraFunctionLibrary.h>
 #include <Game_GameInstance.h>
+#include <Kismet/GameplayStatics.h>
 
 void USelfHealAbilityAction::PrepareAbilityAction(AActor* a_AbilityUser)
 {
@@ -54,6 +55,9 @@ void USelfHealAbilityAction::PlaySelfHeal(AActor* a_AbilityUser)
 	{
 		float hpToAdd = player->GetPlayerMaxHealth() * m_HPAmount;
 		player->TryAddPlayerHealth(hpToAdd);
+
+		float sfxVolume = Cast<UGame_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()))->GetSFXVolume();
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), Cast<USoundBase>(m_SoundEffect), player->GetActorLocation(), sfxVolume);
 	}
 
 	a_AbilityUser->GetWorld()->GetTimerManager().SetTimer(m_MoveTimerHandle, FTimerDelegate::CreateUObject(this, &USelfHealAbilityAction::MoveSelfHeal, a_AbilityUser), 0.01f, true);
