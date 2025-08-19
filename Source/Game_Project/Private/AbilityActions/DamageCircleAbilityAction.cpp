@@ -126,6 +126,9 @@ void UDamageCircleAbilityAction::PlayDamageCircle(AActor* a_AbilityUser)
 			}
 		}
 
+		float sfxVolume = Cast<UGame_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()))->GetSFXVolume();
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), Cast<USoundBase>(m_SoundEffect), player->GetActorLocation(), sfxVolume);
+
 		//a_AbilityUser->GetWorld()->GetTimerManager().SetTimer(m_DebugDrawTimerHandle, FTimerDelegate::CreateUObject(this, &UDamageCircleAbilityAction::DrawDebug, a_AbilityUser), 0.05f, true);
 		a_AbilityUser->GetWorld()->GetTimerManager().SetTimer(m_CircleMoveTimerHandle, FTimerDelegate::CreateUObject(this, &UDamageCircleAbilityAction::MoveCircle, a_AbilityUser), 0.01f, true);
 		a_AbilityUser->GetWorld()->GetTimerManager().SetTimer(m_DamageTickTimerHandle, FTimerDelegate::CreateUObject(this, &UDamageCircleAbilityAction::PerformDamageTick, a_AbilityUser), m_TimeBetweenHits, true);

@@ -207,6 +207,9 @@ void UDamageBallAbilityAction::PlayDamageBall(AActor* a_AbilityUser)
 			inst->m_VFXComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(a_AbilityUser->GetWorld(), m_VFX, startPosition, spawnRotation, scale, true, true, ENCPoolMethod::None, true);
 		}
 
+		float sfxVolume = Cast<UGame_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()))->GetSFXVolume();
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), Cast<USoundBase>(m_SoundEffect), player->GetActorLocation(), sfxVolume);
+
 		a_AbilityUser->GetWorld()->GetTimerManager().SetTimer(inst->m_MoveHandle, FTimerDelegate::CreateUObject(this, &UDamageBallAbilityAction::MoveDamageBallTick, inst, a_AbilityUser), 0.01f, true);
 		
 		a_AbilityUser->GetWorld()->GetTimerManager().SetTimer(inst->m_EndHandle, FTimerDelegate::CreateUObject(this, &UDamageBallAbilityAction::EndDamageBall, inst), m_MaxDuration, false);

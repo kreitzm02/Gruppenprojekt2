@@ -16,6 +16,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Damage Circle Action Settings", meta = (DisplayName = "Circle mesh"))
 	UStaticMesh* m_DCMesh;
 
+	UPROPERTY(EditAnywhere, Category = "Damage Circle Action Settings", meta = (DisplayName = "Sound Effect"))
+	USoundWave* m_SoundEffect;
+
 	UPROPERTY(EditAnywhere, Category = "Damage Circle Action Settings", meta = (DisplayName = "Damage Per Hit"))
 	int32 m_DamagePerHit;
 

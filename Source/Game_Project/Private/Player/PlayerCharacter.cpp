@@ -113,7 +113,7 @@ void APlayerCharacter::BeginPlay()
 		gameInstance->AddGameTimerToViewport();
 	}
 
-	gameInstance = Cast<UGame_GameInstance>(GetGameInstance());
+	m_AudioComp->SetVolumeMultiplier(Cast<UGame_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()))->GetSFXVolume());
 	gameInstance->OnSFXVolumeChanged.AddDynamic(this, &APlayerCharacter::HandleVolumeChanged);
 }
 
@@ -514,10 +514,9 @@ void APlayerCharacter::SetupMeleeHitbox()
 void APlayerCharacter::SetupAudioComp()
 {
 	m_AudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComponent"));
-	if (m_AudioComp)
-	{
-		m_AudioComp->SetSound(Cast<USoundBase>(m_HitSound));
-	}
+	m_AudioComp->SetupAttachment(RootComponent);
+	m_AudioComp->bAutoActivate = false;
+	m_AudioComp->SetSound(Cast<USoundBase>(m_HitSound));
 }
 
 #pragma endregion
@@ -725,6 +724,7 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 		TryAddPlayerHealth(totalDmg * -1); // "adds" negative health
 		m_passedInvulnarabilityTime = 0.0f;
 		m_playerIsHittable = false;
+		m_AudioComp->SetSound(Cast<USoundBase>(m_HitSound));
 		m_AudioComp->Play();
 		if (DamageCauser)
 		{
@@ -945,7 +945,7 @@ void APlayerCharacter::UpdateSelectedAbilityUI()
 
 void APlayerCharacter::FillAbilityLevelMap()
 {
-	if (!m_AbilityLevels.IsEmpty()) return; // if we have a savegame, we can sync the map with the save file before calling this method.
+	if (!m_AbilityLevels.IsEmpty()) return;
 	for (int i = 0; i < (int)EAllAbilities::ENUMLENGTH; i++)
 	{
 		int level = 1;

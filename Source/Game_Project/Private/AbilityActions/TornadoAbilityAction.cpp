@@ -66,6 +66,17 @@ void UTornadoAbilityAction::PlayTornado(AActor* a_AbilityUser)
 	// niagara
 	inst->m_VFXComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(a_AbilityUser->GetWorld(), m_TornadoVFX, spawnPos, FRotator::ZeroRotator, FVector(1.0f), true, true, ENCPoolMethod::None, true);
 
+	//sound
+	inst->m_SoundComp = UGameplayStatics::SpawnSoundAttached(Cast<USoundBase>(m_SoundEffect), static_cast<USceneComponent*>(inst->m_VFXComp), NAME_None, FVector::ZeroVector, 
+		EAttachLocation::KeepRelativeOffset, true, Cast<UGame_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()))->GetSFXVolume(), 1.0f, 0.0f, nullptr, nullptr, false);
+
+	inst->m_SoundComp->bOverrideAttenuation = true;
+	auto& A = inst->m_SoundComp->AttenuationOverrides;
+	A.bAttenuate = true;
+	A.AttenuationShape = EAttenuationShape::Sphere;
+	A.AttenuationShapeExtents = FVector(300.f, 0.f, 0.f);
+	A.FalloffDistance = m_AttractionRadius;
+
 	// movement
 	a_AbilityUser->GetWorld()->GetTimerManager().SetTimer(inst->m_MoveHandle, FTimerDelegate::CreateUObject(this, &UTornadoAbilityAction::MoveTornadoTick, inst), 0.01f, true);
 
@@ -230,6 +241,13 @@ void UTornadoAbilityAction::UpdateHitActors(TSharedPtr<FTornadoInstance> a_Insta
 
 void UTornadoAbilityAction::EndTornado(TSharedPtr<FTornadoInstance> a_Instance)
 {
+	if (a_Instance->m_SoundComp)
+	{
+		a_Instance->m_SoundComp->bAutoDestroy = true;
+		a_Instance->m_SoundComp->FadeOut(0.5f, 0.f);
+		a_Instance->m_SoundComp = nullptr;
+	}
+
 	if (a_Instance->m_VFXComp)
 	{
 		a_Instance->m_VFXComp->DeactivateImmediate();
