@@ -971,6 +971,11 @@ UMainAbilityContainerDataAsset* APlayerCharacter::GetRandomAbilityFromPool()
 			tempPool.RemoveAt(randIndex);
 			continue;
 		}
+		if (m_LvlUpAbilitySelection.Contains(tempPool[randIndex]))
+		{
+			tempPool.RemoveAt(randIndex);
+			continue;
+		}
 		randAbility = tempPool[randIndex];
 		break;
 	}
