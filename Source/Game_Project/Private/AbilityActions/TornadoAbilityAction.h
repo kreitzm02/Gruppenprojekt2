@@ -14,6 +14,7 @@ struct FTornadoInstance
 	FVector m_CurrPosition;
 	TSet<AActor*> m_AlreadyHitActors;
 	UNiagaraComponent* m_VFXComp = nullptr;
+	UAudioComponent* m_SoundComp = nullptr;
 	FTimerHandle m_MoveHandle;
 	FTimerHandle m_EndHandle;
 	FTimerHandle m_ClearHitListHandle;
@@ -28,6 +29,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Niagara VFX", meta = (DisplayName = "Tornado vfx"))
 	UNiagaraSystem* m_TornadoVFX;
+
+	UPROPERTY(EditAnywhere, Category = "Tornado Settings", meta = (DisplayName = "Sound Effect"))
+	USoundWave* m_SoundEffect;
 
 	UPROPERTY(EditAnywhere, Category = "Tornado Settings", meta = (DisplayName = "Spawn Radius"))
 	float m_SpawnRadius = 600.0f;

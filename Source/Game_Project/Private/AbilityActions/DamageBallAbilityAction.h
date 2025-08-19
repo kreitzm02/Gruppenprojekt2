@@ -29,6 +29,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Niagara VFX", meta = (DisplayName = "Projectile"))
 	UNiagaraSystem* m_VFX;
 
+	UPROPERTY(EditAnywhere, Category = "Damage Ball Action Settings", meta = (DisplayName = "Sound Effect"))
+	USoundWave* m_SoundEffect;
+
 	UPROPERTY(EditAnywhere, Category = "Damage Ball Action Settings", meta = (DisplayName = "Damage"))
 	int32 m_Damage;
 

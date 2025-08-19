@@ -19,6 +19,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Berserk Ability Action Settings", meta = (DisplayName = "VFX"))
 	UNiagaraSystem* m_BerserkVFX;
 
+	UPROPERTY(EditAnywhere, Category = "Berserk Ability Action Settings", meta = (DisplayName = "Sound Effect"))
+	USoundWave* m_SoundEffect;
+
 	UPROPERTY(EditAnywhere, Category = "Berserk Ability Action Settings", meta = (DisplayName = "Atk Points to Raise"))
 	float m_APAmount;
 

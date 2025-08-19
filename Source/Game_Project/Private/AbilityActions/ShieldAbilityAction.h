@@ -18,6 +18,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Shield Ability Action Settings", meta = (DisplayName = "VFX"))
 	UNiagaraSystem* m_ShieldVFX;
 
+	UPROPERTY(EditAnywhere, Category = "Shield Ability Action Settings", meta = (DisplayName = "Sound Effect"))
+	USoundWave* m_SoundEffect;
+
 	UPROPERTY(EditAnywhere, Category = "Shield Ability Action Settings", meta = (DisplayName = "Defense to Add"))
 	float m_DPAmount;
 

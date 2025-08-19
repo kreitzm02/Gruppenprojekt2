@@ -18,6 +18,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Heal Ability Action Settings", meta = (DisplayName = "VFX"))
 	UNiagaraSystem* m_HealVFX;
 
+	UPROPERTY(EditAnywhere, Category = "Heal Ability Action Settings", meta = (DisplayName = "Sound Effect"))
+	USoundWave* m_SoundEffect;
+
 	UPROPERTY(EditAnywhere, Category = "Heal Ability Action Settings", meta = (DisplayName = "HP to Heal (in %)"))
 	float m_HPAmount;
 
