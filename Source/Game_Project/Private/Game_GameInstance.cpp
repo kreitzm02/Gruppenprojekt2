@@ -224,6 +224,5 @@ void UGame_GameInstance::OnTimerEnd()
 		m_timerWidgetInstance = nullptr;
 	}
 	ACharacter* player = GetFirstLocalPlayerController()->GetCharacter();
-	ULoadingScreenManager::Get(player->GetWorld())->StartLoading(player->GetWorld());
 	UGameplayStatics::OpenLevel(this, "EndbossArena");
 }
