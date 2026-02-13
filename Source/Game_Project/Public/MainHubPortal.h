@@ -23,6 +23,12 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UFUNCTION(Server, Reliable)
+	void RequestServerTravel(APlayerController* a_pc);
+
+	void DoServerTravel();
+
+	bool m_travelInProgress = false;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
