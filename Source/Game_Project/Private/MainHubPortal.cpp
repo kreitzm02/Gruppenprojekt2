@@ -54,7 +54,17 @@ void AMainHubPortal::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor*
     if (APlayerCharacter* Player = Cast<APlayerCharacter>(OtherActor))
     {
         ULoadingScreenManager::Get(Player->GetWorld())->StartLoading(Player->GetWorld());
-        UGameplayStatics::OpenLevel(this, "temp");
+
+    	//UGameplayStatics::OpenLevel(this, "temp");
+
+        if (HasAuthority())
+        {
+	        DoServerTravel();
+        }
+        else
+        {
+	        RequestServerTravel(Cast<APlayerController>(Player->GetController()));
+        }
 
         //bool temp;
         //NewLevel = ULevelStreamingDynamic::LoadLevelInstance(this, "temp", FVector::ZeroVector, FRotator::ZeroRotator,  temp);
@@ -71,6 +81,29 @@ void AMainHubPortal::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor*
         gameInstance->SetIsInLevel(true);
     }
 }
+
+void AMainHubPortal::RequestServerTravel_Implementation(APlayerController* a_pc)
+{
+	DoServerTravel();
+}
+
+void AMainHubPortal::DoServerTravel()
+{
+	if (!HasAuthority())
+	{
+		return;
+	}
+    if (m_travelInProgress)
+    {
+	    return;
+    }
+    m_travelInProgress = true;
+     if (UWorld* world = GetWorld())
+     {
+	     world->ServerTravel("/Game/temp?listen");
+     }
+}
+
 
 void AMainHubPortal::Load()
 {
