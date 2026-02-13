@@ -20,6 +20,7 @@
 #include <Game_GameInstance.h>
 
 #include "Enemy_ProjectileBase.h"
+#include "MultiplayerSubsystem.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 
@@ -120,6 +121,15 @@ void APlayerCharacter::BeginPlay()
 	{
 		m_PlayerHealth = m_PlayerMaxHealth * Cast<UGame_GameInstance>(GetGameInstance())->m_playerSave->GetPlayerHPMultiplier();
 	}
+
+	//TODO rewrite mp section
+	//UMultiplayerSubsystem* mpSubsystem = GetGameInstance()->GetSubsystem<UMultiplayerSubsystem>();
+	//if (mpSubsystem->shouldOpen)
+	//{
+	//	UMPSessionInfo* mpSessionInfo = CreateWidget<UMPSessionInfo>(GetWorld(), UMPSessionInfo::StaticClass());
+	//	mpSessionInfo->AddToViewport();
+	//	mpSubsystem->shouldOpen = false;
+	//}
 }
 
 // Called every frame
