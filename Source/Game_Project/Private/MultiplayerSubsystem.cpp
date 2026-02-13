@@ -125,6 +125,7 @@ void UMultiplayerSubsystem::HandleCreateSessionComplete(FName a_sessionName, boo
 	            OnLobbyCreateSuccess.Broadcast();
             }
             sessionPtr->ClearOnCreateSessionCompleteDelegates(this);
+            GetWorld()->ServerTravel("/Game/MainHub1?listen");
         }
     }
 }
