@@ -36,12 +36,12 @@ void UMultiplayerSubsystem::Login()
 		if (IOnlineIdentityPtr identity = m_onlineSubsystem->GetIdentityInterface())
 		{
             FOnlineAccountCredentials credentials;
-            //credentials.Id = FString();
-            //credentials.Token = FString();
-            //credentials.Type = FString("accountportal");
-            credentials.Id = FString("127.0.0.1:8081");
-            credentials.Token = FString("GameProjectCred");
-            credentials.Type = FString("developer");
+            credentials.Id = FString();
+            credentials.Token = FString();
+            credentials.Type = FString("accountportal");
+            //credentials.Id = FString("127.0.0.1:8081");
+            //credentials.Token = FString("GameProjectCred");
+            //credentials.Type = FString("developer");
 			
 
             identity->OnLoginCompleteDelegates->AddUObject(this, &UMultiplayerSubsystem::HandleLoginComplete);
