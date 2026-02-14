@@ -36,12 +36,12 @@ void UMultiplayerSubsystem::Login()
 		if (IOnlineIdentityPtr identity = m_onlineSubsystem->GetIdentityInterface())
 		{
             FOnlineAccountCredentials credentials;
-            credentials.Id = FString();
-            credentials.Token = FString();
-            credentials.Type = FString("accountportal");
-            //credentials.Id = FString("127.0.0.1:8081");
-            //credentials.Token = FString("GameProjectCred");
-            //credentials.Type = FString("developer");
+            //credentials.Id = FString();
+            //credentials.Token = FString();
+            //credentials.Type = FString("accountportal");
+            credentials.Id = FString("127.0.0.1:8081");
+            credentials.Token = FString("GameProjectCred");
+            credentials.Type = FString("developer");
 			
 
             identity->OnLoginCompleteDelegates->AddUObject(this, &UMultiplayerSubsystem::HandleLoginComplete);
@@ -90,19 +90,28 @@ void UMultiplayerSubsystem::CreateSession()
 
                 UE_LOG(LogTemp, Warning, TEXT("Session Code: %s"), *m_lastHostedLobbyCode);
 
-                FOnlineSessionSettings sessionSettings;
-                sessionSettings.bIsDedicated = false;
-                sessionSettings.bShouldAdvertise = true;
-                sessionSettings.bIsLANMatch = false;
-                sessionSettings.NumPublicConnections = 4;
-                sessionSettings.bAllowJoinInProgress = true;
-                sessionSettings.bAllowJoinViaPresence = true;
-                sessionSettings.bUsesPresence = true;
-                sessionSettings.bUseLobbiesIfAvailable = true;
-                sessionSettings.Set(SEARCH_KEYWORDS, m_lastHostedLobbyCode, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
+                if (sessionPtr->GetNumSessions() > 0)
+                {
+                    UE_LOG(LogTemp, Warning, TEXT("Currently running: %i Sessions trying to destroy it first"), sessionPtr->GetNumSessions());
 
-                sessionPtr->OnCreateSessionCompleteDelegates.AddUObject(this, &UMultiplayerSubsystem::HandleCreateSessionComplete);
-                sessionPtr->CreateSession(0, SESSION_NAME, sessionSettings);
+                    DestroySessionForNewOne();
+                }
+                else
+                {
+                    FOnlineSessionSettings sessionSettings;
+                    sessionSettings.bIsDedicated = false;
+                    sessionSettings.bShouldAdvertise = true;
+                    sessionSettings.bIsLANMatch = false;
+                    sessionSettings.NumPublicConnections = 4;
+                    sessionSettings.bAllowJoinInProgress = true;
+                    sessionSettings.bAllowJoinViaPresence = true;
+                    sessionSettings.bUsesPresence = true;
+                    sessionSettings.bUseLobbiesIfAvailable = true;
+                    sessionSettings.Set(SEARCH_KEYWORDS, m_lastHostedLobbyCode, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
+
+                    sessionPtr->OnCreateSessionCompleteDelegates.AddUObject(this, &UMultiplayerSubsystem::HandleCreateSessionComplete);
+                    sessionPtr->CreateSession(0, SESSION_NAME, sessionSettings);
+                }
             }
         }
     }
@@ -125,7 +134,9 @@ void UMultiplayerSubsystem::HandleCreateSessionComplete(FName a_sessionName, boo
 	            OnLobbyCreateSuccess.Broadcast();
             }
             sessionPtr->ClearOnCreateSessionCompleteDelegates(this);
-            GetWorld()->ServerTravel("/Game/MainHub1?listen");
+            
+            //GetWorld()->ServerTravel("/Game/MainHub1?listen");
+            UGameplayStatics::OpenLevel(GetWorld(), FName("/Game/MainHub1"), true, TEXT("listen"));
         }
     }
 }
@@ -145,6 +156,7 @@ void UMultiplayerSubsystem::DestroySession()
     }
 }
 
+
 void UMultiplayerSubsystem::HandleDestroySessionComplete(FName a_sessionName, bool a_bWasSuccessful)
 {
     if (m_onlineSubsystem)
@@ -153,12 +165,44 @@ void UMultiplayerSubsystem::HandleDestroySessionComplete(FName a_sessionName, bo
         {
             if (a_bWasSuccessful)
             {
-                OnLobbyCreateSuccess.Broadcast();
+                UE_LOG(LogTemp, Warning, TEXT("Session Destroyed"));
             }
             sessionPtr->ClearOnDestroySessionCompleteDelegates(this);
         }
     }
 }
+
+void UMultiplayerSubsystem::DestroySessionForNewOne()
+{
+    if (m_isLoggedIn)
+    {
+        if (m_onlineSubsystem)
+        {
+            if (IOnlineSessionPtr sessionPtr = m_onlineSubsystem->GetSessionInterface())
+            {
+                sessionPtr->OnDestroySessionCompleteDelegates.AddUObject(this, &UMultiplayerSubsystem::HandleDestroySessionForNewOneComplete);
+                sessionPtr->DestroySession(SESSION_NAME);
+            }
+        }
+    }
+}
+
+void UMultiplayerSubsystem::HandleDestroySessionForNewOneComplete(FName a_sessionName, bool a_bWasSuccessful)
+{
+    if (m_onlineSubsystem)
+    {
+        if (IOnlineSessionPtr sessionPtr = m_onlineSubsystem->GetSessionInterface())
+        {
+            if (a_bWasSuccessful)
+            {
+                UE_LOG(LogTemp, Warning, TEXT("Session Destroyed trying to create new Session"));
+            }
+            sessionPtr->ClearOnDestroySessionCompleteDelegates(this);
+            CreateSession();
+        }
+    }
+}
+
 
 void UMultiplayerSubsystem::GetAllFriends()
 {

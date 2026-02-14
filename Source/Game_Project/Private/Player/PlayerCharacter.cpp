@@ -122,14 +122,9 @@ void APlayerCharacter::BeginPlay()
 		m_PlayerHealth = m_PlayerMaxHealth * Cast<UGame_GameInstance>(GetGameInstance())->m_playerSave->GetPlayerHPMultiplier();
 	}
 
-	//TODO rewrite mp section
-	//UMultiplayerSubsystem* mpSubsystem = GetGameInstance()->GetSubsystem<UMultiplayerSubsystem>();
-	//if (mpSubsystem->shouldOpen)
-	//{
-	//	UMPSessionInfo* mpSessionInfo = CreateWidget<UMPSessionInfo>(GetWorld(), UMPSessionInfo::StaticClass());
-	//	mpSessionInfo->AddToViewport();
-	//	mpSubsystem->shouldOpen = false;
-	//}
+	const ENetMode NetMode = GetNetMode();
+	UE_LOG(LogTemp, Warning, TEXT("TRAVEL: NetMode=%d (0=Standalone,1=Dedicated,2=Listen,3=Client) HasAuthority=%d"),
+		(int32)NetMode, HasAuthority() ? 1 : 0);
 }
 
 // Called every frame
