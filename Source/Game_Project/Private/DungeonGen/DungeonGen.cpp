@@ -44,7 +44,7 @@ void ADungeonGen::BeginPlay()
 				PC->SetActorLocation(FVector((float)startPos.X * m_UnitSize, (float)startPos.Y * m_UnitSize, 100.0f));
 				PC->SetActorRotation(FRotator::ZeroRotator);
 				UE_LOG(LogTemp, Log, TEXT("PlayerCharacter (Iterator) auf Startraum gesetzt."));
-				break;
+				//break;
 			}
 		}
 	}
