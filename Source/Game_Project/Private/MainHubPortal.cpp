@@ -8,6 +8,7 @@
 
 #include "Gamemode_Standart.h"
 #include "Game_GameInstance.h"
+#include "TestGM.h"
 
 // Sets default values
 AMainHubPortal::AMainHubPortal()
@@ -102,13 +103,14 @@ void AMainHubPortal::DoServerTravel()
 	    return;
     }
     m_travelInProgress = true;
-     if (UWorld* world = GetWorld())
-     {
-         const ENetMode NetMode = GetNetMode();
-         UE_LOG(LogTemp, Warning, TEXT("TRAVEL: NetMode=%d (0=Standalone,1=Dedicated,2=Listen,3=Client) HasAuthority=%d"),
-             (int32)NetMode, HasAuthority() ? 1 : 0);
-	     world->ServerTravel("/Game/temp?listen", true);
-     }
+    if (UWorld* world = GetWorld())
+    {
+        Cast<UGame_GameInstance>(GetGameInstance())->SetOverworldSeed();
+        const ENetMode NetMode = GetNetMode();
+        UE_LOG(LogTemp, Warning, TEXT("TRAVEL: NetMode=%d (0=Standalone,1=Dedicated,2=Listen,3=Client) HasAuthority=%d"),
+            (int32)NetMode, HasAuthority() ? 1 : 0);
+	    world->ServerTravel("/Game/temp?listen", true);
+    }
 }
 
 
