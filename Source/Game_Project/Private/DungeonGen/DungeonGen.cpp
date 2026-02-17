@@ -33,17 +33,19 @@ void ADungeonGen::BeginPlay()
 	Super::BeginPlay();
 	m_ThisLevel = GetLevel();
 	GenerateDungeon();
-
-	for (TActorIterator<APlayerCharacter> It(GetWorld()); It; ++It)
+	if (HasAuthority())
 	{
-		APlayerCharacter* PC = *It;
-		if (PC)
+		for (TActorIterator<APlayerCharacter> It(GetWorld()); It; ++It)
 		{
-			FInt32Vector2 startPos = m_Data.m_StartRoom.GetRoomCenter();
-			PC->SetActorLocation(FVector((float)startPos.X * m_UnitSize, (float)startPos.Y * m_UnitSize, 100.0f));
-			PC->SetActorRotation(FRotator::ZeroRotator);
-			UE_LOG(LogTemp, Log, TEXT("PlayerCharacter (Iterator) auf Startraum gesetzt."));
-			break;
+			APlayerCharacter* PC = *It;
+			if (PC)
+			{
+				FInt32Vector2 startPos = m_Data.m_StartRoom.GetRoomCenter();
+				PC->SetActorLocation(FVector((float)startPos.X * m_UnitSize, (float)startPos.Y * m_UnitSize, 100.0f));
+				PC->SetActorRotation(FRotator::ZeroRotator);
+				UE_LOG(LogTemp, Log, TEXT("PlayerCharacter (Iterator) auf Startraum gesetzt."));
+				break;
+			}
 		}
 	}
 }
@@ -167,7 +169,10 @@ void ADungeonGen::GenerateDungeon()
 	m_Builder->BuildBossRoom();
 	m_Builder->GenerateEnemies();
 	m_Builder->BuildTorches();
-	BuildNavMeshForDungeon();
+	if (HasAuthority())
+	{
+		BuildNavMeshForDungeon();
+	}
 	ULoadingScreenManager::Get(GetWorld())->EndLoading();
 }
 
