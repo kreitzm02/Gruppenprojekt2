@@ -48,6 +48,11 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
+	void GenerateWorld(int32 a_seed);
+
+	UFUNCTION()
+	void HandleSeedReady(int32 a_seed);
+
 	enum TileType
 	{
 		RoadNoEdges,
@@ -98,6 +103,8 @@ private:
 		}
 	};
 
+	bool m_worldGenerated;
+
 	UPROPERTY(VisibleAnywhere)
 	ACustomChunkManager* m_chunkManager = nullptr;
 
@@ -107,8 +114,8 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Overworld settings")
 	int m_tileSize = 100;
 
-	UPROPERTY(EditAnywhere, Category = "Overworld settings")
-	int32 m_seed = 0;
+	//UPROPERTY(EditAnywhere, Category = "Overworld settings")
+	//int32 m_seed = 0;
 
 	UPROPERTY(EditAnywhere, Category = "Overworld settings")
 	int m_worldSize = 0;
