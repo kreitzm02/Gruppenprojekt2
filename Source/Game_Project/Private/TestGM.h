@@ -19,6 +19,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "GameMode")
 	TSubclassOf<APawn> m_PlayerPawnBPClass;
 
+
 protected:
 	virtual void BeginPlay() override;
 };

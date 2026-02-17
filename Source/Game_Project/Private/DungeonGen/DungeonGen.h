@@ -31,6 +31,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	void BeginGenerateDungeon(int32 a_seed);
+
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* m_DevCube;
 
@@ -82,6 +84,11 @@ private:
 	UPROPERTY()
 	ULevel* m_ThisLevel;
 
+	bool m_dungeonGenerated = false;
+
+	UFUNCTION()
+	void HandleSeedReady(int32 a_seed);
+
 	UFUNCTION()
 	void GenerateRooms();
 
@@ -89,7 +96,7 @@ private:
 	void GenerateCorridors();
 
 	UFUNCTION()
-	void GenerateDungeon();
+	void GenerateDungeon(int32 a_seed);
 
 	UFUNCTION()
 	void BuildNavMeshForDungeon();

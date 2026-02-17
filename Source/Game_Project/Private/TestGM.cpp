@@ -19,22 +19,24 @@ void ATestGM::BeginPlay()
 
 	
 
-	AMultiplayerGameState* gs = GetGameState<AMultiplayerGameState>();
-
-	if (gs)
-	{
-		int32 seed = FMath::RandRange(1,RAND_MAX);
-
-		gs->m_worldSeed = seed;
-
-		gs->ForceNetUpdate();
-
-		UE_LOG(LogTemp, Warning, TEXT("Host set Seed: %d"), seed);
-
-		gs->OnSeedReady.Broadcast(seed);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("No Game State found"));
-	}
+	//AMultiplayerGameState* gs = GetGameState<AMultiplayerGameState>();
+	//
+	//if (gs)
+	//{
+	//	int32 seed = FMath::RandRange(1,RAND_MAX);
+	//
+	//	gs->m_overworldSeed = seed;
+	//
+	//	gs->ForceNetUpdate();
+	//
+	//	UE_LOG(LogTemp, Warning, TEXT("Host set Seed: %d"), seed);
+	//
+	//	gs->OnOverworldSeedReady.Broadcast(seed);
+	//}
+	//else
+	//{
+	//	UE_LOG(LogTemp, Error, TEXT("No Game State found"));
+	//}
 }
+
+

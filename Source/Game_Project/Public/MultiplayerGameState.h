@@ -7,7 +7,8 @@
 #include "MultiplayerGameState.generated.h"
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSeedReady, int32, a_seed);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnOverworldSeedReady, int32, a_seed);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDungeonSeedReady, int32, a_seed);
 
 /**
  * 
@@ -21,14 +22,25 @@ public:
 	AMultiplayerGameState();
 
 	UPROPERTY(ReplicatedUsing = OnRep_WorldSeed, BlueprintReadOnly)
-	int32 m_worldSeed;
+	int32 m_overworldSeed;
 
 	UPROPERTY()
-	FOnSeedReady OnSeedReady;
+	FOnOverworldSeedReady OnOverworldSeedReady;
+
+	UPROPERTY(ReplicatedUsing = OnRep_DungeonSeed, BlueprintReadOnly)
+	int32 m_dungeonSeed;
+
+	UPROPERTY()
+	FOnOverworldSeedReady OnDungeonSeedReady;
 
 protected:
+	virtual void BeginPlay() override;
+
 	UFUNCTION()
 	void OnRep_WorldSeed();
+
+	UFUNCTION()
+	void OnRep_DungeonSeed();
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

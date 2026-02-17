@@ -29,13 +29,13 @@ void AOverworldGeneration::BeginPlay()
 	    return;
     }
 
-    if (gs->m_worldSeed != 0)
+    if (gs->m_overworldSeed != 0)
     {
-	    HandleSeedReady(gs->m_worldSeed);
+	    HandleSeedReady(gs->m_overworldSeed);
     }
     else
     {
-	    gs->OnSeedReady.AddDynamic(this, &AOverworldGeneration::HandleSeedReady);
+	    gs->OnOverworldSeedReady.AddDynamic(this, &AOverworldGeneration::HandleSeedReady);
     }
 }
 
