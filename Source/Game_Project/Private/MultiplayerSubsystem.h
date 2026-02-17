@@ -39,6 +39,9 @@ public:
     UFUNCTION(BlueprintCallable)
     void DestroySession();
 
+    UFUNCTION(BlueprintCallable)
+    void DestroySessionForNewOne();
+
     // Call to get all Friends in Friendslist
     UFUNCTION(BlueprintCallable)
     void GetAllFriends();
@@ -83,6 +86,7 @@ private:
 	void HandleLoginComplete(int32 a_localUserNum, bool a_bWasSuccessful, const FUniqueNetId& a_userId, const FString& a_error);
     void HandleCreateSessionComplete(FName a_sessionName, bool a_bWasSuccessful);
     void HandleDestroySessionComplete(FName a_sessionName, bool a_bWasSuccessful);
+    void HandleDestroySessionForNewOneComplete(FName a_sessionName, bool a_bWasSuccessful);
     void OnGetAllFriendsComplete(int32 a_localUserNum, bool a_bWasSuccessful, const FString& a_listName, const FString& a_errorStr);
     void HandleFindSessionsComplete(bool a_bWasSuccessful);
     void HandleJoinSessionComplete(FName a_sessionName, EOnJoinSessionCompleteResult::Type a_result);

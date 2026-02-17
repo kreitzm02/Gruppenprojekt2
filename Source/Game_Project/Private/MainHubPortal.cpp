@@ -6,6 +6,7 @@
 #include "LoadingScreenManager.h"
 #include <Player/PlayerCharacter.h>
 
+#include "Gamemode_Standart.h"
 #include "Game_GameInstance.h"
 
 // Sets default values
@@ -57,6 +58,9 @@ void AMainHubPortal::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor*
 
     	//UGameplayStatics::OpenLevel(this, "temp");
 
+        //AGamemode_Standart* gm = GetWorld()->GetAuthGameMode<AGamemode_Standart>();
+        //gm->LoadNewMap("/Game/temp?listen");
+
         if (HasAuthority())
         {
 	        DoServerTravel();
@@ -100,6 +104,9 @@ void AMainHubPortal::DoServerTravel()
     m_travelInProgress = true;
      if (UWorld* world = GetWorld())
      {
+         const ENetMode NetMode = GetNetMode();
+         UE_LOG(LogTemp, Warning, TEXT("TRAVEL: NetMode=%d (0=Standalone,1=Dedicated,2=Listen,3=Client) HasAuthority=%d"),
+             (int32)NetMode, HasAuthority() ? 1 : 0);
 	     world->ServerTravel("/Game/temp?listen");
      }
 }
