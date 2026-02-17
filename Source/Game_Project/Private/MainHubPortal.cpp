@@ -107,7 +107,7 @@ void AMainHubPortal::DoServerTravel()
          const ENetMode NetMode = GetNetMode();
          UE_LOG(LogTemp, Warning, TEXT("TRAVEL: NetMode=%d (0=Standalone,1=Dedicated,2=Listen,3=Client) HasAuthority=%d"),
              (int32)NetMode, HasAuthority() ? 1 : 0);
-	     world->ServerTravel("/Game/temp?listen");
+	     world->ServerTravel("/Game/temp?listen", true);
      }
 }
 

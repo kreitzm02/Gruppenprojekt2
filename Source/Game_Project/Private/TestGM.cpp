@@ -10,6 +10,7 @@ ATestGM::ATestGM()
 {
 	DefaultPawnClass = m_PlayerPawnBPClass;
 	PlayerControllerClass = ADefaultPlayerController::StaticClass();
+	bUseSeamlessTravel = true;
 }
 
 void ATestGM::BeginPlay()
