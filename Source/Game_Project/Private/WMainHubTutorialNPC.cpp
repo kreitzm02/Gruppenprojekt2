@@ -30,7 +30,18 @@ void UWMainHubTutorialNPC::OnButton1Clicked()
 		pc->SetInputMode(FInputModeGameOnly());
 	}
 	ULoadingScreenManager::Get(GetWorld())->StartLoading(GetWorld());
-	UGameplayStatics::OpenLevel(this, FName("TutorialArea1"));
+	//UGameplayStatics::OpenLevel(this, FName("TutorialArea1"));
+
+	if (GetWorld()->GetFirstLocalPlayerFromController()->GetPlayerController(GetWorld())->HasAuthority())
+	{
+		DoServerTravel();
+		UE_LOG(LogTemp, Warning, TEXT("Has Authority"));
+	}
+	else
+	{
+		RequestServerTravel();
+		UE_LOG(LogTemp, Warning, TEXT("Has no Authority"));
+	}
 }
 
 void UWMainHubTutorialNPC::OnButton2Clicked()
@@ -42,4 +53,30 @@ void UWMainHubTutorialNPC::OnButton2Clicked()
 		pc->SetInputMode(FInputModeGameOnly());
 	}
 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.0f);
+}
+
+void UWMainHubTutorialNPC::RequestServerTravel_Implementation()
+{
+	DoServerTravel();
+}
+
+void UWMainHubTutorialNPC::DoServerTravel()
+{
+	
+	if (!GetWorld()->GetFirstLocalPlayerFromController()->GetPlayerController(GetWorld())->HasAuthority())
+	{
+		return;
+	}
+	if (m_travelInProgress)
+	{
+		return;
+	}
+	m_travelInProgress = true;
+	if (UWorld* world = GetWorld())
+	{
+		const ENetMode NetMode = GetWorld()->GetFirstLocalPlayerFromController()->GetPlayerController(GetWorld())->GetNetMode();
+		UE_LOG(LogTemp, Warning, TEXT("TRAVEL: NetMode=%d (0=Standalone,1=Dedicated,2=Listen,3=Client) HasAuthority=%d"),
+			(int32)NetMode, GetWorld()->GetFirstLocalPlayerFromController()->GetPlayerController(GetWorld())->HasAuthority() ? 1 : 0);
+		world->ServerTravel("/Game/TutorialArea1?listen");
+	}
 }

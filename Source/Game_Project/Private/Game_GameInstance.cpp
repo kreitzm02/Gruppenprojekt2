@@ -4,6 +4,7 @@
 #include "Game_GameInstance.h"
 
 #include "LoadingScreenManager.h"
+#include "MultiplayerGameState.h"
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "Microsoft/AllowMicrosoftPlatformTypes.h"
@@ -146,6 +147,57 @@ void UGame_GameInstance::SetSFXVolume(float a_volume)
 
 
 
+void UGame_GameInstance::SetOverworldSeed()
+{
+	AMultiplayerGameState* gs = GetWorld()->GetGameState<AMultiplayerGameState>();
+
+	if (gs)
+	{
+		int32 seed = FMath::RandRange(1, RAND_MAX);
+
+		m_overworldSeed = seed;
+
+		gs->m_overworldSeed = seed;
+		
+		gs->ForceNetUpdate();
+
+		UE_LOG(LogTemp, Warning, TEXT("Host set Seed: %d"), seed);
+
+		m_overworldSeedSet = true;
+
+		gs->OnOverworldSeedReady.Broadcast(seed);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("No Game State found"));
+	}
+}
+
+void UGame_GameInstance::SetDungeonSeed()
+{
+	AMultiplayerGameState* gs = GetWorld()->GetGameState<AMultiplayerGameState>();
+
+	if (gs)
+	{
+		int32 seed = FMath::RandRange(1, RAND_MAX);
+
+		m_dungeonSeed = seed;
+
+		gs->m_dungeonSeed = seed;
+
+		gs->ForceNetUpdate();
+
+		UE_LOG(LogTemp, Warning, TEXT("Host set Seed: %d"), seed);
+
+		m_dungeonSeedSet = true;
+
+		gs->OnDungeonSeedReady.Broadcast(seed);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("No Game State found"));
+	}
+}
 
 
 
