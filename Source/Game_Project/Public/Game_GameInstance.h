@@ -59,6 +59,20 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float GetSFXVolume() { return m_sfxVolume; }
 
+
+	void SetOverworldSeed();
+
+	int32 m_overworldSeed;
+
+	bool m_overworldSeedSet = false;
+
+	void SetDungeonSeed();
+
+	int32 m_dungeonSeed;
+
+	bool m_dungeonSeedSet = false;
+
+
 	void SetIsInLevel(bool a_isInLevel) { m_isInLevel = a_isInLevel; }
 
 	UFUNCTION(BlueprintCallable)

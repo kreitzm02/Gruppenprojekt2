@@ -20,6 +20,7 @@
 #include <Game_GameInstance.h>
 
 #include "Enemy_ProjectileBase.h"
+#include "MultiplayerSubsystem.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 
@@ -129,6 +130,10 @@ void APlayerCharacter::BeginPlay()
 	{
 		m_PlayerHealth = m_PlayerMaxHealth * Cast<UGame_GameInstance>(GetGameInstance())->m_playerSave->GetPlayerHPMultiplier();
 	}
+
+	const ENetMode NetMode = GetNetMode();
+	UE_LOG(LogTemp, Warning, TEXT("TRAVEL: NetMode=%d (0=Standalone,1=Dedicated,2=Listen,3=Client) HasAuthority=%d"),
+		(int32)NetMode, HasAuthority() ? 1 : 0);
 }
 
 // Called every frame

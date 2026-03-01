@@ -28,4 +28,12 @@ public:
 
     UFUNCTION()
     void OnButton2Clicked();
+
+private:
+    UFUNCTION(Server, Reliable)
+    void RequestServerTravel();
+
+    void DoServerTravel();
+
+    bool m_travelInProgress = false;
 };

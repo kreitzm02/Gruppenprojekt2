@@ -13,6 +13,8 @@
 #include <Player/PlayerCharacter.h>
 #include <Engine/LevelStreamingDynamic.h>
 
+#include "MultiplayerGameState.h"
+
 // Sets default values
 ADungeonGen::ADungeonGen()
 {
@@ -25,27 +27,58 @@ ADungeonGen::ADungeonGen()
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> cubeMesh(*DEFAULT_CUBE_PATH);
 	
 	if (cubeMesh.Succeeded()) m_DevCube->SetStaticMesh(cubeMesh.Object);
+
+	m_dungeonGenerated = false;
 }
 
 // Called when the game starts or when spawned
 void ADungeonGen::BeginPlay()
 {
 	Super::BeginPlay();
-	m_ThisLevel = GetLevel();
-	GenerateDungeon();
+	//m_ThisLevel = GetLevel();
+	//GenerateDungeon();
+	//if (HasAuthority())
+	//{
+	//	for (TActorIterator<APlayerCharacter> It(GetWorld()); It; ++It)
+	//	{
+	//		APlayerCharacter* PC = *It;
+	//		if (PC)
+	//		{
+	//			FInt32Vector2 startPos = m_Data.m_StartRoom.GetRoomCenter();
+	//			PC->SetActorLocation(FVector((float)startPos.X * m_UnitSize, (float)startPos.Y * m_UnitSize, 100.0f));
+	//			PC->SetActorRotation(FRotator::ZeroRotator);
+	//			UE_LOG(LogTemp, Log, TEXT("PlayerCharacter (Iterator) auf Startraum gesetzt."));
+	//			//break;
+	//		}
+	//	}
+	//}
+	AMultiplayerGameState* gs = GetWorld()->GetGameState<AMultiplayerGameState>();
 
-	for (TActorIterator<APlayerCharacter> It(GetWorld()); It; ++It)
+	if (!gs)
 	{
-		APlayerCharacter* PC = *It;
-		if (PC)
-		{
-			FInt32Vector2 startPos = m_Data.m_StartRoom.GetRoomCenter();
-			PC->SetActorLocation(FVector((float)startPos.X * m_UnitSize, (float)startPos.Y * m_UnitSize, 100.0f));
-			PC->SetActorRotation(FRotator::ZeroRotator);
-			UE_LOG(LogTemp, Log, TEXT("PlayerCharacter (Iterator) auf Startraum gesetzt."));
-			break;
-		}
+		return;
 	}
+
+	if (gs->m_overworldSeed != 0)
+	{
+		HandleSeedReady(gs->m_overworldSeed);
+	}
+	else
+	{
+		gs->OnOverworldSeedReady.AddDynamic(this, &ADungeonGen::HandleSeedReady);
+	}
+}
+
+void ADungeonGen::HandleSeedReady(int32 a_seed)
+{
+	if (m_dungeonGenerated)
+	{
+		return;
+	}
+
+	m_dungeonGenerated = true;
+
+	BeginGenerateDungeon(a_seed);
 }
 
 // Called every frame
@@ -54,6 +87,45 @@ void ADungeonGen::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
+
+void ADungeonGen::BeginGenerateDungeon(int32 a_seed)
+{
+	m_ThisLevel = GetLevel();
+	GenerateDungeon(a_seed);
+	if (HasAuthority())
+	{
+		int xoffset = -60;
+		int yoffset = -60;
+		int loopcount = 0;
+		for (TActorIterator<APlayerCharacter> It(GetWorld()); It; ++It)
+		{
+			APlayerCharacter* PC = *It;
+			if (PC)
+			{
+				FInt32Vector2 startPos = m_Data.m_StartRoom.GetRoomCenter();
+				PC->SetActorLocation(FVector((float)startPos.X * m_UnitSize + xoffset, (float)startPos.Y * m_UnitSize + yoffset, 100.0f));
+				PC->SetActorRotation(FRotator::ZeroRotator);
+				UE_LOG(LogTemp, Log, TEXT("PlayerCharacter (Iterator) auf Startraum gesetzt."));
+				loopcount++;
+				switch (loopcount)
+				{
+				case 1:
+					xoffset = 0;
+					break;
+				case 2:
+					yoffset = 0;
+					break;
+				case 3:
+					xoffset = 60;
+					break;
+				default:
+					break;
+				}
+			}
+		}
+	}
+}
+
 
 void ADungeonGen::GenerateRooms()
 {
@@ -133,10 +205,10 @@ void ADungeonGen::GenerateCorridors()
 	UDungeonGridUtils::ChangeCellsInGrid(affectedCells, ECellType::FLOOR, m_Data.m_DungeonGrid);
 }
 
-void ADungeonGen::GenerateDungeon()
+void ADungeonGen::GenerateDungeon(int32 a_seed)
 {
-	m_Seed = FMath::Rand();
-	m_DungeonRng.Initialize(m_Seed);
+	//m_Seed = FMath::Rand();
+	m_DungeonRng.Initialize(a_seed);
 	m_Data = { m_MaxRoomAmount, m_GridLength, m_GridWidth };
 	GenerateRooms();
 	GenerateCorridors();
@@ -165,9 +237,15 @@ void ADungeonGen::GenerateDungeon()
 	m_Builder->BuildDecorationObjects();
 	m_Builder->SpawnBossEnemyRandom();
 	m_Builder->BuildBossRoom();
-	m_Builder->GenerateEnemies();
+	if (HasAuthority())
+	{
+		m_Builder->GenerateEnemies();
+	}
 	m_Builder->BuildTorches();
-	BuildNavMeshForDungeon();
+	if (HasAuthority())
+	{
+		BuildNavMeshForDungeon();
+	}
 	ULoadingScreenManager::Get(GetWorld())->EndLoading();
 }
 

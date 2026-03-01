@@ -68,4 +68,3 @@ void ADungeonEntrancePortal::SetDungeonAsCleared()
 	m_dungeonCleared = true;
 	SetPortalClearColor();
 }
-

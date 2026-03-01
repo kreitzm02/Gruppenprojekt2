@@ -2,6 +2,8 @@
 
 
 #include "OverworldGeneration.h"
+
+#include "MultiplayerGameState.h"
 #include "Engine/StaticMeshActor.h"
 #include "NavigationSystem.h"
 #include "Kismet/GameplayStatics.h"
@@ -11,6 +13,8 @@ AOverworldGeneration::AOverworldGeneration()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
+
+    m_worldGenerated = false;
 }
 
 // Called when the game starts or when spawned
@@ -18,14 +22,48 @@ void AOverworldGeneration::BeginPlay()
 {
 	Super::BeginPlay();
 
+    AMultiplayerGameState* gs = GetWorld()->GetGameState<AMultiplayerGameState>();
+
+    if (!gs)
+    {
+	    return;
+    }
+
+    if (gs->m_overworldSeed != 0)
+    {
+	    HandleSeedReady(gs->m_overworldSeed);
+    }
+    else
+    {
+	    gs->OnOverworldSeedReady.AddDynamic(this, &AOverworldGeneration::HandleSeedReady);
+    }
+}
+
+void AOverworldGeneration::HandleSeedReady(int32 a_seed)
+{
+	if (m_worldGenerated)
+	{
+		return;
+	}
+
+    m_worldGenerated = true;
+
+    GenerateWorld(a_seed);
+}
+
+
+void AOverworldGeneration::GenerateWorld(int32 a_seed)
+{
+    UE_LOG(LogTemp, Warning, TEXT("Generating World with Seed: %d on %s"), a_seed, HasAuthority() ? TEXT("Host") : TEXT("Client"));
+
     m_chunkManager = Cast<ACustomChunkManager>(UGameplayStatics::GetActorOfClass(GetWorld(),ACustomChunkManager::StaticClass()));
 
-    if (m_seed == 0)
-    {
-        m_seed = FMath::Rand();
-        UE_LOG(LogTemp, Log, TEXT("Random Seed: %d"), m_seed);
-    }
-    m_randomNumber.Initialize(m_seed);
+    //if (m_seed == 0)
+    //{
+    //    m_seed = FMath::Rand();
+    //    UE_LOG(LogTemp, Log, TEXT("Random Seed: %d"), m_seed);
+    //}
+    m_randomNumber.Initialize(a_seed);
 
     InitializeTMap();
 
@@ -364,22 +402,25 @@ void AOverworldGeneration::BeginPlay()
 	}
 
     //enemiesSpawn
-    for (int i = m_emptyTiles.Num() - 1; i >= 0; i--)
+    if (HasAuthority())
     {
-        int enemyDensityRandom = m_randomNumber.RandRange(1, 100);
-        FVector position = m_emptyTiles[i];
-        float currentDistToSpawn = FVector::Dist(TilePosition(position.X, position.Y) + m_worldOffsetVector, FVector::ZeroVector + m_worldOffsetVector);
-
-        //UE_LOG(LogTemp,Error, TEXT("currentDistance: %f"), currentDistToSpawn)
-
-        if (currentDistToSpawn >= m_enemyFreeRangeFromSpawn)
+        for (int i = m_emptyTiles.Num() - 1; i >= 0; i--)
         {
-            if (enemyDensityRandom <= m_enemyDensity)
-            {
-                AEnemyCharacter* enemy;
-                enemy = Cast<AEnemyCharacter>(m_chunkManager->SpawnActorInChunk(m_possibleEnemies[m_randomNumber.RandRange(0, m_possibleEnemies.Num() - 1)], TilePosition(position.X, position.Y) + m_worldOffsetVector, FRotator::ZeroRotator, FActorSpawnParameters()));
+            int enemyDensityRandom = m_randomNumber.RandRange(1, 100);
+            FVector position = m_emptyTiles[i];
+            float currentDistToSpawn = FVector::Dist(TilePosition(position.X, position.Y) + m_worldOffsetVector, FVector::ZeroVector + m_worldOffsetVector);
 
-                m_emptyTiles.RemoveAt(i);
+            //UE_LOG(LogTemp,Error, TEXT("currentDistance: %f"), currentDistToSpawn)
+
+            if (currentDistToSpawn >= m_enemyFreeRangeFromSpawn)
+            {
+                if (enemyDensityRandom <= m_enemyDensity)
+                {
+                    AEnemyCharacter* enemy;
+                    enemy = Cast<AEnemyCharacter>(m_chunkManager->SpawnActorInChunk(m_possibleEnemies[m_randomNumber.RandRange(0, m_possibleEnemies.Num() - 1)], TilePosition(position.X, position.Y) + m_worldOffsetVector, FRotator::ZeroRotator, FActorSpawnParameters()));
+
+                    m_emptyTiles.RemoveAt(i);
+                }
             }
         }
     }

@@ -6,7 +6,9 @@
 #include "LoadingScreenManager.h"
 #include <Player/PlayerCharacter.h>
 
+#include "Gamemode_Standart.h"
 #include "Game_GameInstance.h"
+#include "TestGM.h"
 
 // Sets default values
 AMainHubPortal::AMainHubPortal()
@@ -54,7 +56,20 @@ void AMainHubPortal::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor*
     if (APlayerCharacter* Player = Cast<APlayerCharacter>(OtherActor))
     {
         ULoadingScreenManager::Get(Player->GetWorld())->StartLoading(Player->GetWorld());
-        UGameplayStatics::OpenLevel(this, "temp");
+
+    	//UGameplayStatics::OpenLevel(this, "temp");
+
+        //AGamemode_Standart* gm = GetWorld()->GetAuthGameMode<AGamemode_Standart>();
+        //gm->LoadNewMap("/Game/temp?listen");
+
+        if (HasAuthority())
+        {
+	        DoServerTravel();
+        }
+        else
+        {
+	        RequestServerTravel(Cast<APlayerController>(Player->GetController()));
+        }
 
         //bool temp;
         //NewLevel = ULevelStreamingDynamic::LoadLevelInstance(this, "temp", FVector::ZeroVector, FRotator::ZeroRotator,  temp);
@@ -71,6 +86,33 @@ void AMainHubPortal::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor*
         gameInstance->SetIsInLevel(true);
     }
 }
+
+void AMainHubPortal::RequestServerTravel_Implementation(APlayerController* a_pc)
+{
+	DoServerTravel();
+}
+
+void AMainHubPortal::DoServerTravel()
+{
+	if (!HasAuthority())
+	{
+		return;
+	}
+    if (m_travelInProgress)
+    {
+	    return;
+    }
+    m_travelInProgress = true;
+    if (UWorld* world = GetWorld())
+    {
+        Cast<UGame_GameInstance>(GetGameInstance())->SetOverworldSeed();
+        const ENetMode NetMode = GetNetMode();
+        UE_LOG(LogTemp, Warning, TEXT("TRAVEL: NetMode=%d (0=Standalone,1=Dedicated,2=Listen,3=Client) HasAuthority=%d"),
+            (int32)NetMode, HasAuthority() ? 1 : 0);
+	    world->ServerTravel("/Game/temp?listen", true);
+    }
+}
+
 
 void AMainHubPortal::Load()
 {

@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/GameModeBase.h"
+#include "GameFramework/GameMode.h"
 #include "TestGM.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class ATestGM : public AGameModeBase
+class ATestGM : public AGameMode
 {
 	GENERATED_BODY()
 public:
@@ -18,4 +18,8 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "GameMode")
 	TSubclassOf<APawn> m_PlayerPawnBPClass;
+
+
+protected:
+	virtual void BeginPlay() override;
 };
