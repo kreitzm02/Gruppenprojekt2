@@ -35,6 +35,15 @@ APlayerCharacter::APlayerCharacter()
 	SetupAbilityComp();
 	SetupMeleeHitbox();
 	SetupAudioComp();
+
+	bReplicates = true;
+	SetReplicateMovement(true);
+}
+
+void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(APlayerCharacter, m_CurrentPlayerClass);
 }
 
 // Called when the game starts or when spawned
@@ -311,20 +320,29 @@ void APlayerCharacter::ChangeToAbilitySlot3()
 
 void APlayerCharacter::ChangeToPlayerClassA()
 {
-	m_CurrentPlayerClass = 0;
-	SetupChangedPlayerClass();
+	//m_CurrentPlayerClass = 0;
+	//SetupChangedPlayerClass();
+
+	if (HasAuthority()) ApplyPlayerClass(0);
+	else ServerSetPlayerClass(0);
 }
 
 void APlayerCharacter::ChangeToPlayerClassB()
 {
-	m_CurrentPlayerClass = 1;
-	SetupChangedPlayerClass();
+	//m_CurrentPlayerClass = 1;
+	//SetupChangedPlayerClass();
+
+	if (HasAuthority()) ApplyPlayerClass(1);
+	else ServerSetPlayerClass(1);
 }
 
 void APlayerCharacter::ChangeToPlayerClassC()
 {
-	m_CurrentPlayerClass = 2;
-	SetupChangedPlayerClass();
+	//m_CurrentPlayerClass = 2;
+	//SetupChangedPlayerClass();
+
+	if (HasAuthority()) ApplyPlayerClass(2);
+	else ServerSetPlayerClass(2);
 }
 
 void APlayerCharacter::ChangeToPlayerClassD()
@@ -1161,6 +1179,24 @@ bool APlayerCharacter::CheckIfCurrentPlayerClassIsValid()
 {
 	if (m_PlayerCharDataAssets.Num() > m_CurrentPlayerClass && m_CurrentPlayerClass >= 0) return true;
 	else return false;
+}
+
+void APlayerCharacter::OnRep_PlayerClass()
+{
+	ApplyPlayerClass(m_CurrentPlayerClass);
+}
+
+void APlayerCharacter::ServerSetPlayerClass_Implementation(int32 a_NewClass)
+{
+	ApplyPlayerClass(a_NewClass);
+}
+
+void APlayerCharacter::ApplyPlayerClass(int32 a_NewClass)
+{
+	if (a_NewClass < 0 || a_NewClass >= m_PlayerCharDataAssets.Num()) return;
+
+	m_CurrentPlayerClass = a_NewClass;
+	SetupChangedPlayerClass();
 }
 
 // PLAYER STATS

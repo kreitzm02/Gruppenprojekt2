@@ -13,6 +13,7 @@
 #include <WLvlUpAbilitySelect.h>
 #include "WLvlUpAbilityReplace.h"
 #include <Widget_PauseMenu.h>
+#include "Net/UnrealNetwork.h"
 
 #include "NiagaraSystem.h"
 #include "PlayerCharacter.generated.h"
@@ -25,6 +26,9 @@ class APlayerCharacter : public ACharacter
 public:
 	// Sets default values for this character's properties
 	APlayerCharacter();
+
+	// multiplayer get properties from another player
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:
 	// Called when the game starts or when spawned
@@ -119,6 +123,19 @@ public:
 
 private:
 
+	// new mp / server stuff
+	UPROPERTY(ReplicatedUsing=OnRep_PlayerClass)
+	int32 m_CurrentPlayerClass = 0;
+
+	UFUNCTION()
+	void OnRep_PlayerClass();
+
+	UFUNCTION(Server, Reliable)
+	void ServerSetPlayerClass(int32 a_NewClass);
+	void ApplyPlayerClass(int32 a_NewClass);
+
+	//
+
 	void UpdateHealthBar();
 	void UpdateStaminabar();
 	void UpdatePlayerSpeed();
@@ -155,8 +172,6 @@ private:
 	int32 m_AbilityNum = 0;
 
 	int32 m_CurrentAbilitySlot = 0;
-
-	int32 m_CurrentPlayerClass = 0;
 
 	bool m_IsPlayerAlive = true;
 
