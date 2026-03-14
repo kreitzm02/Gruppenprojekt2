@@ -34,6 +34,8 @@ void UFSM_ChasePlayer::OnEnter()
 
 	ACharacter* character = Cast<ACharacter>(m_ownerCharacter);
 	character->GetCharacterMovement()->MaxWalkSpeed = m_walkSpeed;
+	
+	m_target = Cast<AEnemyCharacter>(m_ownerCharacter)->GetCurrentTarget();
 }
 
 void UFSM_ChasePlayer::OnUpdate(float a_deltaTime)
@@ -42,56 +44,40 @@ void UFSM_ChasePlayer::OnUpdate(float a_deltaTime)
 
 	if (!m_ownerCharacter) return;
 
+	if (m_target == nullptr)
+	{
+		m_target = Cast<AEnemyCharacter>(m_ownerCharacter)->GetCurrentTarget();
+	}
+	
+	if (m_target == nullptr)
+	{
+		return;
+	}
+	
 	if (m_ownerCharacter == nullptr)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Player Chase has no Owner Pawn!"))
 	}
 	else
 	{
-		TArray<FOverlapResult> overlaps;
-		FCollisionQueryParams queryParams;
-		queryParams.AddIgnoredActor(m_ownerCharacter);
-
-		FCollisionObjectQueryParams objectQueryParams;
-		objectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel1);
-
-		bool hasOverlap = m_ownerCharacter->GetWorld()->OverlapMultiByObjectType(
-			overlaps,
-			m_ownerCharacter->GetActorLocation(),
-			FQuat::Identity,
-			objectQueryParams,
-			FCollisionShape::MakeSphere(m_chaseRange),
-			queryParams
-		);
-		for(FOverlapResult& overlap : overlaps)
+		AAIController* aiController = Cast<AAIController>(m_ownerCharacter->GetController());
+		if (aiController)
 		{
-			AActor* actor = overlap.GetActor();
-			if (actor && actor->IsA(ACharacter::StaticClass()))
+			UNavigationSystemV1* navSystem = UNavigationSystemV1::GetCurrent(m_ownerCharacter->GetWorld());
+			if (navSystem)
 			{
-				ACharacter* player = Cast<ACharacter>(actor);
-				if (player)
+				FNavLocation navLocation;
+				if (navSystem->GetRandomPointInNavigableRadius(m_target->GetActorLocation(), 1.0f, navLocation))
 				{
-					AAIController* aiController = Cast<AAIController>(m_ownerCharacter->GetController());
-					if (aiController)
-					{
-						UNavigationSystemV1* navSystem = UNavigationSystemV1::GetCurrent(m_ownerCharacter->GetWorld());
-						if (navSystem)
-						{
-							FNavLocation navLocation;
-							if (navSystem->GetRandomPointInNavigableRadius(player->GetActorLocation(), 1.0f, navLocation))
-							{
-								aiController->MoveToLocation(navLocation.Location);
-							}
-						}
-					}
+					aiController->MoveToLocation(navLocation.Location);
 				}
 			}
 		}
 	}
-
 }
 
 void UFSM_ChasePlayer::OnExit()
 {
     Super::OnExit();
+	m_target = nullptr;
 }

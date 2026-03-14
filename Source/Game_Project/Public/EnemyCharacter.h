@@ -56,6 +56,10 @@ public:
 
 	UBoxComponent* GetWeaponHitbox() { return m_weaponHitbox; }
 
+	ACharacter* GetCurrentTarget() { return m_currentTarget; }
+	
+	void SetCurrentTarget(ACharacter* a_target) { m_currentTarget = a_target; }
+	
 	float GetPlayerDetectionRadius() { return m_playerDetectionRadius; }
 
 	float GetPlayerChaseRadius() { return m_playerChaseRadius; }
@@ -89,6 +93,11 @@ public:
 
 	void SetKnockback(float a_knockback) { m_knockback = a_knockback; }
 protected:
+	UFUNCTION()
+	void OnRep_Health();
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	void UpdateHealthBar();
 
 	virtual void OnDeath();
@@ -106,7 +115,10 @@ protected:
 	FTimerHandle m_invulnarabilityTimerHandle;
 
 	bool m_isInvulnerable = false;
-
+	
+	UPROPERTY()
+	ACharacter* m_currentTarget = nullptr;
+	
 	UPROPERTY()
 	UGame_GameInstance* m_gameInstance;
 
@@ -187,6 +199,7 @@ protected:
 	UPROPERTY()
 	UWidget_EnemyHealthBar* m_widgetHealthBar = nullptr;
 
+	UPROPERTY(Replicated, ReplicatedUsing = OnRep_Health, BlueprintReadOnly)
 	float m_currentHealth;
 
 	float m_attackDuration = 0.0f;

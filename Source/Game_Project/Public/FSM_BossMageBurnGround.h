@@ -29,7 +29,7 @@ private:
 	UAnimSequence* m_castBurnGroundAnimation = nullptr;
 
 	UPROPERTY()
-	ACharacter* m_player = nullptr;
+	ACharacter* m_target = nullptr;
 
 	UPROPERTY()
 	ABossEnemy_Mage* m_owner;

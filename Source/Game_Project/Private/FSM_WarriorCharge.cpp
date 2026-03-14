@@ -35,31 +35,7 @@ void UFSM_WarriorCharge::OnEnter()
 	}
 	else
 	{
-		TArray<FOverlapResult> overlaps;
-		FCollisionQueryParams queryParams;
-		queryParams.AddIgnoredActor(m_ownerCharacter);
-
-		FCollisionObjectQueryParams objectQueryParams;
-		objectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel1);
-
-		bool test = m_ownerCharacter->GetWorld()->OverlapMultiByObjectType(
-			overlaps,
-			m_ownerCharacter->GetActorLocation(),
-			FQuat::Identity,
-			objectQueryParams,
-			FCollisionShape::MakeSphere(m_chaseRange),
-			queryParams
-		);
-		for (FOverlapResult& overlap : overlaps)
-		{
-			AActor* actor = overlap.GetActor();
-			if (actor && actor->IsA(ACharacter::StaticClass()))
-			{
-				m_player = Cast<ACharacter>(actor);
-			}
-		}
-		ACharacter* character = Cast<ACharacter>(m_ownerCharacter);
-		character->GetCharacterMovement()->MaxWalkSpeed = m_chargeSpeed;
+		m_target = Cast<AEnemyCharacter>(m_ownerCharacter)->GetCurrentTarget();
 	}
 }
 
@@ -68,6 +44,16 @@ void UFSM_WarriorCharge::OnUpdate(float a_deltatime)
 	Super::OnUpdate(a_deltatime);
 
 	if (!m_ownerCharacter) return;
+	
+	if (m_target == nullptr)
+	{
+		m_target = Cast<AEnemyCharacter>(m_ownerCharacter)->GetCurrentTarget();
+	}
+	
+	if (m_target == nullptr)
+	{
+		return;
+	}
 
 	AAIController* aiController = Cast<AAIController>(m_ownerCharacter->GetController());
 	if (aiController)
@@ -76,7 +62,7 @@ void UFSM_WarriorCharge::OnUpdate(float a_deltatime)
 		if (navSystem)
 		{
 			FNavLocation navLocation;
-			if (navSystem->GetRandomPointInNavigableRadius(m_player->GetActorLocation(), 1.0f, navLocation))
+			if (navSystem->GetRandomPointInNavigableRadius(m_target->GetActorLocation(), 1.0f, navLocation))
 			{
 				aiController->MoveToLocation(navLocation.Location);
 			}
@@ -87,7 +73,9 @@ void UFSM_WarriorCharge::OnUpdate(float a_deltatime)
 void UFSM_WarriorCharge::OnExit()
 {
 	Super::OnExit();
-
+	
+	m_target = nullptr;
+	
 	if (!m_ownerCharacter) return;
 
 	AEnemy_Warrior* enemy = Cast<AEnemy_Warrior>(m_ownerCharacter);

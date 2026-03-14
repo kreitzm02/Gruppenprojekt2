@@ -33,5 +33,8 @@ private:
 	UPROPERTY()
 	float m_chaseRange = 0.0f;
 
+	UPROPERTY()
+	ACharacter* m_target;
+	
 	FVector m_targetLocation;
 };

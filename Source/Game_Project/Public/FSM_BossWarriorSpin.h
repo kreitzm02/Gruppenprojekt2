@@ -29,7 +29,7 @@ private:
 	UAnimSequence* m_chargeAnimation;
 
 	UPROPERTY()
-	ACharacter* m_player = nullptr;
+	ACharacter* m_target = nullptr;
 
 	UPROPERTY()
 	ABossEnemy_Warrior* m_owner = nullptr;

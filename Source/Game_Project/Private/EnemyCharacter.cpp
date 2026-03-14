@@ -11,12 +11,16 @@
 #include "CustomChunkSystem/CustomChunkManager.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 AEnemyCharacter::AEnemyCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	bReplicates = true;
+	SetReplicateMovement(true);
 
 	m_skeletalMesh = GetMesh();
 
@@ -160,24 +164,44 @@ void AEnemyCharacter::UpdateHealthBar()
 	m_widgetHealthBar->SetHealthPercent(healthPercent);
 }
 
-
-float AEnemyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+void AEnemyCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
-	if (!m_isInvulnerable)
-	{
-		m_currentHealth = FMath::Clamp(m_currentHealth - DamageAmount, 0.0f, m_maxHealth);
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AEnemyCharacter, m_currentHealth);
+}
 
-		UpdateHealthBar();
-
-		m_receivingActionSoundComp->Sound = m_hitSound;
-		m_receivingActionSoundComp->Play(0.0f);
-
-		GetWorld()->GetTimerManager().SetTimer(m_invulnarabilityTimerHandle, this, &AEnemyCharacter::MakeThisVulnerable, m_invulnerableTime, false);
-	}
-
+void AEnemyCharacter::OnRep_Health()
+{
+	UpdateHealthBar();
 	if (m_currentHealth <= 0.0f && !m_isDead)
 	{
 		OnDeath();
+	}
+}
+
+
+float AEnemyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	if (HasAuthority())
+	{
+		if (!m_isInvulnerable)
+		{
+			m_currentHealth = FMath::Clamp(m_currentHealth - DamageAmount, 0.0f, m_maxHealth);
+
+			OnRep_Health();
+
+			UpdateHealthBar();
+
+			m_receivingActionSoundComp->Sound = m_hitSound;
+			m_receivingActionSoundComp->Play(0.0f);
+
+			GetWorld()->GetTimerManager().SetTimer(m_invulnarabilityTimerHandle, this, &AEnemyCharacter::MakeThisVulnerable, m_invulnerableTime, false);
+		}
+
+		if (m_currentHealth <= 0.0f && !m_isDead)
+		{
+			OnDeath();
+		}
 	}
 
 	return DamageAmount;

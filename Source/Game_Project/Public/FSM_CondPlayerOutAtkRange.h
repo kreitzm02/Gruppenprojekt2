@@ -20,6 +20,9 @@ public:
 	bool IsConditionMet(float a_deltaTime) override;
 
 private:
+	//void SetTarget(ACharacter* a_target);
+	//void SearchNearestPlayer();
+	
 	UPROPERTY(EditAnywhere, Category = "Debug")
 	bool m_enableDebug = true;
 
@@ -34,4 +37,7 @@ private:
 	float m_attackDuration = 0.0f;
 
 	float m_passedTime = 0.0f;
+	
+	UPROPERTY()
+	ACharacter* m_target;
 };

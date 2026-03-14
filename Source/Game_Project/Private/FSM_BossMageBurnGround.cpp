@@ -34,29 +34,7 @@ void UFSM_BossMageBurnGround::OnEnter()
 	}
 	else
 	{
-		TArray<FOverlapResult> overlaps;
-		FCollisionQueryParams queryParams;
-		queryParams.AddIgnoredActor(m_ownerCharacter);
-
-		FCollisionObjectQueryParams objectQueryParams;
-		objectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel1);
-
-		bool hasOverlap = m_ownerCharacter->GetWorld()->OverlapMultiByObjectType(
-			overlaps,
-			m_ownerCharacter->GetActorLocation(),
-			FQuat::Identity,
-			objectQueryParams,
-			FCollisionShape::MakeSphere(m_detectionRange),
-			queryParams
-		);
-		for (FOverlapResult& overlap : overlaps)
-		{
-			AActor* actor = overlap.GetActor();
-			if (actor && actor->IsA(ACharacter::StaticClass()))
-			{
-				m_player = Cast<ACharacter>(actor);
-			}
-		}
+		m_target = Cast<AEnemyCharacter>(m_ownerCharacter)->GetCurrentTarget();
 	}
 
 	m_currentMultiplier = m_owner->GetMultiplier();
@@ -78,6 +56,16 @@ void UFSM_BossMageBurnGround::OnUpdate(float a_deltaTime)
 	Super::OnUpdate(a_deltaTime);
 
 	if (!m_owner) return;
+	
+	if (m_target == nullptr)
+	{
+		m_target = Cast<AEnemyCharacter>(m_ownerCharacter)->GetCurrentTarget();
+	}
+	
+	if (m_target == nullptr)
+	{
+		return;
+	}
 
 	m_passedTime += a_deltaTime * m_currentMultiplier;
 
@@ -85,7 +73,7 @@ void UFSM_BossMageBurnGround::OnUpdate(float a_deltaTime)
 	{
 		//fire burn ground
 		m_owner->PlayCastBurnGroundSound(false);
-		m_owner->FireBurnGround(m_player);
+		m_owner->FireBurnGround(m_target);
 
 		m_burnGroundFired = true;
 	}
@@ -110,6 +98,8 @@ void UFSM_BossMageBurnGround::OnUpdate(float a_deltaTime)
 void UFSM_BossMageBurnGround::OnExit()
 {
 	Super::OnExit();
+
+	m_target = nullptr;
 
 	if (!m_owner) return;
 

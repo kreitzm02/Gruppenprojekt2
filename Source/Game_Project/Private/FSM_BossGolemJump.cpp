@@ -31,29 +31,7 @@ void UFSM_BossGolemJump::OnEnter()
 		}
 		else
 		{
-			TArray<FOverlapResult> overlaps;
-			FCollisionQueryParams queryParams;
-			queryParams.AddIgnoredActor(m_ownerCharacter);
-
-			FCollisionObjectQueryParams objectQueryParams;
-			objectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel1);
-
-			bool hasOverlap = m_ownerCharacter->GetWorld()->OverlapMultiByObjectType(
-				overlaps,
-				m_ownerCharacter->GetActorLocation(),
-				FQuat::Identity,
-				objectQueryParams,
-				FCollisionShape::MakeSphere(m_detectionRange),
-				queryParams
-			);
-			for (FOverlapResult& overlap : overlaps)
-			{
-				AActor* actor = overlap.GetActor();
-				if (actor && actor->IsA(ACharacter::StaticClass()))
-				{
-					m_player = Cast<ACharacter>(actor);
-				}
-			}
+			m_target = Cast<AEnemyCharacter>(m_ownerCharacter)->GetCurrentTarget();
 		}
 
 		m_currentMultiplier = m_owner->GetMultiplier();
@@ -69,13 +47,13 @@ void UFSM_BossGolemJump::OnEnter()
 
 		m_jumpStartLocation = m_owner->GetActorLocation();
 
-		m_jumpToLocation = m_player->GetActorLocation();
+		m_jumpToLocation = m_target->GetActorLocation();
 
 		m_ellapsedTime = 0.0f;
 
 		m_owner->PlayJumpSound(false);
 
-		m_owner->SetActorRotation((m_player->GetActorLocation() - m_owner->GetActorLocation()).Rotation());
+		m_owner->SetActorRotation((m_target->GetActorLocation() - m_owner->GetActorLocation()).Rotation());
 	}
 }
 
@@ -84,6 +62,16 @@ void UFSM_BossGolemJump::OnUpdate(float a_deltatime)
 	Super::OnUpdate(a_deltatime);
 	if (m_owner)
 	{
+		if (m_target == nullptr)
+		{
+			m_target = Cast<AEnemyCharacter>(m_ownerCharacter)->GetCurrentTarget();
+		}
+	
+		if (m_target == nullptr)
+		{
+			return;
+		}
+		
 		if (m_isJumping)
 		{
 			m_ellapsedTime += a_deltatime * m_currentMultiplier;
@@ -114,7 +102,7 @@ void UFSM_BossGolemJump::OnUpdate(float a_deltatime)
 		{
 			m_jumpStartLocation = m_owner->GetActorLocation();
 
-			m_jumpToLocation = m_player->GetActorLocation();
+			m_jumpToLocation = m_target->GetActorLocation();
 
 			m_isJumping = true;
 
@@ -122,7 +110,7 @@ void UFSM_BossGolemJump::OnUpdate(float a_deltatime)
 
 			m_owner->PlayJumpSound(false);
 
-			m_owner->SetActorRotation((m_player->GetActorLocation() - m_owner->GetActorLocation()).Rotation());
+			m_owner->SetActorRotation((m_target->GetActorLocation() - m_owner->GetActorLocation()).Rotation());
 		}
 	}
 
@@ -131,6 +119,9 @@ void UFSM_BossGolemJump::OnUpdate(float a_deltatime)
 void UFSM_BossGolemJump::OnExit()
 {
 	Super::OnExit();
+	
+	m_target = nullptr;
+	
 	if (m_owner)
 	{
 		m_owner->ResetUsedJump();
