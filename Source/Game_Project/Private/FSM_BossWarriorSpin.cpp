@@ -55,7 +55,7 @@ void UFSM_BossWarriorSpin::OnEnter()
 			AActor* actor = overlap.GetActor();
 			if (actor && actor->IsA(ACharacter::StaticClass()))
 			{
-				m_player = Cast<ACharacter>(actor);
+				m_target = Cast<ACharacter>(actor);
 			}
 		}
 
@@ -64,7 +64,7 @@ void UFSM_BossWarriorSpin::OnEnter()
 		m_owner->GetCharacterMovement()->BrakingDecelerationWalking = 10000;
 	}
 
-	m_spinDirectionNormal = (m_player->GetActorLocation() - m_ownerCharacter->GetActorLocation()).GetSafeNormal();
+	m_spinDirectionNormal = (m_target->GetActorLocation() - m_ownerCharacter->GetActorLocation()).GetSafeNormal();
 
 	m_owner->PlaySpinAttackSound(true);
 }
@@ -83,7 +83,7 @@ void UFSM_BossWarriorSpin::OnUpdate(float a_deltatime)
 
 	FCollisionQueryParams traceParams;
 	traceParams.AddIgnoredActor(m_ownerCharacter);
-	traceParams.AddIgnoredActor(m_player);
+	traceParams.AddIgnoredActor(m_target);
 
 	bool hit = m_ownerCharacter->GetWorld()->LineTraceSingleByChannel(
 		hitResult,

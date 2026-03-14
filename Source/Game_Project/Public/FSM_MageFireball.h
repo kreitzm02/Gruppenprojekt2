@@ -41,7 +41,7 @@ private:
 	int m_castingLoopsUntilFireball = 1;
 
 	UPROPERTY()
-	AActor* m_player = nullptr;
+	AActor* m_target = nullptr;
 
 	bool m_fireballFired = false;
 

@@ -35,29 +35,7 @@ void UFSM_BossWarriorCharge::OnEnter()
 	}
 	else
 	{
-		TArray<FOverlapResult> overlaps;
-		FCollisionQueryParams queryParams;
-		queryParams.AddIgnoredActor(m_ownerCharacter);
-
-		FCollisionObjectQueryParams objectQueryParams;
-		objectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel1);
-
-		bool hasOverlap = m_ownerCharacter->GetWorld()->OverlapMultiByObjectType(
-			overlaps,
-			m_ownerCharacter->GetActorLocation(),
-			FQuat::Identity,
-			objectQueryParams,
-			FCollisionShape::MakeSphere(m_detectionRange),
-			queryParams
-		);
-		for (FOverlapResult& overlap : overlaps)
-		{
-			AActor* actor = overlap.GetActor();
-			if (actor && actor->IsA(ACharacter::StaticClass()))
-			{
-				m_player = Cast<ACharacter>(actor);
-			}
-		}
+		m_target = Cast<AEnemyCharacter>(m_ownerCharacter)->GetCurrentTarget();
 		
 		m_owner->GetCharacterMovement()->MaxWalkSpeed = m_chargeSpeed * m_owner->GetMultiplier();
 		m_owner->GetCharacterMovement()->MaxAcceleration = 10000;
@@ -75,6 +53,16 @@ void UFSM_BossWarriorCharge::OnUpdate(float a_deltatime)
 
 	if (!m_owner) return;
 
+	if (m_target == nullptr)
+	{
+		m_target = Cast<AEnemyCharacter>(m_ownerCharacter)->GetCurrentTarget();
+	}
+	
+	if (m_target == nullptr)
+	{
+		return;
+	}
+	
 	if(m_isCharging)
 	{
 		m_ownerCharacter->AddMovementInput(m_chargeDirectionNormal);
@@ -86,7 +74,7 @@ void UFSM_BossWarriorCharge::OnUpdate(float a_deltatime)
 
 		FCollisionQueryParams traceParams;
 		traceParams.AddIgnoredActor(m_ownerCharacter);
-		traceParams.AddIgnoredActor(m_player);
+		traceParams.AddIgnoredActor(m_target);
 
 		bool hit = m_ownerCharacter->GetWorld()->LineTraceSingleByChannel(
 			hitResult,
@@ -123,7 +111,7 @@ void UFSM_BossWarriorCharge::OnUpdate(float a_deltatime)
 
 		if (m_resetChargeDirection)
 		{
-			m_chargeDirectionNormal = (m_player->GetActorLocation() - m_ownerCharacter->GetActorLocation()).GetSafeNormal();
+			m_chargeDirectionNormal = (m_target->GetActorLocation() - m_ownerCharacter->GetActorLocation()).GetSafeNormal();
 
 			m_chargeDirectionNormal.Z = 0.0f;
 			m_owner->SetActorRotation(m_chargeDirectionNormal.Rotation());
@@ -148,6 +136,8 @@ void UFSM_BossWarriorCharge::OnExit()
 {
 	Super::OnExit();
 
+	m_target = nullptr;
+	
 	if (!m_owner) return;
 
 	m_owner->SetChargeReady(false);

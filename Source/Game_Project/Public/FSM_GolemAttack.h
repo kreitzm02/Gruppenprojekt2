@@ -32,7 +32,7 @@ private:
 	AEnemy_Golem* m_thisEnemy;
 
 	UPROPERTY()
-	AActor* m_player = nullptr;
+	AActor* m_target = nullptr;
 
 	float m_passedTime = 0.0f;
 

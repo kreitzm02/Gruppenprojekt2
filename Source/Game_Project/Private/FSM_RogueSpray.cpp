@@ -38,27 +38,7 @@ void UFSM_RogueSpray::OnEnter()
 	}
 	else
 	{
-
-		TArray<FOverlapResult> overlaps;
-		FCollisionQueryParams queryParams;
-		queryParams.AddIgnoredActor(m_ownerCharacter);
-
-		FCollisionObjectQueryParams objectQueryParams;
-		objectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel1);
-
-		bool test = m_ownerCharacter->GetWorld()->OverlapMultiByObjectType(
-			overlaps,
-			m_ownerCharacter->GetActorLocation(),
-			FQuat::Identity,
-			objectQueryParams,
-			FCollisionShape::MakeSphere(m_thisEnemy->GetPlayerChaseRadius()),
-			queryParams
-		);
-		for (FOverlapResult& overlap : overlaps)
-		{
-			m_player = overlap.GetActor();
-			break;
-		}
+		m_target = Cast<AEnemyCharacter>(m_ownerCharacter)->GetCurrentTarget();
 	}
 }
 
@@ -68,9 +48,19 @@ void UFSM_RogueSpray::OnUpdate(float a_deltaTime)
 
 	if (!m_thisEnemy) return;
 
-	if (m_player)
+	if (m_target == nullptr)
 	{
-		FVector playerDirection = m_player->GetActorLocation() - m_ownerCharacter->GetActorLocation();
+		m_target = Cast<AEnemyCharacter>(m_ownerCharacter)->GetCurrentTarget();
+	}
+	
+	if (m_target == nullptr)
+	{
+		return;
+	}
+	
+	if (m_target)
+	{
+		FVector playerDirection = m_target->GetActorLocation() - m_ownerCharacter->GetActorLocation();
 		playerDirection.Z = 0.0f;
 		m_ownerCharacter->SetActorRotation(playerDirection.Rotation());
 	}
@@ -89,7 +79,7 @@ void UFSM_RogueSpray::OnUpdate(float a_deltaTime)
 	if (!m_shotFired && m_passedTime >= m_shootAtAnimStartOffset)
 	{
 		m_thisEnemy->PlayBasicAttackSound(false);
-		m_thisEnemy->FireArrow(m_player);
+		m_thisEnemy->FireArrow(m_target);
 		m_shotFired = true;
 	}
 }
@@ -98,6 +88,8 @@ void UFSM_RogueSpray::OnExit()
 {
 	Super::OnExit();
 
+	m_target = nullptr;
+	
 	if (!m_thisEnemy) return;
 
 	m_thisEnemy->SetArrowSprayReady(false);

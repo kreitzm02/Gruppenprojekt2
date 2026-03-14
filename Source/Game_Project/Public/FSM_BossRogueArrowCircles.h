@@ -39,9 +39,6 @@ private:
 	float m_slowerMultiplier = 0.5f;
 
 	UPROPERTY()
-	AActor* m_player = nullptr;
-
-	UPROPERTY()
 	FVector m_spawnPoint = FVector::OneVector;
 
 	UPROPERTY()

@@ -28,7 +28,7 @@ private:
 	UAnimSequence* m_chargeAnimation;
 
 	UPROPERTY()
-	ACharacter* m_player = nullptr;
+	ACharacter* m_target = nullptr;
 
 	float m_chargeSpeed;
 

@@ -38,7 +38,7 @@ private:
 	float m_shootAtAnimStartOffset = 0.0f;
 
 	UPROPERTY()
-	AActor* m_player = nullptr;
+	AActor* m_target = nullptr;
 
 	bool m_shotFired = false;
 

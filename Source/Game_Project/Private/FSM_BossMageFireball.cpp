@@ -41,28 +41,7 @@ void UFSM_BossMageFireball::OnEnter()
 	}
 	else
 	{
-		ABossEnemy_Mage* thisEnemy = Cast<ABossEnemy_Mage>(m_ownerCharacter);
-
-		TArray<FOverlapResult> overlaps;
-		FCollisionQueryParams queryParams;
-		queryParams.AddIgnoredActor(m_ownerCharacter);
-
-		FCollisionObjectQueryParams objectQueryParams;
-		objectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel1);
-
-		bool test = m_ownerCharacter->GetWorld()->OverlapMultiByObjectType(
-			overlaps,
-			m_ownerCharacter->GetActorLocation(),
-			FQuat::Identity,
-			objectQueryParams,
-			FCollisionShape::MakeSphere(thisEnemy->GetPlayerChaseRadius()),
-			queryParams
-		);
-		for (FOverlapResult& overlap : overlaps)
-		{
-			m_player = overlap.GetActor();
-			break;
-		}
+		m_target = Cast<AEnemyCharacter>(m_ownerCharacter)->GetCurrentTarget();
 	}
 
 	m_ownerSkeletalMesh->PlayAnimation(m_castingAnimation, true);
@@ -73,8 +52,18 @@ void UFSM_BossMageFireball::OnUpdate(float a_deltaTime)
 	Super::OnUpdate(a_deltaTime);
 
 	if (!m_thisEnemy) return;
+	
+	if (m_target == nullptr)
+	{
+		m_target = Cast<AEnemyCharacter>(m_ownerCharacter)->GetCurrentTarget();
+	}
+	
+	if (m_target == nullptr)
+	{
+		return;
+	}
 
-	FVector playerDirection = m_player->GetActorLocation() - m_ownerCharacter->GetActorLocation();
+	FVector playerDirection = m_target->GetActorLocation() - m_ownerCharacter->GetActorLocation();
 	playerDirection.Z = 0.0f;
 	m_ownerCharacter->SetActorRotation(playerDirection.Rotation());
 
@@ -91,7 +80,7 @@ void UFSM_BossMageFireball::OnUpdate(float a_deltaTime)
 	if (!m_fireballFired && m_passedTime >= m_castDuration + m_shootAtAnimStartOffset)
 	{
 		m_thisEnemy->PlayCastFireballSound(false);
-		m_thisEnemy->FireFireball(m_player);
+		m_thisEnemy->FireFireball(m_target);
 		m_fireballFired = true;
 	}
 }
@@ -100,6 +89,8 @@ void UFSM_BossMageFireball::OnExit()
 {
 	Super::OnExit();
 
+	m_target = nullptr;
+	
 	if (!m_thisEnemy) return;
 
 	m_thisEnemy->StopOwnSound();

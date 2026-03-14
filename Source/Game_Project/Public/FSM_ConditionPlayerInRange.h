@@ -16,6 +16,9 @@ class GAME_PROJECT_API UFSM_ConditionPlayerInRange : public UFSM_BaseStateTransi
 	GENERATED_BODY()
 
 private:
+	void SetTarget(ACharacter* a_target);
+	void SearchNearestPlayer();
+	
 	UPROPERTY(EditAnywhere, Category = "Debug")
 	bool m_enableDebug = true;
 
@@ -27,7 +30,9 @@ private:
 
 	UPROPERTY()
 	float m_detectionRadius;
-
+	
+	UPROPERTY()
+	ACharacter* m_target = nullptr;
 
 
 public:

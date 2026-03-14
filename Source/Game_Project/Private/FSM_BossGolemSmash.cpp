@@ -28,29 +28,7 @@ void UFSM_BossGolemSmash::OnEnter()
 	}
 	else
 	{
-		TArray<FOverlapResult> overlaps;
-		FCollisionQueryParams queryParams;
-		queryParams.AddIgnoredActor(m_ownerCharacter);
-
-		FCollisionObjectQueryParams objectQueryParams;
-		objectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel1);
-
-		bool hasOverlap = m_ownerCharacter->GetWorld()->OverlapMultiByObjectType(
-			overlaps,
-			m_ownerCharacter->GetActorLocation(),
-			FQuat::Identity,
-			objectQueryParams,
-			FCollisionShape::MakeSphere(m_detectionRange),
-			queryParams
-		);
-		for (FOverlapResult& overlap : overlaps)
-		{
-			AActor* actor = overlap.GetActor();
-			if (actor && actor->IsA(ACharacter::StaticClass()))
-			{
-				m_player = Cast<ACharacter>(actor);
-			}
-		}
+		m_target = Cast<AEnemyCharacter>(m_ownerCharacter)->GetCurrentTarget();
 
 		m_currentMultiplier = m_owner->GetMultiplier();
 
@@ -74,11 +52,21 @@ void UFSM_BossGolemSmash::OnUpdate(float a_deltaTime)
 	Super::OnUpdate(a_deltaTime);
 	if (m_owner)
 	{
+		if (m_target == nullptr)
+		{
+			m_target = Cast<AEnemyCharacter>(m_ownerCharacter)->GetCurrentTarget();
+		}
+	
+		if (m_target == nullptr)
+		{
+			return;
+		}
+		
 		m_passedTime += a_deltaTime * m_currentMultiplier;
 
 		if (m_passedTime >= m_shockwaveAtAnimStartOffset && !m_shockwaveStarted)
 		{
-			m_owner->CreateSmashShockwaveWithBoulder(m_player);
+			m_owner->CreateSmashShockwaveWithBoulder(m_target);
 			m_shockwaveStarted = true;
 		}
 
@@ -105,6 +93,9 @@ void UFSM_BossGolemSmash::OnUpdate(float a_deltaTime)
 void UFSM_BossGolemSmash::OnExit()
 {
 	Super::OnExit();
+	
+	m_target = nullptr;
+	
 	if (m_owner)
 	{
 		m_owner->ResetUsedSmash();
